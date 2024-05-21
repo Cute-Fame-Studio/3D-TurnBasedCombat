@@ -13,3 +13,7 @@ config_version=5
 config/name="Turn-Based Combat"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
+
+[dotnet]
+
+project/assembly_name="Turn-Based Combat"

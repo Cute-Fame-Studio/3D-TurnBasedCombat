@@ -1,14 +1,14 @@
 extends Control
 
 var activePlayer
-var Fame = CharacterBody3D
+var character = CharacterBody3D
 var enemy
 var characters = []
 
 signal start_combat(enemyProperty)
 signal add_character(character)
 
-@export var combat = false
+@export var combat = true
 
 func _process(_delta):
 	if combat:
@@ -49,12 +49,12 @@ func _on_skills_pressed():
 
 
 func _on_defend_pressed():
-	pass # Replace with function body.
+	print("This cannot be used.")
 
 
 func _on_item_pressed():
-	pass # Replace with function body.
+	print("This cannot be used.")
 
 
 func _on_run_pressed():
-	pass # Replace with function body.
+	print("This cannot be used.")

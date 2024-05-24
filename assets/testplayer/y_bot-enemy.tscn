@@ -1,6 +1,7 @@
-[gd_scene load_steps=17 format=3 uid="uid://clmhyw21qciy4"]
+[gd_scene load_steps=19 format=3 uid="uid://clmhyw21qciy4"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_kfukl"]
+[ext_resource type="Script" path="res://battle-manager/enemycombat.gd" id="2_7wb1w"]
 
 [sub_resource type="Animation" id="Animation_pjn1p"]
 resource_name = "armature_stand"
@@ -18167,7 +18168,11 @@ _data = {
 "walk": SubResource("Animation_dl4t7")
 }
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_rsctr"]
+size = Vector3(1, 1.80408, 1)
+
 [node name="Enemy" instance=ExtResource("1_kfukl")]
+script = ExtResource("2_7wb1w")
 
 [node name="GeneralSkeleton" parent="Armature" index="0"]
 bones/0/position = Vector3(-1.60699e-05, 0.978864, 1.4695e-05)
@@ -18251,3 +18256,9 @@ libraries = {
 [node name="AnimationTree" type="AnimationTree" parent="AnimationPlayer" index="0"]
 root_node = NodePath("../..")
 anim_player = NodePath("..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.918676, 0)
+shape = SubResource("BoxShape3D_rsctr")
+
+[connection signal="damage" from="." to="." method="_on_damage"]

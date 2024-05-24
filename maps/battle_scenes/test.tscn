@@ -1,10 +1,8 @@
-[gd_scene load_steps=25 format=3 uid="uid://b56ncgnrwugct"]
+[gd_scene load_steps=23 format=3 uid="uid://b56ncgnrwugct"]
 
 [ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://assets/testplayer/y_bot-player.tscn" id="1_2aqym"]
 [ext_resource type="Script" path="res://battle-manager/battlemanager.gd" id="1_2kmw4"]
 [ext_resource type="PackedScene" uid="uid://clmhyw21qciy4" path="res://assets/testplayer/y_bot-enemy.tscn" id="2_a11mn"]
-[ext_resource type="Script" path="res://battle-manager/battlehud/activeplayer.gd" id="3_y6t0e"]
-[ext_resource type="Script" path="res://battle-manager/enemycombat.gd" id="5_fxpib"]
 [ext_resource type="PackedScene" uid="uid://cyjcaceen0235" path="res://battle-manager/battlehud/battlehud.tscn" id="6_bnngp"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1kyon"]
@@ -18203,7 +18201,6 @@ size = Vector3(100, 0.5, 100)
 
 [node name="Member0" parent="." instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.38419)
-script = ExtResource("3_y6t0e")
 
 [node name="AnimationPlayer" parent="Member0" index="1"]
 libraries = {
@@ -18213,11 +18210,14 @@ libraries = {
 
 [node name="Enemy" parent="." instance=ExtResource("2_a11mn")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.25, 2)
-script = ExtResource("5_fxpib")
 
 [node name="BattleHud" parent="." instance=ExtResource("6_bnngp")]
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.784137, -0.161839, 0.599113, -0.0331128, 0.953111, 0.300804, -0.619703, -0.25571, 0.742011, 2.48554, 3.00572, 3.78263)
 
+[connection signal="pressed" from="BattleHud/HBoxContainer/Attack" to="." method="_on_attack_pressed"]
+[connection signal="pressed" from="BattleHud/HBoxContainer/Skills" to="." method="_on_skills_pressed"]
+
 [editable path="Member0"]
+[editable path="BattleHud"]

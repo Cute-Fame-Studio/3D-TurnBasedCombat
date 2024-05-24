@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="Turn-Based Combat"
+run/main_scene="res://maps/battle_scenes/test.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+Activeplayer="*res://battle-manager/battlehud/activeplayer.gd"
 
 [dotnet]
 

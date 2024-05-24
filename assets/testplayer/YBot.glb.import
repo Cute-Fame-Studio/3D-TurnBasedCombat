@@ -13,7 +13,7 @@ dest_files=["res://.godot/imported/YBot.glb-2c2b6d9c6c53d141219619d50f1da9a2.scn
 
 [params]
 
-nodes/root_type=""
+nodes/root_type="CharacterBody3D"
 nodes/root_name=""
 nodes/apply_root_scale=true
 nodes/root_scale=1.0

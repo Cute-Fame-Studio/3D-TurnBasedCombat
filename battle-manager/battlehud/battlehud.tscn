@@ -9,6 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 4
 script = ExtResource("1_0qukq")
 
 [node name="HBoxContainer" type="VBoxContainer" parent="."]
@@ -49,6 +50,8 @@ layout_mode = 2
 size_flags_horizontal = 0
 text = "Run"
 
+[connection signal="add_character" from="." to="." method="_on_add_character"]
+[connection signal="start_combat" from="." to="." method="_on_start_combat"]
 [connection signal="pressed" from="HBoxContainer/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="HBoxContainer/Skills" to="." method="_on_skills_pressed"]
 [connection signal="pressed" from="HBoxContainer/Defend" to="." method="_on_defend_pressed"]

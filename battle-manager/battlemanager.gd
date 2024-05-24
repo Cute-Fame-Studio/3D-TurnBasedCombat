@@ -26,12 +26,12 @@ func _ready():
 	BattleHud.start_combat.emit(enemy)
 
 
-func _on_move_1_pressed():
+func _on_attack_pressed():
 	var moveKeys = moves.keys()
 	if moves.size() > 0:
 		_do_move(moves[moveKeys[0]])
 
-func _on_move_2_pressed():
+func _on_skills_pressed():
 	var moveKeys = moves.keys()
 	if moves.size() > 1:
 		_do_move(moves[moveKeys[1]])
@@ -52,4 +52,3 @@ func _do_move(move):
 	print(move["damage"])
 	var damagePoints = move["damage"]
 	enemy.damage.emit(damagePoints)
-

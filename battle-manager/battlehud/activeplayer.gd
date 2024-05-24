@@ -1,4 +1,4 @@
-extends Node
+extends Node3D
 
 var activeCharacter
 

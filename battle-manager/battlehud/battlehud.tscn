@@ -2,18 +2,10 @@
 
 [ext_resource type="Script" path="res://battle-manager/battlehud/battlehud.gd" id="1_0qukq"]
 
-[node name="BattleHud" type="Control" groups=["BattleHud"]]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 4
+[node name="BattleHUD" type="CanvasLayer" groups=["BattleHud"]]
 script = ExtResource("1_0qukq")
 
 [node name="HBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -50,10 +42,11 @@ layout_mode = 2
 size_flags_horizontal = 0
 text = "Run"
 
-[connection signal="add_character" from="." to="." method="_on_add_character"]
-[connection signal="start_combat" from="." to="." method="_on_start_combat"]
+[node name="CharacterInfo" type="Label" parent="."]
+offset_left = 8.0
+offset_top = 200.0
+offset_right = 1928.0
+offset_bottom = 264.0
+
 [connection signal="pressed" from="HBoxContainer/Attack" to="." method="_on_attack_pressed"]
-[connection signal="pressed" from="HBoxContainer/Skills" to="." method="_on_skills_pressed"]
 [connection signal="pressed" from="HBoxContainer/Defend" to="." method="_on_defend_pressed"]
-[connection signal="pressed" from="HBoxContainer/Item" to="." method="_on_item_pressed"]
-[connection signal="pressed" from="HBoxContainer/Run" to="." method="_on_run_pressed"]

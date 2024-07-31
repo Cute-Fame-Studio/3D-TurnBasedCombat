@@ -1,6 +1,7 @@
-[gd_scene load_steps=18 format=3 uid="uid://bcqxqucgohr4x"]
+[gd_scene load_steps=19 format=3 uid="uid://bcqxqucgohr4x"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_2a5t1"]
+[ext_resource type="Script" path="res://battle-manager/player.gd" id="2_y13mn"]
 
 [sub_resource type="Animation" id="Animation_pjn1p"]
 resource_name = "armature_stand"
@@ -18170,7 +18171,9 @@ _data = {
 [sub_resource type="BoxShape3D" id="BoxShape3D_0fjwj"]
 size = Vector3(1, 1.80408, 1)
 
-[node name="Member0" instance=ExtResource("1_2a5t1")]
+[node name="Member0" groups=["players"] instance=ExtResource("1_2a5t1")]
+script = ExtResource("2_y13mn")
+character_name = "Player"
 
 [node name="AnimationPlayer" parent="." index="1"]
 libraries = {

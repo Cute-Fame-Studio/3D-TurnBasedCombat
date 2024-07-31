@@ -18211,13 +18211,14 @@ libraries = {
 [node name="Enemy" parent="." instance=ExtResource("2_a11mn")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.25, 2)
 
-[node name="BattleHud" parent="." instance=ExtResource("6_bnngp")]
-
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.784137, -0.161839, 0.599113, -0.0331128, 0.953111, 0.300804, -0.619703, -0.25571, 0.742011, 2.48554, 3.00572, 3.78263)
+transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -2.08627)
 
-[connection signal="pressed" from="BattleHud/HBoxContainer/Attack" to="." method="_on_attack_pressed"]
-[connection signal="pressed" from="BattleHud/HBoxContainer/Skills" to="." method="_on_skills_pressed"]
+[node name="BattleHUD" parent="." instance=ExtResource("6_bnngp")]
+combat = true
+
+[connection signal="pressed" from="BattleHUD/HBoxContainer/Attack" to="." method="_on_attack_pressed"]
+[connection signal="pressed" from="BattleHUD/HBoxContainer/Skills" to="." method="_on_skills_pressed"]
 
 [editable path="Member0"]
-[editable path="BattleHud"]
+[editable path="BattleHUD"]

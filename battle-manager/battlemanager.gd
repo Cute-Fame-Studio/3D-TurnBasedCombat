@@ -1,54 +1,108 @@
 extends Node3D
 
-@onready var enemy = get_tree().get_first_node_in_group("Enemy")
-@onready var BattleHud = get_tree().get_first_node_in_group("BattleHud")
+var players: Array = []
+var enemies: Array = []
+var turn_order: Array = []
+var current_turn: int = 0
 
-@export var moves = {
-	"Attack": {
-		"damage": 15,
-		"manaCost": 0
-	},
-	"Block": {
-		"damage": 0,
-		"manaCost": 0
-	}
-}
-
-@export var character = {
-	"name": "Eben",
-	"totalMana:": 100,
-	"totalHP": 100,
-	"moves": moves
-}
+@onready var hud: CanvasLayer = $BattleHUD
 
 func _ready():
-	BattleHud.add_character.emit(character)
-	BattleHud.start_combat.emit(enemy)
+	if not hud:
+		push_error("BattleHUD node not found. Please make sure it's added to the scene.")
+		return
 
+	if not hud.is_connected("action_selected", _on_action_selected):
+		hud.action_selected.connect(_on_action_selected)
 
-func _on_attack_pressed():
-	var moveKeys = moves.keys()
-	if moves.size() > 0:
-		_do_move(moves[moveKeys[0]])
+	initialize_battle()
 
-func _on_skills_pressed():
-	var moveKeys = moves.keys()
-	if moves.size() > 1:
-		_do_move(moves[moveKeys[1]])
+func initialize_battle():
+	players = get_tree().get_nodes_in_group("players")
+	enemies = get_tree().get_nodes_in_group("enemies")
+	
+	for player in players:
+		hud.on_add_character(player)
+	
+	# Ensure players are at the start of the turn order
+	turn_order = players + enemies
+	
+	if enemies.size() > 0:
+		hud.on_start_combat(enemies[0])  # Assuming single enemy for now
+	start_next_turn()
 
+func start_next_turn():
+	if is_battle_over():
+		end_battle()
+		return
 
-func _on_move_3_pressed():
-	var moveKeys = moves.keys()
-	if moves.size() > 2:
-		_do_move(moves[moveKeys[2]])
+	var current_character = turn_order[current_turn]
+	
+	if current_character.is_defeated():
+		turn_order.erase(current_character)
+		current_turn = current_turn % turn_order.size()
+		start_next_turn()
+		return
+	
+	if current_character in players:
+		player_turn(current_character)
+	else:
+		enemy_turn(current_character)
+	
+	update_hud()
 
+func player_turn(character):
+	hud.set_active_character(character)
+	hud.show_action_buttons(character)
 
-func _on_move_4_pressed():
-	var moveKeys = moves.keys()
-	if moves.size() > 3:
-		_do_move(moves[moveKeys[3]])
+func _on_action_selected(action: String, target):
+	var current_character = turn_order[current_turn]
+	match action:
+		"attack":
+			perform_attack(current_character, target)
+		"defend":
+			perform_defend(current_character)
+	end_turn()
 
-func _do_move(move):
-	print(move["damage"])
-	var damagePoints = move["damage"]
-	enemy.damage.emit(damagePoints)
+func perform_attack(attacker, target):
+	var damage = attacker.get_attack_damage()
+	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
+	target.take_damage(damage)
+
+func perform_defend(character):
+	character.defend()
+	print("%s is defending!" % character.character_name)
+
+func enemy_turn(character):
+	var target = players[randi() % players.size()]  # Choose a random player to attack
+	perform_attack(character, target)
+	end_turn()
+
+func end_turn():
+	current_turn = (current_turn + 1) % turn_order.size()
+	start_next_turn()
+
+func update_hud():
+	hud.update_character_info()
+	if turn_order[current_turn] in players:
+		hud.show_action_buttons(turn_order[current_turn])
+	else:
+		hud.hide_action_buttons()
+
+func is_battle_over():
+	return are_all_defeated(players) or are_all_defeated(enemies)
+
+func are_all_defeated(characters: Array):
+	for character in characters:
+		if not character.is_defeated():
+			return false
+	return true
+
+func end_battle():
+	if are_all_defeated(enemies):
+		hud.show_battle_result("Victory! All enemies have been defeated.")
+		for player in players:
+			player.gain_experience(100)
+	elif are_all_defeated(players):
+		hud.show_battle_result("Game Over. All players have been defeated.")
+	hud.hide_action_buttons()

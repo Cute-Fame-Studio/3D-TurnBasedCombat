@@ -1,60 +1,89 @@
-extends Control
+extends CanvasLayer
 
-var activePlayer
-var character = CharacterBody3D
-var enemy
-var characters = []
+signal action_selected(action: String, target: CharacterBody3D)
 
-signal start_combat(enemyProperty)
-signal add_character(character)
+var active_character: CharacterBody3D
+var enemy: CharacterBody3D
+var characters: Array[CharacterBody3D] = []
 
-@export var combat = true
+@export var combat: bool = false
 
-func _process(_delta):
-	if combat:
-		for character in characters:
-			var moves = character["moves"].keys()
-			var i = 0
-			var labels = self.get_child(0).get_children()
-			for move in moves:
-				labels[i].text = move
-				i += 1
+@onready var action_buttons = $HBoxContainer
+@onready var attack_button = $HBoxContainer/Attack
+@onready var defend_button = $HBoxContainer/Defend
+@onready var character_info = $CharacterInfo
 
-func _do_move(move):
-	print(move["damage"])
-	var damagePoints = move["damage"]
-	enemy.damage.emit(damagePoints)
+func _ready():
+	_connect_signals()
+	hide_action_buttons()
+	
+	# Ensure all required nodes exist
+	if not character_info:
+		push_error("CharacterInfo node not found in BattleHUD. Please add a Label node named CharacterInfo.")
+		return
 
-func _on_add_character(character):
-	characters.append(character)
-	Activeplayer._set_active_character(character)
-
-func _on_start_combat(enemyProperty):
-	combat = true
-	enemy = enemyProperty
-
+func _connect_signals():
+	if attack_button:
+		attack_button.pressed.connect(_on_attack_pressed)
+	else:
+		push_error("Attack button not found in BattleHUD.")
+	
+	if defend_button:
+		defend_button.pressed.connect(_on_defend_pressed)
+	else:
+		push_error("Defend button not found in BattleHUD.")
 
 func _on_attack_pressed():
-	var characterKey = Activeplayer.activeCharacter.keys()
-	print(characterKey)
-	var moves = Activeplayer.activeCharacter["moves"]
-	print(moves)
-	var moveKeys = moves.keys()
-	if moves.size() > 0:
-		_do_move(moves["Attack"])
-
-
-func _on_skills_pressed():
-	print("This cannot be used.")
-
+	action_selected.emit("attack", enemy)
 
 func _on_defend_pressed():
-	print("This cannot be used.")
+	action_selected.emit("defend", null)
 
+func show_action_buttons(character: CharacterBody3D):
+	active_character = character
+	if action_buttons:
+		action_buttons.show()
+	else:
+		push_error("Action buttons container not found in BattleHUD.")
 
-func _on_item_pressed():
-	print("This cannot be used.")
+func hide_action_buttons():
+	if action_buttons:
+		action_buttons.hide()
+	else:
+		push_error("Action buttons container not found in BattleHUD.")
 
+func update_character_info():
+	if not character_info:
+		push_error("CharacterInfo node not found in BattleHUD.")
+		return
+	
+	if active_character:
+		character_info.text = "%s\nHP: %d/%d" % [active_character.character_name, active_character.current_health, active_character.max_health]
+	else:
+		character_info.text = "No active character"
 
-func _on_run_pressed():
-	print("This cannot be used.")
+func on_start_combat(enemy_node: CharacterBody3D):
+	combat = true
+	enemy = enemy_node
+	update_character_info()
+
+func on_add_character(character: CharacterBody3D):
+	characters.append(character)
+	if not active_character:
+		active_character = character
+	update_character_info()
+
+func show_battle_result(result: String):
+	var result_label = Label.new()
+	result_label.text = result
+	result_label.anchor_left = 0.5
+	result_label.anchor_top = 0.5
+	result_label.anchor_right = 0.5
+	result_label.anchor_bottom = 0.5
+	result_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	result_label.grow_vertical = Control.GROW_DIRECTION_BOTH
+	add_child(result_label)
+
+func set_active_character(character: CharacterBody3D):
+	active_character = character
+	update_character_info()

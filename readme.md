@@ -11,6 +11,11 @@ These are using retargted animations, Just to show that they are possible with a
 This battle system was gonna be used in my own projects, But as a collabrative effort, It will be open sourced, And maintained by the owner of this github repo. (The Game In Question Is Still In Development) [- Cute Fame 3D (Working Title)]
 
 ## Getting Started/Project TaskBoard:
-[TaskBoard/ToDo](https://github.com/orgs/Cute-Fame-Studio/projects/2)
+
+### [Getting Started](https://github.com/Cute-Fame-Studio/3D-TurnBasedCombat/blob/3a52040dce2baa93689853395029f7fb2f1c978d/gettingstarted.md)
+### [TaskBoard/ToDo](https://github.com/orgs/Cute-Fame-Studio/projects/2)
 
 Godot 4.3 (Stable)+
+
+## Current Progress
+<img src="https://github.com/user-attachments/assets/63d7e807-756d-4205-848b-410cfb3c69d8" width=50% height=50%>

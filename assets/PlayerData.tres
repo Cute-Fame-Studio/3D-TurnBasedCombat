@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://ciia7nijtierl"]
+
+[ext_resource type="Script" path="res://assets/PlayerData.gd" id="1_curse"]
+
+[resource]
+resource_local_to_scene = true
+script = ExtResource("1_curse")
+character_name = "Player"
+max_health = 100
+attack = 10
+defense = 5
+speed = 5

@@ -1,17 +1,28 @@
 extends CharacterBody3D
 
-@export var character_name: String = ""
-@export var max_health: int = 100
-@export var attack: int = 10
-@export var defense: int = 5
-@export var speed: int = 5
+@export var PlayerData: Resource 
+
+var character_name: String
+var max_health: int
+var attack: int
+var defense: int
+var speed: int
 
 var current_health: int
 var is_defending: bool = false
 
 func _ready():
-	current_health = max_health
-	add_to_group("players")
+	if PlayerData:
+		character_name = PlayerData.character_name
+		max_health = PlayerData.max_health
+		attack = PlayerData.attack
+		defense = PlayerData.defense
+		speed = PlayerData.speed
+		
+		current_health = max_health
+		add_to_group("players")
+	else:
+		push_error("PlayerData resource not set!")
 
 func is_defeated() -> bool:
 	return current_health <= 0

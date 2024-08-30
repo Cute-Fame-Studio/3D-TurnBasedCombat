@@ -1,7 +1,8 @@
-[gd_scene load_steps=19 format=3 uid="uid://clmhyw21qciy4"]
+[gd_scene load_steps=20 format=3 uid="uid://clmhyw21qciy4"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_kfukl"]
 [ext_resource type="Script" path="res://battle-manager/enemycombat.gd" id="2_7wb1w"]
+[ext_resource type="Resource" uid="uid://ciia7nijtierl" path="res://assets/PlayerData.tres" id="3_oj7o1"]
 
 [sub_resource type="Animation" id="Animation_pjn1p"]
 resource_name = "armature_stand"
@@ -18173,7 +18174,7 @@ size = Vector3(1, 1.80408, 1)
 
 [node name="Enemy" groups=["enemies"] instance=ExtResource("1_kfukl")]
 script = ExtResource("2_7wb1w")
-character_name = "Enemy"
+PlayerData = ExtResource("3_oj7o1")
 
 [node name="GeneralSkeleton" parent="Armature" index="0"]
 bones/0/position = Vector3(-1.60699e-05, 0.978864, 1.4695e-05)

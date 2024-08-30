@@ -1,89 +1,110 @@
 extends CanvasLayer
 
-signal action_selected(action: String, target: CharacterBody3D)
+signal action_selected(action: String, target)
 
-var active_character: CharacterBody3D
-var enemy: CharacterBody3D
-var characters: Array[CharacterBody3D] = []
+@onready var action_buttons: VBoxContainer = $ActionButtons
+@onready var character_info: VBoxContainer = $PlayerInfo1
+@onready var battle_result_label: Label = $BattleResultLabel
 
-@export var combat: bool = false
+var active_character: Node = null
+var enemy: Node = null
 
-@onready var action_buttons = $HBoxContainer
-@onready var attack_button = $HBoxContainer/Attack
-@onready var defend_button = $HBoxContainer/Defend
-@onready var character_info = $CharacterInfo
+# Health bar-related nodes
+@onready var player_health_bar: ProgressBar = $PlayerHealthBar
+@onready var enemy_health_bar: ProgressBar = $EnemyHealthBar
 
 func _ready():
-	_connect_signals()
+	battle_result_label.hide()
 	hide_action_buttons()
-	
-	# Ensure all required nodes exist
-	if not character_info:
-		push_error("CharacterInfo node not found in BattleHUD. Please add a Label node named CharacterInfo.")
-		return
 
-func _connect_signals():
-	if attack_button:
-		attack_button.pressed.connect(_on_attack_pressed)
-	else:
-		push_error("Attack button not found in BattleHUD.")
-	
-	if defend_button:
-		defend_button.pressed.connect(_on_defend_pressed)
-	else:
-		push_error("Defend button not found in BattleHUD.")
+	# Initialize health bars
+	player_health_bar.hide()
+	enemy_health_bar.hide()
 
+func on_start_combat(enemy_node: Node):
+	enemy = enemy_node
+	update_enemy_health_bar()
+
+func on_add_character(character: Node):
+# Update the CharacterInfo VBoxContainer with the new character info
+# You might need to implement a method in CharacterInfo to handle this
+	if character_info.has_method("add_character"):
+		character_info.add_character(character)
+	else:
+		print("Warning: CharacterInfo node doesn't have an add_character method")
+
+func set_active_character(character: Node):
+	active_character = character
+
+func show_action_buttons(character: Node):
+	action_buttons.show()
+	# You can customize this part to show different actions based on the character
+
+func hide_action_buttons():
+	action_buttons.hide()
+
+func update_character_info():
+# Update this method based on how your CharacterInfo node is structured
+	if character_info.has_method("update_player_info") and active_character:
+		character_info.update_player_info(active_character)
+	if character_info.has_method("update_enemy_info") and enemy:
+		character_info.update_enemy_info(enemy)
+
+func show_battle_result(result: String):
+	battle_result_label.text = result
+	battle_result_label.show()
+
+# Health bar update functions
+func update_player_health_bar():
+	if active_character:
+		player_health_bar.max_value = active_character.max_health
+		player_health_bar.value = active_character.current_health
+		player_health_bar.show()
+
+func update_enemy_health_bar():
+	if enemy:
+		enemy_health_bar.max_value = enemy.max_health
+		enemy_health_bar.value = enemy.current_health
+		enemy_health_bar.show()
+
+# Action button signals
 func _on_attack_pressed():
-	action_selected.emit("attack", enemy)
+	print("Attack button pressed")
+	if enemy:
+		print("Emitting action_selected signal with target: ", enemy.name)
+		action_selected.emit("attack", enemy)
+	else:
+		print("Error: No enemy target set")
 
 func _on_defend_pressed():
 	action_selected.emit("defend", null)
 
-func show_action_buttons(character: CharacterBody3D):
-	active_character = character
-	if action_buttons:
-		action_buttons.show()
-	else:
-		push_error("Action buttons container not found in BattleHUD.")
+# Add other action button handlers as needed (Skills, Item, Run)
 
-func hide_action_buttons():
-	if action_buttons:
-		action_buttons.hide()
-	else:
-		push_error("Action buttons container not found in BattleHUD.")
-
-func update_character_info():
-	if not character_info:
-		push_error("CharacterInfo node not found in BattleHUD.")
-		return
-	
-	if active_character:
-		character_info.text = "%s\nHP: %d/%d" % [active_character.character_name, active_character.current_health, active_character.max_health]
-	else:
-		character_info.text = "No active character"
-
-func on_start_combat(enemy_node: CharacterBody3D):
-	combat = true
-	enemy = enemy_node
+# Function to update all UI elements
+func update_ui():
 	update_character_info()
+	update_player_health_bar()
+	update_enemy_health_bar()
 
-func on_add_character(character: CharacterBody3D):
-	characters.append(character)
-	if not active_character:
-		active_character = character
-	update_character_info()
+# Call this function when the battle starts or when switching to 3D
+func prepare_for_3d():
+# Create a new SubViewport
+	var viewport = SubViewport.new()
+	viewport.size = Vector2(1024, 600)  # Adjust size as needed
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 
-func show_battle_result(result: String):
-	var result_label = Label.new()
-	result_label.text = result
-	result_label.anchor_left = 0.5
-	result_label.anchor_top = 0.5
-	result_label.anchor_right = 0.5
-	result_label.anchor_bottom = 0.5
-	result_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	result_label.grow_vertical = Control.GROW_DIRECTION_BOTH
-	add_child(result_label)
+	# Move all children of this CanvasLayer to the SubViewport
+	for child in get_children():
+		remove_child(child)
+		viewport.add_child(child)
 
-func set_active_character(character: CharacterBody3D):
-	active_character = character
-	update_character_info()
+	# Add the SubViewport to a new TextureRect
+	var texture_rect = TextureRect.new()
+	texture_rect.texture = viewport.get_texture()
+	add_child(texture_rect)
+
+# Now you can use this texture_rect in your 3D environment
+# For example, you could assign its texture to a MeshInstance's material
+
+# Remember to call prepare_for_3d() when you're ready to switch to 3D rendering

@@ -56,7 +56,9 @@ func player_turn(character):
 	hud.show_action_buttons(character)
 
 func _on_action_selected(action: String, target):
+	print("Action selected: ", action, " Target: ", target.name if target else "None")
 	var current_character = turn_order[current_turn]
+	print("Current character: ", current_character.name)
 	match action:
 		"attack":
 			perform_attack(current_character, target)

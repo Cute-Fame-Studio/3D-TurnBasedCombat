@@ -1,8 +1,9 @@
-[gd_scene load_steps=23 format=3 uid="uid://b56ncgnrwugct"]
+[gd_scene load_steps=26 format=3 uid="uid://b56ncgnrwugct"]
 
 [ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://assets/testplayer/y_bot-player.tscn" id="1_2aqym"]
 [ext_resource type="Script" path="res://battle-manager/battlemanager.gd" id="1_2kmw4"]
 [ext_resource type="PackedScene" uid="uid://clmhyw21qciy4" path="res://assets/testplayer/y_bot-enemy.tscn" id="2_a11mn"]
+[ext_resource type="Script" path="res://assets/PlayerData.gd" id="3_5jjwn"]
 [ext_resource type="PackedScene" uid="uid://cyjcaceen0235" path="res://battle-manager/battlehud/battlehud.tscn" id="6_bnngp"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1kyon"]
@@ -18,6 +19,15 @@ sky = SubResource("Sky_4vui1")
 fog_enabled = true
 fog_light_energy = 1.34
 volumetric_fog_density = 0.02
+
+[sub_resource type="Resource" id="Resource_i0qn4"]
+resource_local_to_scene = true
+script = ExtResource("3_5jjwn")
+character_name = "Player"
+max_health = 100
+attack = 10
+defense = 5
+speed = 5
 
 [sub_resource type="Animation" id="Animation_pjn1p"]
 resource_name = "armature_stand"
@@ -18184,6 +18194,15 @@ _data = {
 "walk": SubResource("Animation_dl4t7")
 }
 
+[sub_resource type="Resource" id="Resource_b4i21"]
+resource_local_to_scene = true
+script = ExtResource("3_5jjwn")
+character_name = "Enemy"
+max_health = 100
+attack = 10
+defense = 5
+speed = 5
+
 [node name="Base" type="Node3D"]
 script = ExtResource("1_2kmw4")
 
@@ -18201,6 +18220,7 @@ size = Vector3(100, 0.5, 100)
 
 [node name="Member0" parent="." instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.38419)
+PlayerData = SubResource("Resource_i0qn4")
 
 [node name="AnimationPlayer" parent="Member0" index="1"]
 libraries = {
@@ -18210,15 +18230,12 @@ libraries = {
 
 [node name="Enemy" parent="." instance=ExtResource("2_a11mn")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.25, 2)
+PlayerData = SubResource("Resource_b4i21")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -2.08627)
 
 [node name="BattleHUD" parent="." instance=ExtResource("6_bnngp")]
-combat = true
-
-[connection signal="pressed" from="BattleHUD/HBoxContainer/Attack" to="." method="_on_attack_pressed"]
-[connection signal="pressed" from="BattleHUD/HBoxContainer/Skills" to="." method="_on_skills_pressed"]
 
 [editable path="Member0"]
 [editable path="BattleHUD"]

@@ -1,11 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://cyjcaceen0235"]
+[gd_scene load_steps=3 format=3 uid="uid://cyjcaceen0235"]
 
 [ext_resource type="Script" path="res://battle-manager/battlehud/battlehud.gd" id="1_0qukq"]
+[ext_resource type="Script" path="res://battle-manager/battlehud/character_info.gd" id="2_64dmw"]
 
 [node name="BattleHUD" type="CanvasLayer" groups=["BattleHud"]]
 script = ExtResource("1_0qukq")
 
-[node name="HBoxContainer" type="VBoxContainer" parent="."]
+[node name="ActionButtons" type="VBoxContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -15,38 +16,75 @@ size_flags_horizontal = 0
 size_flags_vertical = 4
 alignment = 2
 
-[node name="Attack" type="Button" parent="HBoxContainer"]
+[node name="Attack" type="Button" parent="ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 text = "Attack
 "
 
-[node name="Skills" type="Button" parent="HBoxContainer"]
+[node name="Skills" type="Button" parent="ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Skills"
 
-[node name="Defend" type="Button" parent="HBoxContainer"]
+[node name="Defend" type="Button" parent="ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Defend"
 
-[node name="Item" type="Button" parent="HBoxContainer"]
+[node name="Item" type="Button" parent="ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Item"
 
-[node name="Run" type="Button" parent="HBoxContainer"]
+[node name="Run" type="Button" parent="ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Run"
 
-[node name="CharacterInfo" type="Label" parent="."]
-offset_left = 8.0
-offset_top = 200.0
-offset_right = 1928.0
-offset_bottom = 264.0
+[node name="BattleResultLabel" type="Label" parent="."]
+offset_top = 625.0
+offset_right = 1152.0
+offset_bottom = 648.0
 
-[connection signal="pressed" from="HBoxContainer/Attack" to="." method="_on_attack_pressed"]
-[connection signal="pressed" from="HBoxContainer/Defend" to="." method="_on_defend_pressed"]
+[node name="PlayerInfo" type="Label" parent="."]
+offset_left = 65.0
+offset_top = 40.0
+offset_right = 204.0
+offset_bottom = 72.0
+
+[node name="EnemyInfo1" type="VBoxContainer" parent="."]
+offset_top = 131.0
+offset_right = 73.0
+offset_bottom = 131.0
+
+[node name="PlayerInfo1" type="VBoxContainer" parent="."]
+offset_top = 23.0
+offset_right = 73.0
+offset_bottom = 127.0
+script = ExtResource("2_64dmw")
+
+[node name="PlayerNameLabel" type="Label" parent="PlayerInfo1"]
+layout_mode = 2
+
+[node name="PlayerHealthLabel" type="Label" parent="PlayerInfo1"]
+layout_mode = 2
+
+[node name="EnemyNameLabel" type="Label" parent="PlayerInfo1"]
+layout_mode = 2
+
+[node name="EnemyHealthLabel" type="Label" parent="PlayerInfo1"]
+layout_mode = 2
+
+[node name="PlayerHealthBar" type="ProgressBar" parent="."]
+offset_right = 91.0
+offset_bottom = 27.0
+
+[node name="EnemyHealthBar" type="ProgressBar" parent="."]
+offset_left = 1056.0
+offset_right = 1154.0
+offset_bottom = 27.0
+
+[connection signal="pressed" from="ActionButtons/Attack" to="." method="_on_attack_pressed"]
+[connection signal="pressed" from="ActionButtons/Defend" to="." method="_on_defend_pressed"]

@@ -79,6 +79,9 @@ func _on_attack_pressed():
 func _on_defend_pressed():
 	action_selected.emit("defend", null)
 
+func _on_skills_pressed():
+	pass # Replace with function body.
+
 # Add other action button handlers as needed (Skills, Item, Run)
 
 # Function to update all UI elements

@@ -5,6 +5,9 @@ var enemies: Array = []
 var turn_order: Array = []
 var current_turn: int = 0
 
+var current_battler
+var default_anim = "Locomotion-Library/idle2"
+
 @onready var hud: CanvasLayer = $BattleHUD
 
 func _ready():
@@ -23,12 +26,15 @@ func initialize_battle():
 	
 	for player in players:
 		hud.on_add_character(player)
+		player.battle_idle()
 	
 	# Ensure players are at the start of the turn order
 	turn_order = players + enemies
 	
 	if enemies.size() > 0:
 		hud.on_start_combat(enemies[0])  # Assuming single enemy for now
+		enemies[0].battle_idle()
+
 	start_next_turn()
 
 func start_next_turn():
@@ -37,6 +43,7 @@ func start_next_turn():
 		return
 
 	var current_character = turn_order[current_turn]
+	current_battler = current_character
 	
 	if current_character.is_defeated():
 		turn_order.erase(current_character)
@@ -48,7 +55,7 @@ func start_next_turn():
 		player_turn(current_character)
 	else:
 		enemy_turn(current_character)
-	
+
 	update_hud()
 
 func player_turn(character):
@@ -64,12 +71,16 @@ func _on_action_selected(action: String, target):
 			perform_attack(current_character, target)
 		"defend":
 			perform_defend(current_character)
+	
 	end_turn()
 
 func perform_attack(attacker, target):
+	# current_anim.play("Locomotion-Library/attack1")
+	attacker.attack_anim()
 	var damage = attacker.get_attack_damage()
 	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
 	target.take_damage(damage)
+	update_hud()
 
 func perform_defend(character):
 	character.defend()
@@ -81,6 +92,11 @@ func enemy_turn(character):
 	end_turn()
 
 func end_turn():
+	await current_battler.wait_attack()
+	# if turn_order[current_turn].is_defending == false:
+		# await current_anim.animation_finished
+		# battle_idle(turn_order[current_turn])
+
 	current_turn = (current_turn + 1) % turn_order.size()
 	start_next_turn()
 

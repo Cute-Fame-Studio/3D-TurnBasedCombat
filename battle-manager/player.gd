@@ -11,6 +11,8 @@ var speed: int
 var current_health: int
 var is_defending: bool = false
 
+@onready var state_machine = $AnimationTree["parameters/playback"]
+
 func _ready():
 	if PlayerData:
 		character_name = PlayerData.character_name
@@ -48,3 +50,14 @@ func defend():
 
 func gain_experience(amount: int):
 	print("%s gained %d experience!" % [character_name, amount])
+
+
+func battle_idle():
+	state_machine.travel("battle_idle")
+
+func attack_anim():
+	state_machine.travel("attack")
+
+func wait_attack():
+	await $AnimationTree.animation_finished
+	battle_idle()

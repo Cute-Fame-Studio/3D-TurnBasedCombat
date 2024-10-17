@@ -12,6 +12,8 @@ var current_health: int
 var is_defending: bool = false
 
 @onready var state_machine = $AnimationTree["parameters/playback"]
+@onready var skill_node: Node = get_node("SkillList")
+@onready var skill_list: Array[Resource] = skill_node.get_skills()
 
 func _ready():
 	if PlayerData:
@@ -44,6 +46,13 @@ func take_damage(amount: int):
 		current_health = 0
 	print("%s took %d damage. Health: %d/%d" % [character_name, damage_taken, current_health, max_health])
 
+func take_healing(amount: int):
+	var healing = min(amount, max_health - current_health)
+
+	current_health += healing
+	print("%s received %d healing. Health: %d/%d" % [character_name, healing, current_health, max_health])
+	return healing
+
 func defend():
 	is_defending = true
 	print("%s is defending. Defense doubled for the next attack." % character_name)
@@ -57,7 +66,18 @@ func battle_idle():
 
 func attack_anim():
 	state_machine.travel("attack")
+	return get_attack_damage()
+
+func skill_attack():
+	state_machine.travel(skill_list[0].anim_tree_name)
+	return skill_list[0].number_value
+
+func skill_heal():
+	state_machine.travel(skill_list[1].anim_tree_name)
+	return skill_list[1].number_value
 
 func wait_attack():
+	if self.is_defending:
+		return
 	await $AnimationTree.animation_finished
 	battle_idle()

@@ -79,6 +79,13 @@ func _on_attack_pressed():
 func _on_defend_pressed():
 	action_selected.emit("defend", null)
 
+func _on_skills_pressed():
+	action_selected.emit("skills", enemy)
+
+func _on_item_pressed() -> void:
+	action_selected.emit("item", null)
+
+
 # Add other action button handlers as needed (Skills, Item, Run)
 
 # Function to update all UI elements

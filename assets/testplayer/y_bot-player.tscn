@@ -1,7 +1,10 @@
-[gd_scene load_steps=24 format=3 uid="uid://bcqxqucgohr4x"]
+[gd_scene load_steps=33 format=3 uid="uid://bcqxqucgohr4x"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_2a5t1"]
 [ext_resource type="Script" path="res://battle-manager/player.gd" id="2_y13mn"]
+[ext_resource type="Script" path="res://battle-manager/skill_list.gd" id="3_da0b1"]
+[ext_resource type="Resource" uid="uid://bkn0p2p5vxwv3" path="res://assets/abilities/damage_ability.tres" id="4_b43tf"]
+[ext_resource type="Resource" uid="uid://bhp64tgfkw5xm" path="res://assets/abilities/heal_ability.tres" id="5_qhict"]
 
 [sub_resource type="Animation" id="Animation_pjn1p"]
 resource_name = "armature_stand"
@@ -18174,10 +18177,28 @@ animation = &"Locomotion-Library/attack1"
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_f8jrq"]
 animation = &"Locomotion-Library/idle2"
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gyp3t"]
+animation = &"Locomotion-Library/jump"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_qu72c"]
+animation = &"Locomotion-Library/kick1"
+
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_bk3gb"]
 xfade_time = 0.2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_bn3j8"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_lm7ud"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_0idrr"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_00hc0"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_uno5v"]
 xfade_time = 0.2
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_v16q4"]
@@ -18185,63 +18206,19 @@ states/Start/position = Vector2(210, 94)
 states/attack/node = SubResource("AnimationNodeAnimation_3rsfg")
 states/attack/position = Vector2(658, 86)
 states/battle_idle/node = SubResource("AnimationNodeAnimation_f8jrq")
-states/battle_idle/position = Vector2(448, 86)
-transitions = ["battle_idle", "attack", SubResource("AnimationNodeStateMachineTransition_bk3gb"), "attack", "battle_idle", SubResource("AnimationNodeStateMachineTransition_bn3j8")]
+states/battle_idle/position = Vector2(447, 86)
+states/jump/node = SubResource("AnimationNodeAnimation_gyp3t")
+states/jump/position = Vector2(658, 11)
+states/kick/node = SubResource("AnimationNodeAnimation_qu72c")
+states/kick/position = Vector2(658, 154)
+transitions = ["battle_idle", "attack", SubResource("AnimationNodeStateMachineTransition_bk3gb"), "attack", "battle_idle", SubResource("AnimationNodeStateMachineTransition_bn3j8"), "battle_idle", "kick", SubResource("AnimationNodeStateMachineTransition_lm7ud"), "kick", "battle_idle", SubResource("AnimationNodeStateMachineTransition_0idrr"), "battle_idle", "jump", SubResource("AnimationNodeStateMachineTransition_00hc0"), "jump", "battle_idle", SubResource("AnimationNodeStateMachineTransition_uno5v")]
+graph_offset = Vector2(-87, -30)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0fjwj"]
 size = Vector3(1, 1.80408, 1)
 
 [node name="Member0" groups=["players"] instance=ExtResource("1_2a5t1")]
 script = ExtResource("2_y13mn")
-
-[node name="GeneralSkeleton" parent="Armature" index="0"]
-bones/0/position = Vector3(-0.00162541, 0.940152, -0.0874569)
-bones/0/rotation = Quaternion(0.101056, 0.00222472, -0.00836191, 0.994843)
-bones/2/rotation = Quaternion(-1.86265e-09, 0, 0, 1)
-bones/3/rotation = Quaternion(1.86265e-09, 0, 0, 1)
-bones/5/rotation = Quaternion(0.042094, 0.00559564, -0.00419821, 0.999089)
-bones/8/rotation = Quaternion(0.427979, 0.715217, -0.460001, 0.306102)
-bones/9/rotation = Quaternion(0.507429, -0.4715, 0.571841, 0.439548)
-bones/10/rotation = Quaternion(0.089351, 0.555173, -0.0457545, 0.825655)
-bones/13/rotation = Quaternion(0.275189, -0.224691, -0.158879, 0.921164)
-bones/14/rotation = Quaternion(0.303967, -0.0223307, -0.141263, 0.941887)
-bones/16/rotation = Quaternion(0.224267, 0.0739265, -0.066327, 0.969454)
-bones/17/rotation = Quaternion(0.480355, 0.0117295, -0.0807914, 0.873266)
-bones/18/rotation = Quaternion(0.479989, 0.00699928, -0.0834755, 0.873266)
-bones/20/rotation = Quaternion(0.501771, -3.72529e-08, 1.19209e-06, 0.865001)
-bones/21/rotation = Quaternion(0.497478, -0.00570349, -0.0160652, 0.867309)
-bones/22/rotation = Quaternion(0.496893, -0.000608951, -0.0295442, 0.867309)
-bones/24/rotation = Quaternion(0.501771, -7.45058e-09, 1.60933e-06, 0.865001)
-bones/25/rotation = Quaternion(0.501493, 0.0110823, -0.00143087, 0.86509)
-bones/26/rotation = Quaternion(0.500747, -0.0284931, 0.00774452, 0.86509)
-bones/28/rotation = Quaternion(0.509405, -8.9407e-08, 1.54972e-06, 0.860527)
-bones/29/rotation = Quaternion(0.464319, -0.0428433, 0.114364, 0.877208)
-bones/30/rotation = Quaternion(0.459487, -0.0652946, 0.122945, 0.877207)
-bones/32/rotation = Quaternion(-0.0693836, 0.774072, -0.625025, -0.0730917)
-bones/33/rotation = Quaternion(0.558042, 0.399985, -0.628879, 0.364845)
-bones/34/rotation = Quaternion(0.0559988, -0.580183, -0.083993, 0.808206)
-bones/37/rotation = Quaternion(0.275189, 0.224691, 0.158879, 0.921164)
-bones/38/rotation = Quaternion(0.303967, 0.0223307, 0.141263, 0.941887)
-bones/40/rotation = Quaternion(0.456368, 0.0881453, 0.0236158, 0.8851)
-bones/41/rotation = Quaternion(0.648449, -0.0158341, 0.109063, 0.753238)
-bones/42/rotation = Quaternion(0.647954, -0.00944854, 0.112687, 0.753239)
-bones/44/rotation = Quaternion(0.501771, 1.11759e-07, -1.19209e-06, 0.865001)
-bones/45/rotation = Quaternion(0.497478, 0.00570349, 0.0160652, 0.867309)
-bones/46/rotation = Quaternion(0.496893, 0.000608921, 0.0295442, 0.867309)
-bones/48/rotation = Quaternion(0.501771, 7.45058e-09, -1.66893e-06, 0.865001)
-bones/49/rotation = Quaternion(0.501493, -0.0110823, 0.00143084, 0.86509)
-bones/50/rotation = Quaternion(0.500747, 0.028493, -0.00774458, 0.86509)
-bones/52/rotation = Quaternion(0.509405, 1.71363e-07, -1.54972e-06, 0.860527)
-bones/53/rotation = Quaternion(0.464319, 0.0428433, -0.114364, 0.877208)
-bones/54/rotation = Quaternion(0.459487, 0.0652946, -0.122945, 0.877207)
-bones/55/rotation = Quaternion(-0.000958366, 0.350043, 0.935706, -0.0438577)
-bones/56/rotation = Quaternion(0.000555782, 0.961939, -0.273159, -0.0075177)
-bones/57/rotation = Quaternion(-0.0274143, 0.692075, -0.720896, 0.0243069)
-bones/58/rotation = Quaternion(-1.64636e-10, 1, 0, -1.64636e-10)
-bones/60/rotation = Quaternion(0.00147787, 0.174744, 0.983754, 0.0411068)
-bones/61/rotation = Quaternion(-0.000566287, 0.960458, -0.278321, 0.00765976)
-bones/62/rotation = Quaternion(-0.130866, 0.530449, -0.787955, -0.283944)
-bones/63/rotation = Quaternion(1.64636e-10, 1, 0, 1.64636e-10)
 
 [node name="AnimationPlayer" parent="." index="1"]
 libraries = {
@@ -18256,3 +18233,7 @@ anim_player = NodePath("../AnimationPlayer")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." index="3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.918676, 0)
 shape = SubResource("BoxShape3D_0fjwj")
+
+[node name="SkillList" type="Node" parent="." index="4"]
+script = ExtResource("3_da0b1")
+default_skill = Array[Resource]([ExtResource("4_b43tf"), ExtResource("5_qhict")])

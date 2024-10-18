@@ -8,6 +8,8 @@ var current_turn: int = 0
 var current_battler
 var default_anim = "Locomotion-Library/idle2"
 
+@export var OriginalMap = "res://maps/regular_map/backtogame.tscn"
+
 @onready var hud: CanvasLayer = $BattleHUD
 
 func _ready():
@@ -136,6 +138,8 @@ func end_battle():
 		hud.show_battle_result("Victory! All enemies have been defeated.")
 		for player in players:
 			player.gain_experience(100)
+			# Toggle Enemy's off on the scene you left.
+			get_tree().change_scene_to_file(OriginalMap) # This code causes the crash.
 	elif are_all_defeated(players):
 		hud.show_battle_result("Game Over. All players have been defeated.")
 	hud.hide_action_buttons()

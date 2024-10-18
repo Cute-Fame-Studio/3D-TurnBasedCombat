@@ -19,7 +19,6 @@ func _ready():
 
 	# Initialize health bars
 	player_health_bar.hide()
-	enemy_health_bar.hide()
 
 func on_start_combat(enemy_node: Node):
 	enemy = enemy_node
@@ -36,7 +35,7 @@ func on_add_character(character: Node):
 func set_active_character(character: Node):
 	active_character = character
 
-func show_action_buttons(character: Node):
+func show_action_buttons(_character: Node):
 	action_buttons.show()
 	# You can customize this part to show different actions based on the character
 
@@ -73,18 +72,24 @@ func _on_attack_pressed():
 	if enemy:
 		print("Emitting action_selected signal with target: ", enemy.name)
 		action_selected.emit("attack", enemy)
+		hide_action_buttons()
 	else:
 		print("Error: No enemy target set")
 
 func _on_defend_pressed():
+	hide_action_buttons()
 	action_selected.emit("defend", null)
 
 func _on_skills_pressed():
-	pass # Replace with function body.
+	hide_action_buttons()
 	action_selected.emit("skills", enemy)
 
 func _on_item_pressed() -> void:
+	hide_action_buttons()
 	action_selected.emit("item", null)
+
+func _on_run_pressed() -> void:
+	pass # Replace with function body.
 
 
 # Add other action button handlers as needed (Skills, Item, Run)

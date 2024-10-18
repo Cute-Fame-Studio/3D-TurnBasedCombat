@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://clmhyw21qciy4"]
+[gd_scene load_steps=27 format=3 uid="uid://clmhyw21qciy4"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_kfukl"]
 [ext_resource type="Script" path="res://battle-manager/enemycombat.gd" id="2_7wb1w"]

@@ -82,6 +82,7 @@ offset_right = 91.0
 offset_bottom = 27.0
 
 [node name="EnemyHealthBar" type="ProgressBar" parent="."]
+visible = false
 offset_left = 1056.0
 offset_right = 1154.0
 offset_bottom = 27.0
@@ -90,3 +91,4 @@ offset_bottom = 27.0
 [connection signal="pressed" from="ActionButtons/Skills" to="." method="_on_skills_pressed"]
 [connection signal="pressed" from="ActionButtons/Defend" to="." method="_on_defend_pressed"]
 [connection signal="pressed" from="ActionButtons/Item" to="." method="_on_item_pressed"]
+[connection signal="pressed" from="ActionButtons/Run" to="." method="_on_run_pressed"]

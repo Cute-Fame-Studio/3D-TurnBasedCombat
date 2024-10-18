@@ -18,4 +18,4 @@ This battle system was gonna be used in my own projects, But as a collabrative e
 Godot 4.3 (Stable)+
 
 ## Current Progress
-<img src="https://github.com/user-attachments/assets/63d7e807-756d-4205-848b-410cfb3c69d8" width=50% height=50%>
+<img src="https://github.com/user-attachments/assets/df5e2b88-03ee-42b5-90db-7724e2879f78" width=55% height=55%>

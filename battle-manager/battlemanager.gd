@@ -71,20 +71,38 @@ func _on_action_selected(action: String, target):
 			perform_attack(current_character, target)
 		"defend":
 			perform_defend(current_character)
+		"skills":
+			perform_skill(current_character, target)
+		"item":
+			perform_item(current_character)
 	
 	end_turn()
 
 func perform_attack(attacker, target):
-	# current_anim.play("Locomotion-Library/attack1")
-	attacker.attack_anim()
-	var damage = attacker.get_attack_damage()
-	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
-	target.take_damage(damage)
-	update_hud()
+	var damage = attacker.attack_anim()
+	damage_calculation(attacker, target, damage)
 
 func perform_defend(character):
 	character.defend()
 	print("%s is defending!" % character.character_name)
+
+func perform_skill(attacker, target):
+	var damage = attacker.skill_attack()
+	damage_calculation(attacker, target, damage)
+
+func perform_item(user):
+	var amount = user.skill_heal()
+	heal_calculation(user, user, amount)
+
+func damage_calculation(attacker, target, damage):
+	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
+	target.take_damage(damage)
+	update_hud()
+
+func heal_calculation(user, target, amount):
+	var healing = target.take_healing(amount)
+	print("%s heals %s for %d health!" % [user.character_name, target.character_name, healing])
+	update_hud()
 
 func enemy_turn(character):
 	var target = players[randi() % players.size()]  # Choose a random player to attack
@@ -93,9 +111,6 @@ func enemy_turn(character):
 
 func end_turn():
 	await current_battler.wait_attack()
-	# if turn_order[current_turn].is_defending == false:
-		# await current_anim.animation_finished
-		# battle_idle(turn_order[current_turn])
 
 	current_turn = (current_turn + 1) % turn_order.size()
 	start_next_turn()

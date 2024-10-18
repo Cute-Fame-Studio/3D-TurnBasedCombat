@@ -89,3 +89,4 @@ offset_bottom = 27.0
 [connection signal="pressed" from="ActionButtons/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="ActionButtons/Skills" to="." method="_on_skills_pressed"]
 [connection signal="pressed" from="ActionButtons/Defend" to="." method="_on_defend_pressed"]
+[connection signal="pressed" from="ActionButtons/Item" to="." method="_on_item_pressed"]

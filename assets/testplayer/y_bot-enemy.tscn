@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_kfukl"]
 [ext_resource type="Script" path="res://battle-manager/enemycombat.gd" id="2_7wb1w"]
 [ext_resource type="Resource" uid="uid://ciia7nijtierl" path="res://assets/PlayerData.tres" id="3_oj7o1"]
+[ext_resource type="Script" path="res://battle-manager/skill_list.gd" id="4_ig8r7"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0f5eb"]
 albedo_color = Color(0.787671, 0.175527, 0.19364, 1)
@@ -18214,3 +18215,6 @@ anim_player = NodePath("../AnimationPlayer")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." index="3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.918676, 0)
 shape = SubResource("BoxShape3D_rsctr")
+
+[node name="SkillList" type="Node" parent="." index="4"]
+script = ExtResource("4_ig8r7")

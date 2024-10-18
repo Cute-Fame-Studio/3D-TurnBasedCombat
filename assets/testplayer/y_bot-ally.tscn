@@ -2,6 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_2a5t1"]
 [ext_resource type="Script" path="res://battle-manager/player.gd" id="2_y13mn"]
+[ext_resource type="Script" path="res://battle-manager/skill_list.gd" id="3_da0b1"]
+[ext_resource type="Resource" uid="uid://bkn0p2p5vxwv3" path="res://assets/abilities/damage_ability.tres" id="4_b43tf"]
+[ext_resource type="Resource" uid="uid://bhp64tgfkw5xm" path="res://assets/abilities/heal_ability.tres" id="5_qhict"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fy8m0"]
 albedo_color = Color(0.661078, 0.740406, 0.987524, 1)
@@ -18177,10 +18180,28 @@ animation = &"Locomotion-Library/attack1"
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_f8jrq"]
 animation = &"Locomotion-Library/idle2"
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gyp3t"]
+animation = &"Locomotion-Library/jump"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_qu72c"]
+animation = &"Locomotion-Library/kick1"
+
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_bk3gb"]
 xfade_time = 0.2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_bn3j8"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_lm7ud"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_0idrr"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_00hc0"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_uno5v"]
 xfade_time = 0.2
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_v16q4"]
@@ -18188,8 +18209,13 @@ states/Start/position = Vector2(210, 94)
 states/attack/node = SubResource("AnimationNodeAnimation_3rsfg")
 states/attack/position = Vector2(658, 86)
 states/battle_idle/node = SubResource("AnimationNodeAnimation_f8jrq")
-states/battle_idle/position = Vector2(448, 86)
-transitions = ["battle_idle", "attack", SubResource("AnimationNodeStateMachineTransition_bk3gb"), "attack", "battle_idle", SubResource("AnimationNodeStateMachineTransition_bn3j8")]
+states/battle_idle/position = Vector2(447, 86)
+states/jump/node = SubResource("AnimationNodeAnimation_gyp3t")
+states/jump/position = Vector2(658, 11)
+states/kick/node = SubResource("AnimationNodeAnimation_qu72c")
+states/kick/position = Vector2(658, 154)
+transitions = ["battle_idle", "attack", SubResource("AnimationNodeStateMachineTransition_bk3gb"), "attack", "battle_idle", SubResource("AnimationNodeStateMachineTransition_bn3j8"), "battle_idle", "kick", SubResource("AnimationNodeStateMachineTransition_lm7ud"), "kick", "battle_idle", SubResource("AnimationNodeStateMachineTransition_0idrr"), "battle_idle", "jump", SubResource("AnimationNodeStateMachineTransition_00hc0"), "jump", "battle_idle", SubResource("AnimationNodeStateMachineTransition_uno5v")]
+graph_offset = Vector2(-87, -30)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0fjwj"]
 size = Vector3(1, 1.80408, 1)
@@ -18213,3 +18239,7 @@ anim_player = NodePath("../AnimationPlayer")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." index="3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.918676, 0)
 shape = SubResource("BoxShape3D_0fjwj")
+
+[node name="SkillList" type="Node" parent="." index="4"]
+script = ExtResource("3_da0b1")
+default_skill = Array[Resource]([ExtResource("4_b43tf"), ExtResource("5_qhict")])

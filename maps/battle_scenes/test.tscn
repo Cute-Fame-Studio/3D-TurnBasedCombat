@@ -1,6 +1,6 @@
-[gd_scene load_steps=26 format=3 uid="uid://b56ncgnrwugct"]
+[gd_scene load_steps=27 format=3 uid="uid://b56ncgnrwugct"]
 
-[ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://assets/testplayer/y_bot-player.tscn" id="1_2aqym"]
+[ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://assets/testplayer/y_bot-ally.tscn" id="1_2aqym"]
 [ext_resource type="Script" path="res://battle-manager/battlemanager.gd" id="1_2kmw4"]
 [ext_resource type="PackedScene" uid="uid://clmhyw21qciy4" path="res://assets/testplayer/y_bot-enemy.tscn" id="2_a11mn"]
 [ext_resource type="Script" path="res://assets/PlayerData.gd" id="3_5jjwn"]
@@ -20,7 +20,10 @@ fog_enabled = true
 fog_light_energy = 1.34
 volumetric_fog_density = 0.02
 
-[sub_resource type="Resource" id="Resource_8mhce"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_erjfi"]
+albedo_color = Color(0.192279, 0.227401, 0.23218, 1)
+
+[sub_resource type="Resource" id="Resource_k653u"]
 resource_local_to_scene = true
 script = ExtResource("3_5jjwn")
 character_name = "Player"
@@ -18217,12 +18220,13 @@ shadow_enabled = true
 [node name="Platform" type="CSGBox3D" parent="."]
 use_collision = true
 size = Vector3(100, 0.5, 100)
+material = SubResource("StandardMaterial3D_erjfi")
 
-[node name="Member0" parent="." instance=ExtResource("1_2aqym")]
+[node name="Ally" parent="." instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.38419)
-PlayerData = SubResource("Resource_8mhce")
+PlayerData = SubResource("Resource_k653u")
 
-[node name="AnimationPlayer" parent="Member0" index="1"]
+[node name="AnimationPlayer" parent="Ally" index="1"]
 libraries = {
 "": SubResource("AnimationLibrary_hk54p"),
 "Locomotion-Library": SubResource("AnimationLibrary_x8dua")
@@ -18237,5 +18241,5 @@ transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.
 
 [node name="BattleHUD" parent="." instance=ExtResource("6_bnngp")]
 
-[editable path="Member0"]
+[editable path="Ally"]
 [editable path="BattleHUD"]

@@ -1,10 +1,13 @@
-[gd_scene load_steps=33 format=3 uid="uid://bcqxqucgohr4x"]
+[gd_scene load_steps=25 format=3 uid="uid://bcqxqucgohr4x"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_2a5t1"]
 [ext_resource type="Script" path="res://battle-manager/player.gd" id="2_y13mn"]
 [ext_resource type="Script" path="res://battle-manager/skill_list.gd" id="3_da0b1"]
 [ext_resource type="Resource" uid="uid://bkn0p2p5vxwv3" path="res://assets/abilities/damage_ability.tres" id="4_b43tf"]
 [ext_resource type="Resource" uid="uid://bhp64tgfkw5xm" path="res://assets/abilities/heal_ability.tres" id="5_qhict"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fy8m0"]
+albedo_color = Color(0.661078, 0.740406, 0.987524, 1)
 
 [sub_resource type="Animation" id="Animation_pjn1p"]
 resource_name = "armature_stand"
@@ -18217,8 +18220,11 @@ graph_offset = Vector2(-87, -30)
 [sub_resource type="BoxShape3D" id="BoxShape3D_0fjwj"]
 size = Vector3(1, 1.80408, 1)
 
-[node name="Member0" groups=["players"] instance=ExtResource("1_2a5t1")]
+[node name="Ally1" groups=["players"] instance=ExtResource("1_2a5t1")]
 script = ExtResource("2_y13mn")
+
+[node name="Alpha_Surface" parent="Armature/GeneralSkeleton" index="1"]
+material_override = SubResource("StandardMaterial3D_fy8m0")
 
 [node name="AnimationPlayer" parent="." index="1"]
 libraries = {

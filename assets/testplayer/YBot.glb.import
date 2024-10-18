@@ -32,6 +32,16 @@ animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
 _subresources={
+"materials": {
+"Alpha_Body_MAT": {
+"use_external/enabled": false,
+"use_external/path": "res://extra-throwaway/Alpha_Body_MAT.tres"
+},
+"Alpha_Joints_MAT": {
+"use_external/enabled": false,
+"use_external/path": "res://extra-throwaway/Alpha_Joints_MAT.tres"
+}
+},
 "nodes": {
 "PATH:Armature/Skeleton3D": {
 "retarget/bone_map": Object(BoneMap,"resource_local_to_scene":false,"resource_name":"","profile":Object(SkeletonProfileHumanoid,"resource_local_to_scene":false,"resource_name":"","root_bone":&"Root","scale_base_bone":&"Hips","group_size":4,"bone_size":56,"script":null)

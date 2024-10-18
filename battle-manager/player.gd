@@ -60,6 +60,12 @@ func defend():
 func gain_experience(amount: int):
 	print("%s gained %d experience!" % [character_name, amount])
 
+func battle_run():
+	pass
+
+func battle_item():
+	pass 
+	# Intergrate gloot. Trying to do this alone may cause mistakes.
 
 func battle_idle():
 	state_machine.travel("battle_idle")

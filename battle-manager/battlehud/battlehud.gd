@@ -80,6 +80,7 @@ func _on_defend_pressed():
 	action_selected.emit("defend", null)
 
 func _on_skills_pressed():
+	pass # Replace with function body.
 	action_selected.emit("skills", enemy)
 
 func _on_item_pressed() -> void:

@@ -1,0 +1,15 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bwb6yoo5ahakq"
+valid=false
+
+[deps]
+
+source_file="res://database/skills/skills_global.csv"
+
+[params]
+
+compress=true
+delimiter=0

@@ -12,15 +12,26 @@ var default_anim = "Locomotion-Library/idle2"
 
 @onready var hud: CanvasLayer = $BattleHUD
 
+# Toggles For Battles
+@export var Attack_Toggle: bool = true
+@export var Skills_Toggle: bool = true
+@export var Defend_Toggle: bool = true
+@export var Item_Toggle: bool = true
+@export var Run_Toggle: bool = true
+
 func _ready():
 	if not hud:
 		push_error("BattleHUD node not found. Please make sure it's added to the scene.")
 		return
-
 	if not hud.is_connected("action_selected", _on_action_selected):
 		hud.action_selected.connect(_on_action_selected)
-
 	initialize_battle()
+	# Checking Toggles!
+	$BattleHUD/ActionButtons/Attack.disabled = not Attack_Toggle
+	$BattleHUD/ActionButtons/Skills.disabled = not Skills_Toggle
+	$BattleHUD/ActionButtons/Defend.disabled = not Defend_Toggle
+	$BattleHUD/ActionButtons/Items.disabled = not Item_Toggle
+	$BattleHUD/ActionButtons/Run.disabled = not Run_Toggle
 
 func initialize_battle():
 	players = get_tree().get_nodes_in_group("players")
@@ -143,3 +154,10 @@ func end_battle():
 	elif are_all_defeated(players):
 		hud.show_battle_result("Game Over. All players have been defeated.")
 	hud.hide_action_buttons()
+
+func update_button_states():
+	$BattleHUD/ActionButtons/Attack.disabled = not Attack_Toggle
+	$BattleHUD/ActionButtons/Skills.disabled = not Skills_Toggle
+	$BattleHUD/ActionButtons/Defend.disabled = not Defend_Toggle
+	$BattleHUD/ActionButtons/Items.disabled = not Item_Toggle
+	$BattleHUD/ActionButtons/Run.disabled = not Run_Toggle

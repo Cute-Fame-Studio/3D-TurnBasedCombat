@@ -23,7 +23,7 @@ volumetric_fog_density = 0.02
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_erjfi"]
 albedo_color = Color(0.192279, 0.227401, 0.23218, 1)
 
-[sub_resource type="Resource" id="Resource_7arsd"]
+[sub_resource type="Resource" id="Resource_ue5g3"]
 resource_local_to_scene = true
 script = ExtResource("3_5jjwn")
 character_name = "Player"
@@ -18224,7 +18224,7 @@ material = SubResource("StandardMaterial3D_erjfi")
 
 [node name="Ally" parent="." instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.38419)
-PlayerData = SubResource("Resource_7arsd")
+PlayerData = SubResource("Resource_ue5g3")
 
 [node name="AnimationPlayer" parent="Ally" index="1"]
 libraries = {

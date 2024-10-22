@@ -1,0 +1,19 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://vikty66khym4"]
+
+[ext_resource type="Script" path="res://database/skills/skills_global.gd" id="1_313wc"]
+
+[resource]
+resource_name = "Weapon: Giga Sword"
+script = ExtResource("1_313wc")
+color = ""
+tags = "[weapon, common]"
+type = "Offensive"
+attributes = "[0, 0, 0, 2]"
+animation_name = "undefined"
+critical_rate = 0
+hit_chance = 100
+target = "single enemy"
+description = "test"
+sp = 0
+hp = 0
+element = "Physical"

@@ -28,15 +28,15 @@ layout_mode = 2
 size_flags_horizontal = 0
 text = "Skills"
 
+[node name="Items" type="Button" parent="ActionButtons"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Items"
+
 [node name="Defend" type="Button" parent="ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Defend"
-
-[node name="Item" type="Button" parent="ActionButtons"]
-layout_mode = 2
-size_flags_horizontal = 0
-text = "Item"
 
 [node name="Run" type="Button" parent="ActionButtons"]
 layout_mode = 2
@@ -89,6 +89,6 @@ offset_bottom = 27.0
 
 [connection signal="pressed" from="ActionButtons/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="ActionButtons/Skills" to="." method="_on_skills_pressed"]
+[connection signal="pressed" from="ActionButtons/Items" to="." method="_on_items_pressed"]
 [connection signal="pressed" from="ActionButtons/Defend" to="." method="_on_defend_pressed"]
-[connection signal="pressed" from="ActionButtons/Item" to="." method="_on_item_pressed"]
 [connection signal="pressed" from="ActionButtons/Run" to="." method="_on_run_pressed"]

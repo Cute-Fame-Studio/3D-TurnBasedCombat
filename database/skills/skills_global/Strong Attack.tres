@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://ckxq1hpkuqihh"]
+
+[ext_resource type="Script" path="res://database/skills/skills_global.gd" id="1_q462g"]
+
+[resource]
+resource_name = "Weapon: Fireball"
+script = ExtResource("1_q462g")
+color = ""
+tags = "[weapon, uncommon]"
+type = "Offensive"
+animation_name = "strong-attack"
+critical_rate = 0
+hit_chance = 100
+target = "single enemys"
+description = "test"
+sp = 0
+hp = 0
+element = "Physical"

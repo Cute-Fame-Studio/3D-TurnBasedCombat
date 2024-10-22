@@ -84,7 +84,7 @@ func _on_skills_pressed():
 	hide_action_buttons()
 	action_selected.emit("skills", enemy)
 
-func _on_item_pressed() -> void:
+func _on_items_pressed() -> void:
 	hide_action_buttons()
 	action_selected.emit("item", null)
 

@@ -14,6 +14,7 @@ var is_defending: bool = false
 @onready var state_machine = $AnimationTree["parameters/playback"]
 @onready var skill_node: Node = get_node("SkillList")
 @onready var skill_list: Array[Resource] = skill_node.get_skills()
+@onready var exp_node: Node = get_node("Experience")
 
 func _ready():
 	if PlayerData:
@@ -59,6 +60,7 @@ func defend():
 
 func gain_experience(amount: int):
 	print("%s gained %d experience!" % [character_name, amount])
+	print ("%s needs %d to level up!" % [character_name, get_exp_stat().get_exp_to_level()])
 
 func battle_run():
 	pass
@@ -87,3 +89,6 @@ func wait_attack():
 		return
 	await $AnimationTree.animation_finished
 	battle_idle()
+
+func get_exp_stat():
+	return exp_node

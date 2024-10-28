@@ -89,7 +89,16 @@ func _on_action_selected(action: String, target):
 		"item":
 			perform_item(current_character)
 	
+	process_exp_gain(current_character, target) # EDIT: Temp exp access/effect - gain exp on turn end
+	
 	end_turn()
+
+func process_exp_gain(user, target):
+	if not target:
+		return
+	var exp_gained = target.get_exp_stat().get_exp_on_kill()
+	user.get_exp_stat().add_exp(exp_gained)
+	user.gain_experience(exp_gained)
 
 func perform_attack(attacker, target):
 	var damage = attacker.attack_anim()

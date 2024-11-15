@@ -117,6 +117,7 @@ func perform_item(user):
 	heal_calculation(user, user, amount)
 
 func damage_calculation(attacker, target, damage):
+	damage = Formulas.physical_damage(attacker, target, damage)
 	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
 	target.take_damage(damage)
 	update_hud()

@@ -5,11 +5,11 @@ var enemies: Array = []
 var turn_order: Array = []
 var current_turn: int = 0
 
+@onready var ActionButtons = find_child("ActionButtons")
+
 var current_battler
-var default_anim = "Locomotion-Library/idle2"
-
+@export var default_anim = "Locomotion-Library/idle2"
 @export var OriginalMap = "res://maps/regular_map/backtogame.tscn"
-
 @onready var hud: CanvasLayer = $BattleHUD
 
 # Toggles For Battles
@@ -27,11 +27,11 @@ func _ready():
 		hud.action_selected.connect(_on_action_selected)
 	initialize_battle()
 	# Checking Toggles!
-	$BattleHUD/ActionButtons/Attack.disabled = not Attack_Toggle
-	$BattleHUD/ActionButtons/Skills.disabled = not Skills_Toggle
-	$BattleHUD/ActionButtons/Defend.disabled = not Defend_Toggle
-	$BattleHUD/ActionButtons/Items.disabled = not Item_Toggle
-	$BattleHUD/ActionButtons/Run.disabled = not Run_Toggle
+	ActionButtons.get_node("Attack").disabled = not Attack_Toggle
+	ActionButtons.get_node("Skills").disabled = not Skills_Toggle
+	ActionButtons.get_node("Defend").disabled = not Defend_Toggle
+	ActionButtons.get_node("Items").disabled = not Item_Toggle
+	ActionButtons.get_node("Run").disabled = not Run_Toggle
 
 func initialize_battle():
 	players = get_tree().get_nodes_in_group("players")
@@ -166,8 +166,8 @@ func end_battle():
 	hud.hide_action_buttons()
 
 func update_button_states():
-	$BattleHUD/ActionButtons/Attack.disabled = not Attack_Toggle
-	$BattleHUD/ActionButtons/Skills.disabled = not Skills_Toggle
-	$BattleHUD/ActionButtons/Defend.disabled = not Defend_Toggle
-	$BattleHUD/ActionButtons/Items.disabled = not Item_Toggle
-	$BattleHUD/ActionButtons/Run.disabled = not Run_Toggle
+	ActionButtons.get_node("Attack").disabled = not Attack_Toggle
+	ActionButtons.get_node("Skills").disabled = not Skills_Toggle
+	ActionButtons.get_node("Defend").disabled = not Defend_Toggle
+	ActionButtons.get_node("Items").disabled = not Item_Toggle
+	ActionButtons.get_node("Skills").disabled = not Run_Toggle

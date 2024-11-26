@@ -4,6 +4,7 @@ enum AIType {AGGRESSIVE, DEFENSIVE}
 
 @export var ai_type: AIType = AIType.AGGRESSIVE
 
+
 func _ready():
 	super._ready()
 	remove_from_group("players")

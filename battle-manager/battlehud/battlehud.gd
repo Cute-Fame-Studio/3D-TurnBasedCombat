@@ -2,16 +2,17 @@ extends CanvasLayer
 
 signal action_selected(action: String, target)
 
-@onready var action_buttons: VBoxContainer = $ActionButtons
-@onready var character_info: VBoxContainer = $PlayerInfo1
-@onready var battle_result_label: Label = $BattleResultLabel
+@onready var action_buttons: VBoxContainer = $Control/ActionButtons
+@onready var character_info: VBoxContainer = $Control/PlayerStats
+@onready var enemy_stats: VBoxContainer = $Control/EnemyStats
+@onready var battle_result_label: Label = $Control/BattleResultLabel
 
 var active_character: Node = null
 var enemy: Node = null
 
 # Health bar-related nodes
-@onready var player_health_bar: ProgressBar = $PlayerHealthBar
-@onready var enemy_health_bar: ProgressBar = $EnemyHealthBar
+@onready var player_health_bar: ProgressBar = $Control/PlayerStats/PlayerHealthBar
+@onready var enemy_health_bar: ProgressBar = $Control/EnemyStats/EnemyHealthBar
 
 func _ready():
 	battle_result_label.hide()
@@ -46,8 +47,8 @@ func update_character_info():
 # Update this method based on how your CharacterInfo node is structured
 	if character_info.has_method("update_player_info") and active_character:
 		character_info.update_player_info(active_character)
-	if character_info.has_method("update_enemy_info") and enemy:
-		character_info.update_enemy_info(enemy)
+	if enemy_stats.has_method("update_enemy_info") and enemy:
+		enemy_stats.update_enemy_stats(enemy) # Needs some fixing, The reason why the enemy has a player name.
 
 func show_battle_result(result: String):
 	battle_result_label.text = result

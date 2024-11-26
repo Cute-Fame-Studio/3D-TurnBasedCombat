@@ -23,7 +23,7 @@ volumetric_fog_density = 0.02
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_erjfi"]
 albedo_color = Color(0.192279, 0.227401, 0.23218, 1)
 
-[sub_resource type="Resource" id="Resource_88s8w"]
+[sub_resource type="Resource" id="Resource_odq78"]
 resource_local_to_scene = true
 script = ExtResource("3_5jjwn")
 character_name = "Player"
@@ -18226,7 +18226,7 @@ material = SubResource("StandardMaterial3D_erjfi")
 
 [node name="Ally" parent="." instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.38419)
-PlayerData = SubResource("Resource_88s8w")
+PlayerData = SubResource("Resource_odq78")
 
 [node name="GeneralSkeleton" parent="Ally/Armature" index="0"]
 bones/0/position = Vector3(-6.75701e-08, 0.997919, 8.41358e-07)
@@ -18291,6 +18291,26 @@ PlayerData = SubResource("Resource_b4i21")
 transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -2.08627)
 
 [node name="BattleHUD" parent="." instance=ExtResource("6_bnngp")]
+
+[node name="BattleResultLabel" parent="BattleHUD/Control" index="1"]
+layout_mode = 0
+offset_top = 0.0
+offset_bottom = 140.0
+
+[node name="PlayerInfo" parent="BattleHUD/Control" index="2"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 139.0
+offset_bottom = 32.0
+
+[node name="EnemyStats" parent="BattleHUD/Control" index="3"]
+layout_mode = 0
+offset_top = 0.0
+offset_bottom = 0.0
+
+[node name="PlayerStats" parent="BattleHUD/Control" index="4"]
+layout_mode = 0
 
 [editable path="Ally"]
 [editable path="BattleHUD"]

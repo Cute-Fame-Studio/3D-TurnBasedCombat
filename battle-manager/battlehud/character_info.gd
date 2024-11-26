@@ -1,6 +1,8 @@
 extends VBoxContainer
 
-# In your CharacterInfo.gd script
+# Declare the progress bar node
+@onready var player_health_bar: ProgressBar = $PlayerHealthBar
+
 func add_character(character: Node):
 	# Add a new label or update existing UI elements
 	var label = Label.new()
@@ -10,9 +12,5 @@ func add_character(character: Node):
 func update_player_info(character: Node):
 	# Update player-specific UI elements
 	$PlayerNameLabel.text = character.character_name
-	$PlayerHealthLabel.text = str(character.current_health) + "/" + str(character.max_health)
-
-func update_enemy_info(enemy: Node):
-	# Update enemy-specific UI elements
-	$EnemyNameLabel.text = enemy.character_name
-	$EnemyHealthLabel.text = str(enemy.current_health) + "/" + str(enemy.max_health)
+	$PlayerHealthBar.max_value = character.max_health
+	$PlayerHealthBar.value = character.current_health

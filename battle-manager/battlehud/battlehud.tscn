@@ -1,12 +1,41 @@
-[gd_scene load_steps=3 format=3 uid="uid://cyjcaceen0235"]
+[gd_scene load_steps=4 format=3 uid="uid://cyjcaceen0235"]
 
 [ext_resource type="Script" path="res://battle-manager/battlehud/battlehud.gd" id="1_0qukq"]
 [ext_resource type="Script" path="res://battle-manager/battlehud/character_info.gd" id="2_64dmw"]
 
+[sub_resource type="GDScript" id="GDScript_mbt63"]
+resource_name = "EnemyStats"
+script/source = "extends VBoxContainer
+
+# Declare the progress bar node
+@onready var enemy_health_bar: ProgressBar = $EnemyHealthBar
+
+func add_character(character: Node):
+	# Add a new label or update existing UI elements
+	var label = Label.new()
+	label.text = character.character_name
+	add_child(label)
+
+func update_enemy_stats(character: Node):
+	# Update enemy-specific UI elements
+	$EnemyNameLabel.text = character.character_name
+	$EnemyHealthBar.max_value = character.max_health
+	$EnemyHealthBar.value = character.current_health
+"
+
 [node name="BattleHUD" type="CanvasLayer" groups=["BattleHud"]]
 script = ExtResource("1_0qukq")
 
-[node name="ActionButtons" type="VBoxContainer" parent="."]
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ActionButtons" type="VBoxContainer" parent="Control"]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -16,79 +45,110 @@ size_flags_horizontal = 0
 size_flags_vertical = 4
 alignment = 2
 
-[node name="Attack" type="Button" parent="ActionButtons"]
+[node name="Attack" type="Button" parent="Control/ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 text = "Attack
 "
 
-[node name="Skills" type="Button" parent="ActionButtons"]
+[node name="Skills" type="Button" parent="Control/ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Skills"
 
-[node name="Items" type="Button" parent="ActionButtons"]
+[node name="Items" type="Button" parent="Control/ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Items"
 
-[node name="Defend" type="Button" parent="ActionButtons"]
+[node name="Defend" type="Button" parent="Control/ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Defend"
 
-[node name="Run" type="Button" parent="ActionButtons"]
+[node name="Run" type="Button" parent="Control/ActionButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Run"
 
-[node name="BattleResultLabel" type="Label" parent="."]
-offset_top = 625.0
+[node name="BattleResultLabel" type="Label" parent="Control"]
+layout_mode = 0
+offset_top = 225.0
 offset_right = 1152.0
-offset_bottom = 648.0
+offset_bottom = 365.0
 
-[node name="PlayerInfo" type="Label" parent="."]
+[node name="PlayerInfo" type="Label" parent="Control"]
+layout_mode = 0
 offset_left = 65.0
 offset_top = 40.0
 offset_right = 204.0
 offset_bottom = 72.0
 
-[node name="EnemyInfo1" type="VBoxContainer" parent="."]
+[node name="EnemyStats" type="VBoxContainer" parent="Control"]
+layout_mode = 0
 offset_top = 131.0
 offset_right = 73.0
 offset_bottom = 131.0
+script = SubResource("GDScript_mbt63")
 
-[node name="PlayerInfo1" type="VBoxContainer" parent="."]
-offset_top = 23.0
+[node name="EnemyNameLabel" type="Label" parent="Control/EnemyStats"]
+layout_mode = 2
+
+[node name="EnemyHealthBar" type="ProgressBar" parent="Control/EnemyStats"]
+layout_mode = 2
+
+[node name="PlayerStats" type="VBoxContainer" parent="Control"]
+layout_mode = 1
 offset_right = 73.0
-offset_bottom = 127.0
+offset_bottom = 104.0
 script = ExtResource("2_64dmw")
 
-[node name="PlayerNameLabel" type="Label" parent="PlayerInfo1"]
+[node name="PlayerNameLabel" type="Label" parent="Control/PlayerStats"]
 layout_mode = 2
 
-[node name="PlayerHealthLabel" type="Label" parent="PlayerInfo1"]
+[node name="PlayerHealthBar" type="ProgressBar" parent="Control/PlayerStats"]
 layout_mode = 2
 
-[node name="EnemyNameLabel" type="Label" parent="PlayerInfo1"]
-layout_mode = 2
-
-[node name="EnemyHealthLabel" type="Label" parent="PlayerInfo1"]
-layout_mode = 2
-
-[node name="PlayerHealthBar" type="ProgressBar" parent="."]
-offset_right = 91.0
-offset_bottom = 27.0
-
-[node name="EnemyHealthBar" type="ProgressBar" parent="."]
+[node name="Skills" type="Control" parent="Control"]
 visible = false
-offset_left = 1056.0
-offset_right = 1154.0
-offset_bottom = 27.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[connection signal="pressed" from="ActionButtons/Attack" to="." method="_on_attack_pressed"]
-[connection signal="pressed" from="ActionButtons/Skills" to="." method="_on_skills_pressed"]
-[connection signal="pressed" from="ActionButtons/Items" to="." method="_on_items_pressed"]
-[connection signal="pressed" from="ActionButtons/Defend" to="." method="_on_defend_pressed"]
-[connection signal="pressed" from="ActionButtons/Run" to="." method="_on_run_pressed"]
+[node name="ColorRect" type="ColorRect" parent="Control/Skills"]
+layout_mode = 0
+offset_left = 296.0
+offset_top = 477.0
+offset_right = 789.0
+offset_bottom = 624.0
+color = Color(0, 0, 0, 1)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/Skills/ColorRect"]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Delete Me" type="Button" parent="Control/Skills/ColorRect/HBoxContainer"]
+layout_mode = 2
+text = "Delete Me"
+flat = true
+icon_alignment = 2
+
+[node name="Delete Me2" type="Button" parent="Control/Skills/ColorRect/HBoxContainer"]
+layout_mode = 2
+text = "Delete Me"
+
+[connection signal="pressed" from="Control/ActionButtons/Attack" to="." method="_on_attack_pressed"]
+[connection signal="pressed" from="Control/ActionButtons/Skills" to="." method="_on_skills_pressed"]
+[connection signal="pressed" from="Control/ActionButtons/Items" to="." method="_on_items_pressed"]
+[connection signal="pressed" from="Control/ActionButtons/Defend" to="." method="_on_defend_pressed"]
+[connection signal="pressed" from="Control/ActionButtons/Run" to="." method="_on_run_pressed"]

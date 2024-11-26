@@ -10,3 +10,4 @@ max_health = 100
 attack = 10
 defense = 5
 speed = 5
+element = 0

@@ -6,14 +6,4 @@ extends Resource
 @export var attack: int = 10
 @export var defense: int = 5
 @export var speed: int = 5
-@export var element: Elements
-
-enum Elements 
-{
-    UNASPECTED = 0,
-    EARTH = 1,
-    AIR = 2,
-    FIRE = 3,
-    WATER = 4,
-    ENDLIST
-}
+@export var element: int = GlobalBattleSettings.Elements.Physical # Double Check, This may be broken. I cannot confirm

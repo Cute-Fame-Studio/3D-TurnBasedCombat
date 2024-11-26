@@ -29,6 +29,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Activeplayer="*res://battle-manager/battlehud/activeplayer.gd"
+GlobalBattleSettings="*res://assets/GlobalBattleSettings.gd"
 
 [dotnet]
 

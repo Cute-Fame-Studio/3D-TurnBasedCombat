@@ -28,6 +28,7 @@ func _ready():
 		add_to_group("players")
 	else:
 		push_error("PlayerData resource not set!")
+	print("Current Element: ",PlayerData.element)
 
 func is_defeated() -> bool:
 	return current_health <= 0
@@ -74,7 +75,8 @@ func battle_idle():
 
 func attack_anim():
 	state_machine.travel("attack")
-	return get_attack_damage()
+	return get_attack_damage() # Needing to transfer to dealing damage through animation. Not after! 
+	# Some animations may do damage multiple times during their attack, It is better to dynamically show the damage being dealt.
 
 func skill_attack():
 	state_machine.travel(skill_list[0].anim_tree_name)

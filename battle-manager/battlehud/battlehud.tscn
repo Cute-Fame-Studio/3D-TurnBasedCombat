@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://cyjcaceen0235"]
+[gd_scene load_steps=5 format=3 uid="uid://cyjcaceen0235"]
 
 [ext_resource type="Script" path="res://battle-manager/battlehud/battlehud.gd" id="1_0qukq"]
 [ext_resource type="Script" path="res://battle-manager/battlehud/character_info.gd" id="2_64dmw"]
+[ext_resource type="Theme" uid="uid://crdk7x2bxdhob" path="res://theme_test.tres" id="2_uiugx"]
 
 [sub_resource type="GDScript" id="GDScript_mbt63"]
 resource_name = "EnemyStats"
@@ -33,6 +34,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_uiugx")
 
 [node name="ActionButtons" type="VBoxContainer" parent="Control"]
 layout_mode = 1
@@ -43,6 +45,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
+theme_type_variation = &"Base"
 alignment = 2
 
 [node name="Attack" type="Button" parent="Control/ActionButtons"]
@@ -111,7 +114,6 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="Skills" type="Control" parent="Control"]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -129,23 +131,19 @@ color = Color(0, 0, 0, 1)
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Control/Skills/ColorRect"]
 layout_direction = 2
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_right = 493.0
+offset_bottom = 144.0
+theme_override_constants/separation = 100
 alignment = 1
 
-[node name="Delete Me" type="Button" parent="Control/Skills/ColorRect/HBoxContainer"]
+[node name="Skill 1" type="Button" parent="Control/Skills/ColorRect/HBoxContainer"]
 layout_mode = 2
-text = "Delete Me"
-flat = true
-icon_alignment = 2
+text = "Skill 1"
 
-[node name="Delete Me2" type="Button" parent="Control/Skills/ColorRect/HBoxContainer"]
+[node name="Skill 2" type="Button" parent="Control/Skills/ColorRect/HBoxContainer"]
 layout_mode = 2
-text = "Delete Me"
+text = "Skill 2"
 
 [connection signal="pressed" from="Control/ActionButtons/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="Control/ActionButtons/Skills" to="." method="_on_skills_pressed"]

@@ -7,7 +7,7 @@ signal action_selected(action: String, target)
 @onready var enemy_stats: VBoxContainer = $Control/EnemyStats
 @onready var battle_result_label: Label = $Control/BattleResultLabel
 
-var active_character: Node = null
+var activeBattler: Node = null
 var enemy: Node = null
 
 # Health bar-related nodes
@@ -33,8 +33,8 @@ func on_add_character(character: Node):
 	else:
 		print("Warning: CharacterInfo node doesn't have an add_character method")
 
-func set_active_character(character: Node):
-	active_character = character
+func set_activebattler(character: Node):
+	activeBattler = character
 
 func show_action_buttons(_character: Node):
 	action_buttons.show()
@@ -45,8 +45,8 @@ func hide_action_buttons():
 
 func update_character_info():
 # Update this method based on how your CharacterInfo node is structured
-	if character_info.has_method("update_player_info") and active_character:
-		character_info.update_player_info(active_character)
+	if character_info.has_method("update_player_info") and activeBattler:
+		character_info.update_player_info(activeBattler)
 	if enemy_stats.has_method("update_enemy_info") and enemy:
 		enemy_stats.update_enemy_stats(enemy) # Needs some fixing, The reason why the enemy has a player name.
 
@@ -56,9 +56,9 @@ func show_battle_result(result: String):
 
 # Health bar update functions
 func update_player_health_bar():
-	if active_character:
-		player_health_bar.max_value = active_character.max_health
-		player_health_bar.value = active_character.current_health
+	if activeBattler:
+		player_health_bar.max_value = activeBattler.max_health
+		player_health_bar.value = activeBattler.current_health
 		player_health_bar.show()
 
 func update_enemy_health_bar():
@@ -83,6 +83,8 @@ func _on_defend_pressed():
 
 func _on_skills_pressed():
 	hide_action_buttons()
+	# Skills will instance a button and automatically get their theme. If a theme needs to be specified!
+	# An setting to specify what variation in that theme should be used.
 	action_selected.emit("skills", enemy)
 
 func _on_items_pressed() -> void:
@@ -117,8 +119,3 @@ func prepare_for_3d():
 	var texture_rect = TextureRect.new()
 	texture_rect.texture = viewport.get_texture()
 	add_child(texture_rect)
-
-# Now you can use this texture_rect in your 3D environment
-# For example, you could assign its texture to a MeshInstance's material
-
-# Remember to call prepare_for_3d() when you're ready to switch to 3D rendering

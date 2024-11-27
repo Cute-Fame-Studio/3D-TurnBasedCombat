@@ -1,6 +1,6 @@
 [gd_resource type="Resource" load_steps=2 format=3 uid="uid://5b3kwmig3tbx"]
 
-[ext_resource type="Script" path="res://assets/GlobalBattleSettings.gd" id="1_on87y"]
+[ext_resource type="Script" path="res://database/battle/GlobalBattleSettings.gd" id="1_on87y"]
 
 [resource]
 script = ExtResource("1_on87y")

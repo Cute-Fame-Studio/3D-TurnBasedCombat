@@ -1,0 +1,10 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://crdk7x2bxdhob"]
+
+[ext_resource type="Texture2D" uid="uid://i6v7uo8qdg1d" path="res://Placeholder.svg" id="1_17fte"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h0lgr"]
+
+[resource]
+Base/base_type = &"Button"
+Button/icons/icon = ExtResource("1_17fte")
+Button/styles/normal = SubResource("StyleBoxFlat_h0lgr")

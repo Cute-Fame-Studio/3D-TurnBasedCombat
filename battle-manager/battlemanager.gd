@@ -8,8 +8,10 @@ var current_turn: int = 0
 @onready var ActionButtons = find_child("ActionButtons")
 
 var current_battler
+# Defualt animation should check for weapon's later down the road, And adapt to using them with unique animations.
 @export var default_anim = "Locomotion-Library/idle2"
-@export var OriginalMap = "res://maps/regular_map/backtogame.tscn"
+# Added by repo owner, Fame. To test compatibility with returning after a battle.
+@export var GameMap = "res://maps/regular_map/backtogame.tscn"
 @onready var hud: CanvasLayer = $BattleHUD
 
 # Toggles For Battles
@@ -72,7 +74,7 @@ func start_next_turn():
 	update_hud()
 
 func player_turn(character):
-	hud.set_active_character(character)
+	hud.set_activebattler(character)
 	hud.show_action_buttons(character)
 
 func _on_action_selected(action: String, target):
@@ -108,6 +110,7 @@ func perform_defend(character):
 	character.defend()
 	print("%s is defending!" % character.character_name)
 
+# Don't forget that game's also allow skill's to heal players, So use a universal term and if statements.
 func perform_skill(attacker, target):
 	var damage = attacker.skill_attack()
 	damage_calculation(attacker, target, damage)
@@ -116,6 +119,7 @@ func perform_item(user):
 	var amount = user.skill_heal()
 	heal_calculation(user, user, amount)
 
+# Loving the additions of formula's!
 func damage_calculation(attacker, target, damage):
 	damage = Formulas.physical_damage(attacker, target, damage)
 	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
@@ -146,22 +150,22 @@ func update_hud():
 		hud.hide_action_buttons()
 
 func is_battle_over():
-	return are_all_defeated(players) or are_all_defeated(enemies)
+	return all_defeated(players) or all_defeated(enemies)
 
-func are_all_defeated(characters: Array):
+func all_defeated(characters: Array):
 	for character in characters:
 		if not character.is_defeated():
 			return false
 	return true
 
 func end_battle():
-	if are_all_defeated(enemies):
+	if all_defeated(enemies):
 		hud.show_battle_result("Victory! All enemies have been defeated.")
 		for player in players:
 			player.gain_experience(100)
-			# Toggle Enemy's off on the scene you left.
-			get_tree().change_scene_to_file(OriginalMap) # This code causes the crash.
-	elif are_all_defeated(players):
+			# Be sure to toggle Enemy's off on the scene you left.
+			get_tree().change_scene_to_file(GameMap) # This code causes the crash.
+	elif all_defeated(players):
 		hud.show_battle_result("Game Over. All players have been defeated.")
 	hud.hide_action_buttons()
 

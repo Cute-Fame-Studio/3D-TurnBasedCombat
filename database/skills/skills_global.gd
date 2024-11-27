@@ -12,3 +12,5 @@ extends Resource
 @export var sp : int
 @export var hp : int
 @export var element := ""
+# Don't forget captilization when defining enum's.
+@export var skill_type : int = GlobalBattleSettings.SkillTypes.SKILLS

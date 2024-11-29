@@ -18,6 +18,8 @@ Though, With that being said! This project shouldn't be overcomplicated for a 2d
 ## Project Description:
 This battle system was gonna be used in my own projects, But as a collabrative effort, It will be open sourced, And maintained by the owner of this github repo. (The Game In Question Is Still In Development) [- Cute Fame 3D (Working Title)]
 
+### Combat Basis (TBS System).
+
 ## Getting Started/Project TaskBoard:
 
 ### [Getting Started](https://github.com/Cute-Fame-Studio/3D-TurnBasedCombat/blob/3a52040dce2baa93689853395029f7fb2f1c978d/gettingstarted.md)

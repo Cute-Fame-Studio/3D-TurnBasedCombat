@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="CharacterAbilities" load_steps=2 format=3 uid="uid://bhp64tgfkw5xm"]
 
-[ext_resource type="Script" path="res://battle-manager/character_abilities.gd" id="1_xf3od"]
+[ext_resource type="Script" path="res://battle-manager/skills/character_abilities.gd" id="1_xf3od"]
 
 [resource]
 script = ExtResource("1_xf3od")

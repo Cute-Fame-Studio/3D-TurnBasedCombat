@@ -1,29 +1,28 @@
-[gd_scene load_steps=27 format=3 uid="uid://b56ncgnrwugct"]
+[gd_scene load_steps=26 format=3 uid="uid://b56ncgnrwugct"]
 
 [ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://assets/testplayer/y_bot-ally.tscn" id="1_2aqym"]
-[ext_resource type="Script" path="res://battle-manager/battlemanager.gd" id="1_2kmw4"]
+[ext_resource type="PackedScene" uid="uid://bvhah4cfn4txb" path="res://battle-manager/BattleManager.tscn" id="1_t14x8"]
 [ext_resource type="PackedScene" uid="uid://clmhyw21qciy4" path="res://assets/testplayer/y_bot-enemy.tscn" id="2_a11mn"]
 [ext_resource type="Script" path="res://assets/PlayerData.gd" id="3_5jjwn"]
-[ext_resource type="PackedScene" uid="uid://cyjcaceen0235" path="res://battle-manager/battlehud/battlehud.tscn" id="6_bnngp"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1kyon"]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2ddfu"]
 sky_top_color = Color(0.447336, 0.519571, 0.620102, 1)
 sky_cover_modulate = Color(0.801182, 0.452923, 0.347646, 1)
 
 [sub_resource type="Sky" id="Sky_4vui1"]
-sky_material = SubResource("ProceduralSkyMaterial_1kyon")
+sky_material = SubResource("ProceduralSkyMaterial_2ddfu")
 
-[sub_resource type="Environment" id="Environment_emyb7"]
+[sub_resource type="Environment" id="Environment_misr6"]
 background_mode = 2
 sky = SubResource("Sky_4vui1")
 fog_enabled = true
 fog_light_energy = 1.34
 volumetric_fog_density = 0.02
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_erjfi"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3fc4g"]
 albedo_color = Color(0.192279, 0.227401, 0.23218, 1)
 
-[sub_resource type="Resource" id="Resource_yp6nl"]
+[sub_resource type="Resource" id="Resource_1cjhw"]
 resource_local_to_scene = true
 script = ExtResource("3_5jjwn")
 character_name = "Player"
@@ -18198,7 +18197,7 @@ _data = {
 "walk": SubResource("Animation_dl4t7")
 }
 
-[sub_resource type="Resource" id="Resource_b4i21"]
+[sub_resource type="Resource" id="Resource_mvqdj"]
 resource_local_to_scene = true
 script = ExtResource("3_5jjwn")
 character_name = "Enemy"
@@ -18208,74 +18207,24 @@ defense = 5
 speed = 5
 element = 0
 
-[node name="Base" type="Node3D"]
-script = ExtResource("1_2kmw4")
+[node name="Battle-Manager" instance=ExtResource("1_t14x8")]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_emyb7")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." index="1"]
+environment = SubResource("Environment_misr6")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" index="0"]
 transform = Transform3D(1, 0, 0, 0, 0.0715845, 0.997435, 0, -0.997435, 0.0715845, 0, 17.7598, 0)
 light_energy = 1.646
 shadow_enabled = true
 
-[node name="Platform" type="CSGBox3D" parent="."]
+[node name="Platform" type="CSGBox3D" parent="." index="2"]
 use_collision = true
 size = Vector3(100, 0.5, 100)
-material = SubResource("StandardMaterial3D_erjfi")
+material = SubResource("StandardMaterial3D_3fc4g")
 
-[node name="Ally" parent="." instance=ExtResource("1_2aqym")]
+[node name="Ally" parent="." index="3" instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.38419)
-PlayerData = SubResource("Resource_yp6nl")
-
-[node name="GeneralSkeleton" parent="Ally/Armature" index="0"]
-bones/0/position = Vector3(-6.75701e-08, 0.997919, 8.41358e-07)
-bones/0/rotation = Quaternion(0, 0, 0, 1)
-bones/2/rotation = Quaternion(0, 0, 0, 1)
-bones/3/rotation = Quaternion(0, 0, 0, 1)
-bones/5/rotation = Quaternion(0, 0, 0, 1)
-bones/8/rotation = Quaternion(0, 1, 0, 0)
-bones/9/rotation = Quaternion(0, -0.707107, 0, 0.707107)
-bones/10/rotation = Quaternion(0, 0.707107, 0, 0.707107)
-bones/13/rotation = Quaternion(-1.49012e-08, 0, 0, 1)
-bones/14/rotation = Quaternion(0, 0, 0, 1)
-bones/16/rotation = Quaternion(0, 0, 0, 1)
-bones/17/rotation = Quaternion(0, 0, 0, 1)
-bones/18/rotation = Quaternion(0, 0, 0, 1)
-bones/20/rotation = Quaternion(0, 0, 0, 1)
-bones/21/rotation = Quaternion(0, 0, 0, 1)
-bones/22/rotation = Quaternion(0, 0, 0, 1)
-bones/24/rotation = Quaternion(0, 0, 0, 1)
-bones/25/rotation = Quaternion(0, 0, 0, 1)
-bones/26/rotation = Quaternion(0, 0, 0, 1)
-bones/28/rotation = Quaternion(0, 0, 0, 1)
-bones/29/rotation = Quaternion(0, 0, 0, 1)
-bones/30/rotation = Quaternion(0, 0, 0, 1)
-bones/32/rotation = Quaternion(0, 1, 0, 0)
-bones/33/rotation = Quaternion(0, 0.707107, 0, 0.707107)
-bones/34/rotation = Quaternion(0, -0.707107, 0, 0.707107)
-bones/37/rotation = Quaternion(-1.49012e-08, 0, 0, 1)
-bones/38/rotation = Quaternion(0, 0, 0, 1)
-bones/40/rotation = Quaternion(0, 0, 0, 1)
-bones/41/rotation = Quaternion(0, 0, 0, 1)
-bones/42/rotation = Quaternion(0, 0, 0, 1)
-bones/44/rotation = Quaternion(0, 0, 0, 1)
-bones/45/rotation = Quaternion(0, 0, 0, 1)
-bones/46/rotation = Quaternion(0, 0, 0, 1)
-bones/48/rotation = Quaternion(0, 0, 0, 1)
-bones/49/rotation = Quaternion(0, 0, 0, 1)
-bones/50/rotation = Quaternion(0, 0, 0, 1)
-bones/52/rotation = Quaternion(0, 0, 0, 1)
-bones/53/rotation = Quaternion(0, 0, 0, 1)
-bones/54/rotation = Quaternion(0, 0, 0, 1)
-bones/55/rotation = Quaternion(0, 0, 1, 0)
-bones/56/rotation = Quaternion(0, 1, 0, 0)
-bones/57/rotation = Quaternion(0, 0.707107, -0.707107, 0)
-bones/58/rotation = Quaternion(0, 1, 0, 0)
-bones/60/rotation = Quaternion(0, 0, 1, 0)
-bones/61/rotation = Quaternion(0, 1, 0, 0)
-bones/62/rotation = Quaternion(0, 0.707107, -0.707107, 0)
-bones/63/rotation = Quaternion(0, 1, 0, 0)
+PlayerData = SubResource("Resource_1cjhw")
 
 [node name="AnimationPlayer" parent="Ally" index="1"]
 libraries = {
@@ -18283,31 +18232,12 @@ libraries = {
 "Locomotion-Library": SubResource("AnimationLibrary_x8dua")
 }
 
-[node name="Enemy" parent="." instance=ExtResource("2_a11mn")]
+[node name="Enemy" parent="." index="4" instance=ExtResource("2_a11mn")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.25, 2)
-PlayerData = SubResource("Resource_b4i21")
+PlayerData = SubResource("Resource_mvqdj")
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." index="5"]
 transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -2.08627)
 
-[node name="BattleHUD" parent="." instance=ExtResource("6_bnngp")]
-
-[node name="BattleResultLabel" parent="BattleHUD/Control" index="1"]
-offset_top = 0.0
-offset_bottom = 140.0
-
-[node name="PlayerInfo" parent="BattleHUD/Control" index="2"]
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 139.0
-offset_bottom = 32.0
-
-[node name="EnemyStats" parent="BattleHUD/Control" index="3"]
-offset_top = 0.0
-offset_bottom = 0.0
-
-[node name="PlayerStats" parent="BattleHUD/Control" index="4"]
-layout_mode = 0
-
-[editable path="Ally"]
 [editable path="BattleHUD"]
+[editable path="Ally"]

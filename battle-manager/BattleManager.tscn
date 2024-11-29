@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=3 uid="uid://bvhah4cfn4txb"]
+
+[ext_resource type="Script" path="res://battle-manager/battlemanager.gd" id="1_duov8"]
+[ext_resource type="PackedScene" uid="uid://cyjcaceen0235" path="res://battle-manager/battlehud/battlehud.tscn" id="5_se261"]
+
+[node name="Battle-Manager" type="Node3D"]
+script = ExtResource("1_duov8")
+
+[node name="BattleHUD" parent="." instance=ExtResource("5_se261")]
+
+[node name="BattleResultLabel" parent="BattleHUD/Control" index="1"]
+offset_top = 0.0
+offset_bottom = 140.0
+
+[node name="PlayerInfo" parent="BattleHUD/Control" index="2"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 139.0
+offset_bottom = 32.0
+
+[node name="EnemyStats" parent="BattleHUD/Control" index="3"]
+offset_top = 0.0
+offset_bottom = 0.0
+
+[node name="PlayerStats" parent="BattleHUD/Control" index="4"]
+layout_mode = 0
+
+[editable path="BattleHUD"]

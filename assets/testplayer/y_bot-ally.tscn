@@ -1,7 +1,7 @@
 [gd_scene load_steps=39 format=3 uid="uid://bcqxqucgohr4x"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_2a5t1"]
-[ext_resource type="Script" path="res://battle-manager/players/player.gd" id="2_y13mn"]
+[ext_resource type="Script" path="res://battle-manager/players/battler_ally.gd" id="2_y13mn"]
 [ext_resource type="Script" path="res://battle-manager/skills/skill_list.gd" id="3_da0b1"]
 [ext_resource type="Resource" uid="uid://bkn0p2p5vxwv3" path="res://assets/abilities/damage_ability.tres" id="4_b43tf"]
 [ext_resource type="Resource" uid="uid://bhp64tgfkw5xm" path="res://assets/abilities/heal_ability.tres" id="5_qhict"]
@@ -4149,6 +4149,17 @@ tracks/221/path = NodePath("Armature/GeneralSkeleton:RightThumbMetacarpal")
 tracks/221/interp = 1
 tracks/221/loop_wrap = true
 tracks/221/keys = PackedFloat32Array(0, 1, 0.060003, -0.540625, -0.455768, 0.704556)
+tracks/222/type = "method"
+tracks/222/imported = false
+tracks/222/enabled = true
+tracks/222/path = NodePath(".")
+tracks/222/interp = 1
+tracks/222/loop_wrap = true
+tracks/222/keys = {
+"times": PackedFloat32Array(),
+"transitions": PackedFloat32Array(),
+"values": []
+}
 
 [sub_resource type="Animation" id="Animation_6qiim"]
 resource_name = "idle1-loop"

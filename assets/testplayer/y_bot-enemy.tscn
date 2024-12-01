@@ -1,7 +1,7 @@
 [gd_scene load_steps=28 format=3 uid="uid://clmhyw21qciy4"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_kfukl"]
-[ext_resource type="Script" path="res://battle-manager/players/enemycombat.gd" id="2_7wb1w"]
+[ext_resource type="Script" path="res://battle-manager/players/battler_enemy.gd" id="2_7wb1w"]
 [ext_resource type="Resource" uid="uid://ciia7nijtierl" path="res://assets/PlayerData.tres" id="3_oj7o1"]
 [ext_resource type="Script" path="res://battle-manager/skills/skill_list.gd" id="4_ig8r7"]
 [ext_resource type="Script" path="res://battle-manager/players/experience.gd" id="5_blbti"]

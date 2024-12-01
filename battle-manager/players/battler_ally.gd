@@ -74,9 +74,12 @@ func battle_idle():
 	state_machine.travel("battle_idle")
 
 func attack_anim():
-	state_machine.travel("attack")
+	state_machine.travel("attack") 
 	return get_attack_damage() # Needing to transfer to dealing damage through animation. Not after! 
 	# Some animations may do damage multiple times during their attack, It is better to dynamically show the damage being dealt.
+
+func deal_damage():
+	return get_attack_damage()
 
 func skill_attack():
 	state_machine.travel(skill_list[0].anim_tree_name)

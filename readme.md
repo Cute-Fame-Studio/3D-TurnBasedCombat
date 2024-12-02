@@ -25,8 +25,9 @@ This battle system was gonna be used in my own projects, But as a collabrative e
 ### [Getting Started](https://github.com/Cute-Fame-Studio/3D-TurnBasedCombat/blob/3a52040dce2baa93689853395029f7fb2f1c978d/gettingstarted.md)
 ### [TaskBoard/ToDo](https://github.com/orgs/Cute-Fame-Studio/projects/2)
 
-- Decencies (Included With The Project.)
---[ResourceTables](https://github.com/don-tnowe/godot-resources-as-sheets-plugin) (Pre-Setup)
+- Dependencies (Included With The Project.)
+
+-- [ResourceTables](https://github.com/don-tnowe/godot-resources-as-sheets-plugin) (Pre-Setup)
 
 
 Godot 4.3 (Stable)+

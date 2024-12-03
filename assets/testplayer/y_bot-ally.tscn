@@ -19828,7 +19828,7 @@ graph_offset = Vector2(-9, -22)
 [sub_resource type="BoxShape3D" id="BoxShape3D_0fjwj"]
 size = Vector3(1, 1.80408, 1)
 
-[node name="Ally1" groups=["players"] instance=ExtResource("1_2a5t1")]
+[node name="Ally1" groups=["battler_data", "players"] instance=ExtResource("1_2a5t1")]
 script = ExtResource("2_y13mn")
 
 [node name="Alpha_Surface" parent="Armature/GeneralSkeleton" index="1"]

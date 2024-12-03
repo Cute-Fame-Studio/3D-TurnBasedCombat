@@ -18,10 +18,8 @@ transform = Transform3D(19.3718, 0, 0, 0, 0.246551, 0, 0, 0, 13.3728, 0, 0, 0)
 mesh = SubResource("BoxMesh_kebba")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 shape = SubResource("WorldBoundaryShape3D_j7h1g")
 
 [node name="basic-player" parent="." instance=ExtResource("1_vp4s0")]

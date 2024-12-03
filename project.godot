@@ -29,6 +29,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 GlobalBattleSettings="*res://database/battle/GlobalBattleSettings.gd"
+SaveLoader="*res://assets/save-system/save_loader.gd"
 
 [dotnet]
 
@@ -37,6 +38,10 @@ project/assembly_name="Turn-Based Combat"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/resources_spreadsheet_view/plugin.cfg")
+
+[global_group]
+
+battler_data=""
 
 [input]
 

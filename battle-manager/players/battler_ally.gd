@@ -97,3 +97,22 @@ func wait_attack():
 
 func get_exp_stat():
 	return exp_node
+
+# Save System
+func on_save_game(save_data):
+	var new_data = BattlerData.new()
+	new_data.current_hp = current_health
+	new_data.current_exp = get_exp_stat().get_total_exp()
+	new_data.current_level = get_exp_stat().get_current_level()
+	new_data.skill_list = skill_list
+	
+	save_data["charNameOrID"] = new_data # replace string with key when created
+
+func on_load_game(load_data):
+	var save_data = load_data["charNameOrID"] as BattlerData # replace string with key when created
+	if save_data == null: print("Battler data is empty."); return # exit function if no data
+	
+	current_health = save_data.current_hp
+	get_exp_stat().exp_total = save_data.current_exp
+	get_exp_stat().char_level = save_data.current_level
+	skill_node.character_skills = save_data.skill_list

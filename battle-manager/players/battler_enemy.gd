@@ -1,4 +1,4 @@
-extends "res://battle-manager/players/battler_ally.gd"
+extends Battler
 
 enum AIType {AGGRESSIVE, DEFENSIVE}
 

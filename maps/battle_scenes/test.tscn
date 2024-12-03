@@ -1,9 +1,9 @@
-[gd_scene load_steps=26 format=3 uid="uid://b56ncgnrwugct"]
+[gd_scene load_steps=24 format=3 uid="uid://b56ncgnrwugct"]
 
 [ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://assets/testplayer/y_bot-ally.tscn" id="1_2aqym"]
 [ext_resource type="PackedScene" uid="uid://bvhah4cfn4txb" path="res://battle-manager/BattleManager.tscn" id="1_t14x8"]
 [ext_resource type="PackedScene" uid="uid://clmhyw21qciy4" path="res://assets/testplayer/y_bot-enemy.tscn" id="2_a11mn"]
-[ext_resource type="Script" path="res://assets/PlayerData.gd" id="3_5jjwn"]
+[ext_resource type="Resource" uid="uid://ciia7nijtierl" path="res://assets/PlayerData.tres" id="3_7v3y8"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2ddfu"]
 sky_top_color = Color(0.447336, 0.519571, 0.620102, 1)
@@ -21,16 +21,6 @@ volumetric_fog_density = 0.02
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3fc4g"]
 albedo_color = Color(0.192279, 0.227401, 0.23218, 1)
-
-[sub_resource type="Resource" id="Resource_vnh6p"]
-resource_local_to_scene = true
-script = ExtResource("3_5jjwn")
-character_name = "Player"
-max_health = 100
-attack = 10
-defense = 5
-speed = 5
-element = 0
 
 [sub_resource type="Animation" id="Animation_pjn1p"]
 resource_name = "armature_stand"
@@ -18197,16 +18187,6 @@ _data = {
 "walk": SubResource("Animation_dl4t7")
 }
 
-[sub_resource type="Resource" id="Resource_mvqdj"]
-resource_local_to_scene = true
-script = ExtResource("3_5jjwn")
-character_name = "Enemy"
-max_health = 100
-attack = 10
-defense = 5
-speed = 5
-element = 0
-
 [node name="Battle-Manager" instance=ExtResource("1_t14x8")]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." index="1"]
@@ -18224,7 +18204,7 @@ material = SubResource("StandardMaterial3D_3fc4g")
 
 [node name="Ally" parent="." index="3" instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.38419)
-PlayerData = SubResource("Resource_vnh6p")
+stats = ExtResource("3_7v3y8")
 
 [node name="AnimationPlayer" parent="Ally" index="1"]
 libraries = {
@@ -18234,7 +18214,7 @@ libraries = {
 
 [node name="Enemy" parent="." index="4" instance=ExtResource("2_a11mn")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.25, 2)
-PlayerData = SubResource("Resource_mvqdj")
+stats = ExtResource("3_7v3y8")
 
 [node name="Camera3D" type="Camera3D" parent="." index="5"]
 transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -2.08627)

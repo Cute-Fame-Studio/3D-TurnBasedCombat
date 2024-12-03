@@ -1,10 +1,10 @@
 class_name Formulas
 
 static func physical_damage(attacker, target, damage) -> int:
-	var offense = attacker.PlayerData.attack + damage
-	var defense = target.PlayerData.defense
+	var offense = attacker.stats.attack + damage
+	var defense = target.stats.defense
 	var total_damage = max(0, offense-defense)
-	return total_damage * element_wheel(attacker.PlayerData.element, target.PlayerData.element)
+	return total_damage * element_wheel(attacker.stats.element, target.stats.element)
 
 static func element_wheel(attack_element, defend_element) -> float:
 	var multiplier = 1

@@ -1,4 +1,4 @@
-#resource
+class_name BattlerStats
 extends Resource
 
 @export var character_name: String = "Player"

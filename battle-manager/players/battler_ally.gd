@@ -1,6 +1,7 @@
+class_name Battler
 extends CharacterBody3D
 
-@export var PlayerData: Resource 
+@export var stats: BattlerStats 
 
 var character_name: String
 var max_health: int
@@ -17,18 +18,18 @@ var is_defending: bool = false
 @onready var exp_node: Node = get_node("Experience")
 
 func _ready():
-	if PlayerData:
-		character_name = PlayerData.character_name
-		max_health = PlayerData.max_health
-		attack = PlayerData.attack
-		defense = PlayerData.defense
-		speed = PlayerData.speed
+	if stats:
+		character_name = stats.character_name
+		max_health = stats.max_health
+		attack = stats.attack
+		defense = stats.defense
+		speed = stats.speed
 		
 		current_health = max_health
 		add_to_group("players")
 	else:
-		push_error("PlayerData resource not set!")
-	print("Current Element: ",PlayerData.element)
+		push_error("BattlerStats resource not set!")
+	print("Current Element: ", stats.element)
 
 func is_defeated() -> bool:
 	return current_health <= 0

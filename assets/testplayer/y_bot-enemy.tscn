@@ -1,10 +1,19 @@
-[gd_scene load_steps=28 format=3 uid="uid://clmhyw21qciy4"]
+[gd_scene load_steps=29 format=3 uid="uid://clmhyw21qciy4"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://assets/testplayer/YBot.glb" id="1_kfukl"]
 [ext_resource type="Script" path="res://battle-manager/players/battler_enemy.gd" id="2_7wb1w"]
-[ext_resource type="Resource" uid="uid://ciia7nijtierl" path="res://assets/PlayerData.tres" id="3_oj7o1"]
+[ext_resource type="Script" path="res://assets/BattlerStats.gd" id="3_22q2h"]
 [ext_resource type="Script" path="res://battle-manager/skills/skill_list.gd" id="4_ig8r7"]
 [ext_resource type="Script" path="res://battle-manager/players/experience.gd" id="5_blbti"]
+
+[sub_resource type="Resource" id="Resource_1urlp"]
+script = ExtResource("3_22q2h")
+character_name = "Enemy"
+max_health = 100
+attack = 10
+defense = 5
+speed = 5
+element = 0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0f5eb"]
 albedo_color = Color(0.787671, 0.175527, 0.19364, 1)
@@ -18198,7 +18207,7 @@ size = Vector3(1, 1.80408, 1)
 
 [node name="Enemy" groups=["enemies"] instance=ExtResource("1_kfukl")]
 script = ExtResource("2_7wb1w")
-PlayerData = ExtResource("3_oj7o1")
+stats = SubResource("Resource_1urlp")
 
 [node name="Alpha_Surface" parent="Armature/GeneralSkeleton" index="1"]
 material_override = SubResource("StandardMaterial3D_0f5eb")

@@ -22,7 +22,7 @@ volumetric_fog_density = 0.02
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3fc4g"]
 albedo_color = Color(0.192279, 0.227401, 0.23218, 1)
 
-[sub_resource type="Resource" id="Resource_km6xg"]
+[sub_resource type="Resource" id="Resource_wbsgg"]
 resource_local_to_scene = true
 script = ExtResource("3_v5ker")
 character_name = "Player"
@@ -18197,7 +18197,7 @@ _data = {
 "walk": SubResource("Animation_dl4t7")
 }
 
-[sub_resource type="Resource" id="Resource_tfmum"]
+[sub_resource type="Resource" id="Resource_jyclr"]
 resource_local_to_scene = true
 script = ExtResource("3_v5ker")
 character_name = "Player"
@@ -18208,6 +18208,10 @@ speed = 5
 element = 0
 
 [node name="Battle-Manager" instance=ExtResource("1_t14x8")]
+
+[node name="PlayerStats" parent="BattleHUD/Control" index="4"]
+offset_left = 0.0
+offset_right = 73.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." index="1"]
 environment = SubResource("Environment_misr6")
@@ -18224,7 +18228,7 @@ material = SubResource("StandardMaterial3D_3fc4g")
 
 [node name="Ally" parent="." index="3" instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.38419)
-stats = SubResource("Resource_km6xg")
+stats = SubResource("Resource_wbsgg")
 
 [node name="AnimationPlayer" parent="Ally" index="1"]
 libraries = {
@@ -18234,7 +18238,7 @@ libraries = {
 
 [node name="Enemy" parent="." index="4" instance=ExtResource("2_a11mn")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.25, 2)
-stats = SubResource("Resource_tfmum")
+stats = SubResource("Resource_jyclr")
 
 [node name="Camera3D" type="Camera3D" parent="." index="5"]
 transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -2.08627)

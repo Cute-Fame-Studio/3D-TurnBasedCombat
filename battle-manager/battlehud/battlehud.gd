@@ -6,6 +6,7 @@ signal action_selected(action: String, target)
 @onready var character_info: VBoxContainer = $Control/PlayerStats
 @onready var enemy_stats: VBoxContainer = $Control/EnemyStats
 @onready var battle_result_label: Label = $Control/BattleResultLabel
+@onready var skill_select: Control = $Control/Skills
 
 var activeBattler: Node = null
 var enemy: Node = null
@@ -14,24 +15,29 @@ var enemy: Node = null
 @onready var player_health_bar: ProgressBar = $Control/PlayerStats/PlayerHealthBar
 @onready var enemy_health_bar: ProgressBar = $Control/EnemyStats/EnemyHealthBar
 
+
 func _ready():
+	skill_select.visible = false
 	battle_result_label.hide()
 	hide_action_buttons()
 
 	# Initialize health bars
-	player_health_bar.hide()
+	if player_health_bar and enemy_health_bar:
+		player_health_bar.value = 0
+		enemy_health_bar.value = 0
 
 func on_start_combat(enemy_node: Node):
 	enemy = enemy_node
-	update_enemy_health_bar()
+	update_health_bars()
 
 func on_add_character(character: Node):
 # Update the CharacterInfo VBoxContainer with the new character info
-# You might need to implement a method in CharacterInfo to handle this
+# You might need to implement a method in PlayerInfo to handle this
+	update_health_bars()
 	if character_info.has_method("add_character"):
 		character_info.add_character(character)
 	else:
-		print("Warning: CharacterInfo node doesn't have an add_character method")
+		print("Warning: PlayerInfo node doesn't have an add_character method")
 
 func set_activebattler(character: Node):
 	activeBattler = character
@@ -49,6 +55,16 @@ func update_character_info():
 		character_info.update_player_info(activeBattler)
 	if enemy_stats.has_method("update_enemy_info") and enemy:
 		enemy_stats.update_enemy_stats(enemy) # Needs some fixing, The reason why the enemy has a player name.
+		
+
+func update_health_bars():
+	if activeBattler and player_health_bar:
+		player_health_bar.max_value = activeBattler.max_health
+		player_health_bar.value = activeBattler.current_health
+		
+	if enemy and enemy_health_bar:
+		enemy_health_bar.max_value = enemy.max_health
+		enemy_health_bar.value = enemy.current_health
 
 func show_battle_result(result: String):
 	battle_result_label.text = result
@@ -83,6 +99,8 @@ func _on_defend_pressed():
 
 func _on_skills_pressed():
 	hide_action_buttons()
+	# Please setup the code below this later!
+	skill_select.visible = true
 	# Skills will instance a button and automatically get their theme. If a theme needs to be specified!
 	# An setting to specify what variation in that theme should be used.
 	action_selected.emit("skills", enemy)
@@ -92,8 +110,8 @@ func _on_items_pressed() -> void:
 	action_selected.emit("item", null)
 
 func _on_run_pressed() -> void:
-	pass # Replace with function body.
-
+	hide_action_buttons()
+	action_selected.emit("run", null)
 
 # Add other action button handlers as needed (Skills, Item, Run)
 

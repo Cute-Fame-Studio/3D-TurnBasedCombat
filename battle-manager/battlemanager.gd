@@ -1,15 +1,18 @@
 extends Node3D
 
+var skip_turn = false # Please please please, Change the functionality or entirely remove this down the line.
 var players: Array = []
 var enemies: Array = []
 var turn_order: Array = []
 var current_turn: int = 0
 
 @onready var ActionButtons = find_child("ActionButtons")
+# For referencing and setting variables in the battle settings.
+@onready var battle_settings = GlobalBattleSettings
 
 var current_battler
 # Defualt animation should check for weapon's later down the road, And adapt to using them with unique animations.
-@export var default_anim = "Locomotion-Library/idle2"
+@export var default_animation = "Locomotion-Library/idle2" # Unused, But i reccomend gettomg the stats and animation from the database.
 # Added by repo owner, Fame. To test compatibility with returning after a battle.
 @export var GameMap = "res://maps/regular_map/backtogame.tscn"
 @onready var hud: CanvasLayer = $BattleHUD
@@ -52,9 +55,13 @@ func initialize_battle():
 
 	start_next_turn()
 
+func count_allies():
+	# For now, Should be one.
+	battle_settings.ally_party = 1
+
 func start_next_turn():
 	if is_battle_over():
-		end_battle()
+		end_battle(1)
 		return
 
 	var current_character = turn_order[current_turn]
@@ -74,6 +81,7 @@ func start_next_turn():
 	update_hud()
 
 func player_turn(character):
+	count_allies()
 	hud.set_activebattler(character)
 	hud.show_action_buttons(character)
 
@@ -90,6 +98,8 @@ func _on_action_selected(action: String, target):
 			perform_skill(current_character, target)
 		"item":
 			perform_item(current_character)
+		"run":
+			escape_battle()
 	
 	process_exp_gain(current_character, target) # EDIT: Temp exp access/effect - gain exp on turn end
 	
@@ -124,23 +134,30 @@ func damage_calculation(attacker, target, damage):
 	damage = Formulas.physical_damage(attacker, target, damage)
 	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
 	target.take_damage(damage)
+	hud.update_health_bars()  # Add this line
 	update_hud()
 
 func heal_calculation(user, target, amount):
 	var healing = target.take_healing(amount)
 	print("%s heals %s for %d health!" % [user.character_name, target.character_name, healing])
+	hud.update_health_bars()  # Add this line
 	update_hud()
 
+
 func enemy_turn(character):
-	var target = players[randi() % players.size()]  # Choose a random player to attack
+	var target = players[randi() % players.size()]
 	perform_attack(character, target)
+	hud.update_health_bars()  # Add this line
 	end_turn()
 
 func end_turn():
-	await current_battler.wait_attack()
-
-	current_turn = (current_turn + 1) % turn_order.size()
-	start_next_turn()
+	if skip_turn:
+		current_turn = (current_turn + 1) % turn_order.size()
+		start_next_turn()
+	else:
+		await current_battler.wait_attack()
+		current_turn = (current_turn + 1) % turn_order.size()
+		start_next_turn()
 
 func update_hud():
 	hud.update_character_info()
@@ -158,16 +175,43 @@ func all_defeated(characters: Array):
 			return false
 	return true
 
-func end_battle():
-	if all_defeated(enemies):
+func escape_battle():
+	var base_escape_chance = 70
+	
+	# Reduce chance by 10% for each additional ally
+	var ally_penalty = (battle_settings.ally_party - 1) * 10
+	
+	# Calculate final threshold (base - penalties + difficulty mod)
+	var escape_threshold = base_escape_chance - ally_penalty
+	
+	# Generate random number 1-100
+	var roll = randi_range(1, 100)
+	
+	# Check if escape successful
+	if roll <= escape_threshold:
+		print("Escape successful! (Rolled %d, needed %d or less)" % [roll, escape_threshold])
+		end_battle(0) # Use your existing escape scene transition
+		return true
+	else:
+		print("Escape failed! (Rolled %d, needed %d or less)" % [roll, escape_threshold])
+		skip_turn = true
+		end_turn() # Enemy gets a turn after failed escape
+		return false
+
+func end_battle(_state: int = 1):
+	#0 always ends the battle abruptly. 1, Will end the battle and return to normal, 2 will end the battle with game over.
+	if 0:
+		print("cutscene will play.")
+		pass
+	if 1 or all_defeated(enemies):
 		hud.show_battle_result("Victory! All enemies have been defeated.")
 		for player in players:
 			player.gain_experience(100)
 			# Be sure to toggle Enemy's off on the scene you left.
-			get_tree().change_scene_to_file(GameMap) # This code causes the crash.
-	elif all_defeated(players):
+			get_tree().change_scene_to_file(GameMap)
+	if 2 or all_defeated(players):
 		hud.show_battle_result("Game Over. All players have been defeated.")
-	hud.hide_action_buttons()
+		hud.hide_action_buttons()
 
 func update_button_states():
 	ActionButtons.get_node("Attack").disabled = not Attack_Toggle

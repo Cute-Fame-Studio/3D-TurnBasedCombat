@@ -13,6 +13,7 @@ var Escape_Sound: AudioStream
 var Enemy_Defeat_Sound: AudioStream = null
 var Boss_Defeat_Sound: AudioStream = null
 
+var ally_party: int = 0
 
 enum Elements {
 	Physical = 0,

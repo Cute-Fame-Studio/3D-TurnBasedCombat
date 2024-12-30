@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://cyjcaceen0235"]
+[gd_scene load_steps=6 format=3 uid="uid://cyjcaceen0235"]
 
 [ext_resource type="Script" path="res://battle-manager/battlehud/battlehud.gd" id="1_0qukq"]
 [ext_resource type="Script" path="res://battle-manager/battlehud/character_info.gd" id="2_64dmw"]
 [ext_resource type="Theme" uid="uid://crdk7x2bxdhob" path="res://theme_test.tres" id="2_uiugx"]
+[ext_resource type="Texture2D" uid="uid://isjjmhovpspw" path="res://icon.svg" id="4_1yf0d"]
 
 [sub_resource type="GDScript" id="GDScript_mbt63"]
 resource_name = "EnemyStats"
@@ -11,11 +12,12 @@ script/source = "extends VBoxContainer
 # Declare the progress bar node
 @onready var enemy_health_bar: ProgressBar = $EnemyHealthBar
 
-func add_character(character: Node):
-	# Add a new label or update existing UI elements
-	var label = Label.new()
-	label.text = character.character_name
-	add_child(label)
+func add_character(_character: Node):
+	pass
+	#Add a new label or update existing UI elements
+	#var label = Label.new()
+	#label.text = character.character_name
+	#add_child(label)
 
 func update_enemy_stats(character: Node):
 	# Update enemy-specific UI elements
@@ -38,14 +40,15 @@ theme = ExtResource("2_uiugx")
 
 [node name="ActionButtons" type="VBoxContainer" parent="Control"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
+anchors_preset = 2
+anchor_top = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_top = -226.0
+offset_right = 92.0
+grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 4
-theme_type_variation = &"Base"
+theme = ExtResource("2_uiugx")
 alignment = 2
 
 [node name="Attack" type="Button" parent="Control/ActionButtons"]
@@ -86,35 +89,40 @@ layout_mode = 0
 offset_left = 65.0
 offset_top = 40.0
 offset_right = 204.0
-offset_bottom = 72.0
+offset_bottom = 74.0
 
 [node name="EnemyStats" type="VBoxContainer" parent="Control"]
-layout_mode = 0
-offset_top = 131.0
-offset_right = 73.0
-offset_bottom = 131.0
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -73.0
+offset_bottom = 76.0
+grow_horizontal = 0
 script = SubResource("GDScript_mbt63")
 
 [node name="EnemyNameLabel" type="Label" parent="Control/EnemyStats"]
 layout_mode = 2
+text = "Enemy (Set Manually)"
 
 [node name="EnemyHealthBar" type="ProgressBar" parent="Control/EnemyStats"]
 layout_mode = 2
 
 [node name="PlayerStats" type="VBoxContainer" parent="Control"]
 layout_mode = 1
-offset_right = 73.0
+offset_left = 272.0
+offset_right = 345.0
 offset_bottom = 104.0
 script = ExtResource("2_64dmw")
 
 [node name="PlayerNameLabel" type="Label" parent="Control/PlayerStats"]
 layout_mode = 2
+text = "Test"
 
 [node name="PlayerHealthBar" type="ProgressBar" parent="Control/PlayerStats"]
 layout_mode = 2
 
 [node name="Skills" type="Control" parent="Control"]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -133,18 +141,24 @@ color = Color(0, 0, 0, 1)
 [node name="HBoxContainer" type="HBoxContainer" parent="Control/Skills/ColorRect"]
 layout_direction = 2
 layout_mode = 0
+offset_top = 25.0
 offset_right = 493.0
-offset_bottom = 144.0
+offset_bottom = 121.0
+theme = ExtResource("2_uiugx")
 theme_override_constants/separation = 100
 alignment = 1
 
 [node name="Skill 1" type="Button" parent="Control/Skills/ColorRect/HBoxContainer"]
 layout_mode = 2
+theme_override_icons/icon = ExtResource("4_1yf0d")
 text = "Skill 1"
+icon_alignment = 2
 
 [node name="Skill 2" type="Button" parent="Control/Skills/ColorRect/HBoxContainer"]
 layout_mode = 2
+theme_override_icons/icon = ExtResource("4_1yf0d")
 text = "Skill 2"
+icon_alignment = 2
 
 [connection signal="pressed" from="Control/ActionButtons/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="Control/ActionButtons/Skills" to="." method="_on_skills_pressed"]

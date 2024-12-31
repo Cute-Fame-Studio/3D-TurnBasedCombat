@@ -12,12 +12,11 @@ script/source = "extends VBoxContainer
 # Declare the progress bar node
 @onready var enemy_health_bar: ProgressBar = $EnemyHealthBar
 
-func add_character(_character: Node):
-	pass
-	#Add a new label or update existing UI elements
-	#var label = Label.new()
-	#label.text = character.character_name
-	#add_child(label)
+func add_character(character: Node):
+	# Add a new label or update existing UI elements
+	var label = Label.new()
+	label.text = character.character_name
+	add_child(label)
 
 func update_enemy_stats(character: Node):
 	# Update enemy-specific UI elements
@@ -92,27 +91,40 @@ offset_right = 204.0
 offset_bottom = 74.0
 
 [node name="EnemyStats" type="VBoxContainer" parent="Control"]
+visible = false
 layout_mode = 1
-anchors_preset = 1
+anchors_preset = 1 # Top-Right corner
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -73.0
-offset_bottom = 76.0
+anchor_top = 0.0
+anchor_bottom = 0.0
+offset_left = -200
+offset_top = 20
+offset_right = -20 
+offset_bottom = 100
 grow_horizontal = 0
 script = SubResource("GDScript_mbt63")
 
 [node name="EnemyNameLabel" type="Label" parent="Control/EnemyStats"]
 layout_mode = 2
-text = "Enemy (Set Manually)"
+text = "Test"
 
 [node name="EnemyHealthBar" type="ProgressBar" parent="Control/EnemyStats"]
 layout_mode = 2
 
 [node name="PlayerStats" type="VBoxContainer" parent="Control"]
 layout_mode = 1
-offset_left = 272.0
-offset_right = 345.0
-offset_bottom = 104.0
+anchors_preset = 2 # Top-Left corner
+anchor_top = 0.0
+anchor_bottom = 0.0
+anchor_left = 0.0 
+anchor_right = 0.0
+offset_left = 20
+offset_top = 20
+offset_right = 200
+offset_bottom = 100
+grow_vertical = 1
+grow_horizontal = 1
 script = ExtResource("2_64dmw")
 
 [node name="PlayerNameLabel" type="Label" parent="Control/PlayerStats"]

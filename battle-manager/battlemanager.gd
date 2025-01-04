@@ -6,6 +6,9 @@ var enemies: Array = []
 var turn_order: Array = []
 var current_turn: int = 0
 
+var current_character
+var current_target
+
 @onready var ActionButtons = find_child("ActionButtons")
 # For referencing and setting variables in the battle settings.
 @onready var battle_settings = GlobalBattleSettings
@@ -45,6 +48,7 @@ func initialize_battle():
 	for player in players:
 		hud.on_add_character(player)
 		player.battle_idle()
+		player.anim_damage.connect(_on_anim_damage)
 	
 	# Ensure players are at the start of the turn order
 	turn_order = players + enemies
@@ -52,6 +56,7 @@ func initialize_battle():
 	if enemies.size() > 0:
 		hud.on_start_combat(enemies[0])  # Assuming single enemy for now
 		enemies[0].battle_idle()
+		enemies[0].anim_damage.connect(_on_anim_damage)
 
 	start_next_turn()
 
@@ -64,7 +69,7 @@ func start_next_turn():
 		end_battle(1)
 		return
 
-	var current_character = turn_order[current_turn]
+	current_character = turn_order[current_turn]
 	current_battler = current_character
 	
 	if current_character.is_defeated():
@@ -87,11 +92,13 @@ func player_turn(character):
 
 func _on_action_selected(action: String, target):
 	print("Action selected: ", action, " Target: ", target.name if target else "None")
-	var current_character = turn_order[current_turn]
+	current_character = turn_order[current_turn]
+	current_target = target
 	print("Current character: ", current_character.name)
 	match action:
 		"attack":
-			perform_attack(current_character, target)
+			current_character.attack_anim()
+			# perform_attack(current_character, target)
 		"defend":
 			perform_defend(current_character)
 		"skills":
@@ -104,6 +111,10 @@ func _on_action_selected(action: String, target):
 	process_exp_gain(current_character, target) # EDIT: Temp exp access/effect - gain exp on turn end
 	
 	end_turn()
+	
+func _on_anim_damage():
+	var damage = current_character.get_attack_damage()
+	damage_calculation(current_character, current_target, damage)
 
 func process_exp_gain(user, target):
 	if not target:
@@ -112,9 +123,9 @@ func process_exp_gain(user, target):
 	user.get_exp_stat().add_exp(exp_gained)
 	user.gain_experience(exp_gained)
 
-func perform_attack(attacker, target):
-	var damage = attacker.attack_anim()
-	damage_calculation(attacker, target, damage)
+# func perform_attack(attacker, target):
+	# var damage = 0 # attacker.attack_anim()
+	# damage_calculation(attacker, target, damage)
 
 func perform_defend(character):
 	character.defend()
@@ -146,7 +157,10 @@ func heal_calculation(user, target, amount):
 
 func enemy_turn(character):
 	var target = players[randi() % players.size()]
-	perform_attack(character, target)
+	current_target = target
+	current_character = character
+	current_character.attack_anim()
+	#perform_attack(character, target)
 	hud.update_health_bars()  # Add this line
 	end_turn()
 

@@ -1,6 +1,8 @@
 class_name Battler
 extends CharacterBody3D
 
+signal anim_damage()
+
 @export var stats: BattlerStats 
 
 var character_name: String
@@ -62,7 +64,7 @@ func defend():
 
 func gain_experience(amount: int):
 	print("%s gained %d experience!" % [character_name, amount])
-	print ("%s needs %d to level up!" % [character_name, get_exp_stat().get_exp_to_level()])
+	print("%s needs %d to level up!" % [character_name, get_exp_stat().get_exp_to_level()])
 
 func battle_run():
 	pass
@@ -76,7 +78,7 @@ func battle_idle():
 
 func attack_anim():
 	state_machine.travel("attack") 
-	return get_attack_damage() # Needing to transfer to dealing damage through animation. Not after! 
+	# return get_attack_damage() # Needing to transfer to dealing damage through animation. Not after! 
 	# Some animations may do damage multiple times during their attack, It is better to dynamically show the damage being dealt.
 
 func deal_damage():
@@ -99,7 +101,15 @@ func wait_attack():
 func get_exp_stat():
 	return exp_node
 
+# # #
+# Call methods
+# # #
+func call_attack():
+	anim_damage.emit()
+
+# # #
 # Save System
+# # #
 func on_save_game(save_data):
 	var new_data = BattlerData.new()
 	new_data.current_hp = current_health

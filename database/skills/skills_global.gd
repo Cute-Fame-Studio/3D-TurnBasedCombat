@@ -1,3 +1,4 @@
+class_name Skill
 extends Resource
 
 @export var color := ""
@@ -5,6 +6,7 @@ extends Resource
 @export var type := ""
 @export var icon : Resource
 @export var animation_name := ""
+@export var power : int
 @export var critical_rate : int
 @export var hit_chance : int
 @export var target := ""

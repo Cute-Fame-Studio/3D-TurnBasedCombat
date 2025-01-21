@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-signal action_selected(action: String, target)
+signal action_selected(action: String, target, skill:CharacterAbilities)
 
 @onready var action_buttons: VBoxContainer = $Control/ActionButtons
 @onready var character_info: VBoxContainer = $Control/PlayerStats
@@ -72,24 +72,24 @@ func _on_attack_pressed():
 	print("Attack button pressed")
 	if enemy:
 		print("Emitting action_selected signal with target: ", enemy.name)
-		action_selected.emit("attack", enemy)
+		action_selected.emit("attack", enemy, null)
 		hide_action_buttons()
 	else:
 		print("Error: No enemy target set")
 
 func _on_defend_pressed():
 	hide_action_buttons()
-	action_selected.emit("defend", null)
+	action_selected.emit("defend", null, null)
 
 func _on_skills_pressed():
 	hide_action_buttons()
 	# Skills will instance a button and automatically get their theme. If a theme needs to be specified!
 	# An setting to specify what variation in that theme should be used.
-	action_selected.emit("skills", enemy)
+	action_selected.emit("skills", enemy, activeBattler.skill_list[0])
 
 func _on_items_pressed() -> void:
 	hide_action_buttons()
-	action_selected.emit("item", null)
+	action_selected.emit("item", null, null)
 
 func _on_run_pressed() -> void:
 	pass # Replace with function body.

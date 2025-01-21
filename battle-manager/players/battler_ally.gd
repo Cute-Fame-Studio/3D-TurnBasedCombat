@@ -1,3 +1,4 @@
+class_name Ally
 extends CharacterBody3D
 
 @export var PlayerData: Resource 
@@ -14,7 +15,7 @@ var is_defending: bool = false
 @onready var state_machine = $AnimationTree["parameters/playback"]
 @onready var skill_node: Node = get_node("SkillList")
 @onready var skill_list: Array[Resource] = skill_node.get_skills()
-@onready var exp_node: Node = get_node("Experience")
+@onready var exp_node: Experience = get_node("Experience")
 
 func _ready():
 	if PlayerData:
@@ -25,6 +26,12 @@ func _ready():
 		speed = PlayerData.speed
 		
 		current_health = max_health
+		for skill:CharacterAbilities in skill_list:
+			match skill.damage_type:
+				"Physical":
+					skill.use_skill.connect(skill_attack)
+				"Healing":
+					skill.use_skill.connect(skill_heal)
 		add_to_group("players")
 	else:
 		push_error("PlayerData resource not set!")
@@ -33,8 +40,9 @@ func _ready():
 func is_defeated() -> bool:
 	return current_health <= 0
 
-func get_attack_damage() -> int:
-	return attack + randi() % 5
+func get_attack_damage(target) -> int:
+	var damage = attack + randi() % 5
+	return Formulas.physical_damage(self, target, damage)
 
 func take_damage(amount: int):
 	var damage_reduction = defense
@@ -73,21 +81,30 @@ func battle_item():
 func battle_idle():
 	state_machine.travel("battle_idle")
 
-func attack_anim():
-	state_machine.travel("attack") 
-	return get_attack_damage() # Needing to transfer to dealing damage through animation. Not after! 
+func attack_anim(target) -> int:
+	state_machine.travel("attack")
+	return get_attack_damage(target) # Needing to transfer to dealing damage through animation. Not after! 
 	# Some animations may do damage multiple times during their attack, It is better to dynamically show the damage being dealt.
 
-func deal_damage():
-	return get_attack_damage()
+#func deal_damage():
+	#return get_attack_damage(target)
 
-func skill_attack():
-	state_machine.travel(skill_list[0].anim_tree_name)
-	return skill_list[0].number_value
+func use_skill(skill:CharacterAbilities, target) -> int:
+	match skill.damage_type:
+		"Physical":
+			return skill_attack(target, skill)
+		"Healing":
+			return skill_heal(skill)
+		_:
+			return skill_attack(target, skill)
 
-func skill_heal():
-	state_machine.travel(skill_list[1].anim_tree_name)
-	return skill_list[1].number_value
+func skill_attack(target, skill:CharacterAbilities):
+	state_machine.travel(skill.anim_tree_name)
+	return Formulas.calculate_damage(self, target, skill)
+
+func skill_heal(skill:CharacterAbilities):
+	state_machine.travel(skill.anim_tree_name)
+	return skill.number_value
 
 func wait_attack():
 	if self.is_defending:

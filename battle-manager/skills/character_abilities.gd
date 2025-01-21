@@ -1,5 +1,8 @@
 class_name CharacterAbilities extends Resource
 
+# Should only ever really emit itself...
+signal use_skill(skill:CharacterAbilities)
+
 @export var ability_name: String
 @export var ability_description: String
 

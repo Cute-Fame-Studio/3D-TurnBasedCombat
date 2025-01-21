@@ -79,8 +79,10 @@ func start_next_turn():
 		return
 	
 	if current_character in players:
+		print("Player's turn")
 		player_turn(current_character)
 	else:
+		print("Enemy's turn")
 		enemy_turn(current_character)
 
 	update_hud()
@@ -90,7 +92,7 @@ func player_turn(character):
 	hud.set_activebattler(character)
 	hud.show_action_buttons(character)
 
-func _on_action_selected(action: String, target):
+func _on_action_selected(action: String, target, skill:CharacterAbilities):
 	print("Action selected: ", action, " Target: ", target.name if target else "None")
 	current_character = turn_order[current_turn]
 	current_target = target
@@ -102,7 +104,7 @@ func _on_action_selected(action: String, target):
 		"defend":
 			perform_defend(current_character)
 		"skills":
-			perform_skill(current_character, target)
+			perform_skill(current_character, target, skill)
 		"item":
 			perform_item(current_character)
 		"run":
@@ -123,18 +125,23 @@ func process_exp_gain(user, target):
 	user.get_exp_stat().add_exp(exp_gained)
 	user.gain_experience(exp_gained)
 
-# func perform_attack(attacker, target):
-	# var damage = 0 # attacker.attack_anim()
-	# damage_calculation(attacker, target, damage)
+# Updating this just to follow pattern being used in battler_enemy
+func perform_attack(attacker, target):
+	var damage = attacker.attack_anim(target)
+	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
+	target.take_damage(damage)
+	update_hud()
 
 func perform_defend(character):
 	character.defend()
 	print("%s is defending!" % character.character_name)
 
 # Don't forget that game's also allow skill's to heal players, So use a universal term and if statements.
-func perform_skill(attacker, target):
-	var damage = attacker.skill_attack()
-	damage_calculation(attacker, target, damage)
+func perform_skill(attacker, target, skill:CharacterAbilities) -> void:
+	var damage = attacker.use_skill(skill, target)
+	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
+	target.take_damage(damage)
+	update_hud()
 
 func perform_item(user):
 	var amount = user.skill_heal()
@@ -154,24 +161,16 @@ func heal_calculation(user, target, amount):
 	hud.update_health_bars()  # Add this line
 	update_hud()
 
-
-func enemy_turn(character):
-	var target = players[randi() % players.size()]
-	current_target = target
-	current_character = character
-	current_character.attack_anim()
-	#perform_attack(character, target)
-	hud.update_health_bars()  # Add this line
+func enemy_turn(character:Enemy) -> void:
+	character.choose_action()
+	update_hud()
 	end_turn()
 
 func end_turn():
-	if skip_turn:
-		current_turn = (current_turn + 1) % turn_order.size()
-		start_next_turn()
-	else:
-		await current_battler.wait_attack()
-		current_turn = (current_turn + 1) % turn_order.size()
-		start_next_turn()
+	await current_battler.wait_attack()
+	
+	current_turn = (current_turn + 1) % turn_order.size()
+	start_next_turn()
 
 func update_hud():
 	hud.update_character_info()

@@ -13,7 +13,8 @@ var Escape_Sound: AudioStream
 var Enemy_Defeat_Sound: AudioStream = null
 var Boss_Defeat_Sound: AudioStream = null
 
-var ally_party: int = 0
+# Set damage calculation type (based on other game damage calcs)
+var Global_Damage_Calc_Type : Damage_Calc_Type = Damage_Calc_Type.PKMN
 
 enum Elements {
 	Physical = 0,
@@ -53,6 +54,10 @@ enum Difficulties {
 	HARD = 2,
 	ENDLIST}
 
+enum Damage_Calc_Type {
+	PKMN = 0,
+	DRGNQST = 1
+}
 # Start Functions down here.
 
 

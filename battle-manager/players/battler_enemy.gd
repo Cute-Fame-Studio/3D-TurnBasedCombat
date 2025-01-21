@@ -1,4 +1,5 @@
-extends Battler
+class_name Enemy
+extends "res://battle-manager/players/battler_ally.gd"
 
 enum AIType {AGGRESSIVE, DEFENSIVE}
 
@@ -22,7 +23,7 @@ func choose_action():
 
 func aggressive_action(players: Array):
 	var target = get_weakest_target(players)
-	var damage = get_attack_damage()
+	var damage = attack_anim(target)
 	print("%s attacks %s with %d damage!" % [character_name, target.character_name, damage])
 	target.take_damage(damage)
 

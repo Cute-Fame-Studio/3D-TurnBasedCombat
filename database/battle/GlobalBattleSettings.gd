@@ -12,6 +12,7 @@ var Miss_Sound : AudioStream
 var Escape_Sound: AudioStream
 var Enemy_Defeat_Sound: AudioStream = null
 var Boss_Defeat_Sound: AudioStream = null
+var Ally_Party: int = 0
 
 # Set damage calculation type (based on other game damage calcs)
 var Global_Damage_Calc_Type : Damage_Calc_Type = Damage_Calc_Type.PKMN

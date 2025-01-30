@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://ciia7nijtierl"]
+[gd_resource type="Resource" script_class="BattlerStats" load_steps=2 format=3 uid="uid://ciia7nijtierl"]
 
 [ext_resource type="Script" path="res://assets/BattlerStats.gd" id="1_curse"]
 

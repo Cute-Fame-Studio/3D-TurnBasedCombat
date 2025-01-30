@@ -62,7 +62,7 @@ func initialize_battle():
 
 func count_allies():
 	# For now, Should be one.
-	battle_settings.ally_party = 1
+	battle_settings.Ally_Party = 1
 
 func start_next_turn():
 	if is_battle_over():

@@ -1,11 +1,33 @@
-[gd_scene load_steps=6 format=3 uid="uid://cyjcaceen0235"]
+[gd_scene load_steps=9 format=3 uid="uid://cyjcaceen0235"]
 
 [ext_resource type="Script" path="res://battle-manager/battlehud/battlehud.gd" id="1_0qukq"]
-[ext_resource type="Script" path="res://battle-manager/battlehud/character_info.gd" id="2_64dmw"]
+[ext_resource type="Script" path="res://battle-manager/battlehud/battler_info.gd" id="2_64dmw"]
 [ext_resource type="Theme" uid="uid://crdk7x2bxdhob" path="res://theme_test.tres" id="2_uiugx"]
 [ext_resource type="Texture2D" uid="uid://isjjmhovpspw" path="res://icon.svg" id="4_1yf0d"]
+[ext_resource type="Texture2D" uid="uid://i6v7uo8qdg1d" path="res://Placeholder.svg" id="5_0lafe"]
 
 [sub_resource type="GDScript" id="GDScript_mbt63"]
+resource_name = "EnemyStats"
+script/source = "extends VBoxContainer
+
+# Declare the progress bar node
+@onready var name_label = $EnemyNameLabel
+@onready var health_bar = $EnemyHealthBar
+
+func add_character(character: Node):
+	pass
+
+func update_enemy_stats(character: Node):
+	if character and is_instance_valid(character):
+		name_label.text = character.character_name
+		health_bar.max_value = character.max_health
+		health_bar.value = character.current_health
+
+func update_character_info(character: Node):
+	update_enemy_stats(character)
+"
+
+[sub_resource type="GDScript" id="GDScript_djde1"]
 resource_name = "EnemyStats"
 script/source = "extends VBoxContainer
 
@@ -13,17 +35,21 @@ script/source = "extends VBoxContainer
 @onready var enemy_health_bar: ProgressBar = $EnemyHealthBar
 
 func add_character(character: Node):
-	# Add a new label or update existing UI elements
-	var label = Label.new()
-	label.text = character.character_name
-	add_child(label)
+	pass
 
-func update_enemy_stats(character: Node):
-	# Update enemy-specific UI elements
-	$EnemyNameLabel.text = character.character_name
-	$EnemyHealthBar.max_value = character.max_health
-	$EnemyHealthBar.value = character.current_health
+#func update_enemy_stats(character: Node):
+	## Update enemy-specific UI elements
+	#$EnemyNameLabel.text = character.character_name
+	#$EnemyHealthBar.max_value = character.max_health
+	#$EnemyHealthBar.value = character.current_health
+
+#func update_enemy_info(enemy: Node):
+	#$EnemyNameLabel.text = enemy.character_name
+	#$EnemyHealthBar.max_value = enemy.max_health
+	#$EnemyHealthBar.value = enemy.current_health
 "
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7jqjx"]
 
 [node name="BattleHUD" type="CanvasLayer" groups=["BattleHud"]]
 script = ExtResource("1_0qukq")
@@ -37,18 +63,19 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_uiugx")
 
-[node name="ActionButtons" type="VBoxContainer" parent="Control"]
+[node name="ActionButtons" type="BoxContainer" parent="Control"]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_top = -226.0
-offset_right = 92.0
+offset_right = 238.0
 grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 4
 theme = ExtResource("2_uiugx")
 alignment = 2
+vertical = true
 
 [node name="Attack" type="Button" parent="Control/ActionButtons"]
 layout_mode = 2
@@ -77,91 +104,271 @@ layout_mode = 2
 size_flags_horizontal = 0
 text = "Run"
 
-[node name="BattleResultLabel" type="Label" parent="Control"]
-layout_mode = 0
-offset_top = 225.0
-offset_right = 1152.0
-offset_bottom = 365.0
-
-[node name="PlayerInfo" type="Label" parent="Control"]
-layout_mode = 0
-offset_left = 65.0
-offset_top = 40.0
-offset_right = 204.0
-offset_bottom = 74.0
-
-[node name="EnemyStats" type="VBoxContainer" parent="Control"]
-visible = false
+[node name="Enemies" type="Control" parent="Control"]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -200.0
-offset_top = 20.0
-offset_right = -20.0
-offset_bottom = 100.0
+offset_left = -212.0
+offset_bottom = 228.0
 grow_horizontal = 0
-script = SubResource("GDScript_mbt63")
 
-[node name="EnemyNameLabel" type="Label" parent="Control/EnemyStats"]
-layout_mode = 2
-text = "Test"
-
-[node name="EnemyHealthBar" type="ProgressBar" parent="Control/EnemyStats"]
-layout_mode = 2
-
-[node name="PlayerStats" type="VBoxContainer" parent="Control"]
-layout_mode = 1
-offset_left = 20.0
-offset_top = 20.0
-offset_right = 200.0
-offset_bottom = 100.0
-script = ExtResource("2_64dmw")
-
-[node name="PlayerNameLabel" type="Label" parent="Control/PlayerStats"]
-layout_mode = 2
-text = "Test"
-
-[node name="PlayerHealthBar" type="ProgressBar" parent="Control/PlayerStats"]
-layout_mode = 2
-
-[node name="Skills" type="Control" parent="Control"]
+[node name="AllEnemies" type="BoxContainer" parent="Control/Enemies"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+vertical = true
 
-[node name="ColorRect" type="ColorRect" parent="Control/Skills"]
-layout_mode = 0
-offset_left = 296.0
-offset_top = 477.0
-offset_right = 789.0
-offset_bottom = 624.0
-color = Color(0, 0, 0, 1)
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Control/Skills/ColorRect"]
-layout_direction = 2
-layout_mode = 0
-offset_top = 25.0
-offset_right = 493.0
-offset_bottom = 121.0
-theme = ExtResource("2_uiugx")
-theme_override_constants/separation = 100
-alignment = 1
-
-[node name="Skill 1" type="Button" parent="Control/Skills/ColorRect/HBoxContainer"]
+[node name="EnemyStats" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
 layout_mode = 2
-theme_override_icons/icon = ExtResource("4_1yf0d")
+script = SubResource("GDScript_mbt63")
+
+[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats"]
+layout_mode = 2
+text = "Test"
+
+[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats"]
+layout_mode = 2
+
+[node name="EnemyStats2" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_djde1")
+
+[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats2"]
+layout_mode = 2
+text = "Test"
+
+[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats2"]
+layout_mode = 2
+
+[node name="EnemyStats3" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_mbt63")
+
+[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats3"]
+layout_mode = 2
+text = "Test"
+
+[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats3"]
+layout_mode = 2
+
+[node name="EnemyStats4" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_djde1")
+
+[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats4"]
+layout_mode = 2
+text = "Test"
+
+[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats4"]
+layout_mode = 2
+
+[node name="Players" type="Control" parent="Control"]
+anchors_preset = 0
+offset_right = 183.0
+offset_bottom = 170.0
+
+[node name="AllAllies" type="BoxContainer" parent="Control/Players"]
+layout_mode = 0
+offset_right = 183.0
+offset_bottom = 228.0
+vertical = true
+
+[node name="AllyStats" type="VBoxContainer" parent="Control/Players/AllAllies"]
+layout_mode = 2
+script = ExtResource("2_64dmw")
+
+[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats"]
+layout_mode = 2
+text = "Test"
+
+[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats"]
+layout_mode = 2
+
+[node name="AllyStats2" type="VBoxContainer" parent="Control/Players/AllAllies"]
+visible = false
+layout_mode = 2
+script = ExtResource("2_64dmw")
+
+[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats2"]
+layout_mode = 2
+text = "Test"
+
+[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats2"]
+layout_mode = 2
+
+[node name="AllyStats3" type="VBoxContainer" parent="Control/Players/AllAllies"]
+visible = false
+layout_mode = 2
+script = ExtResource("2_64dmw")
+
+[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats3"]
+layout_mode = 2
+text = "Test"
+
+[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats3"]
+layout_mode = 2
+
+[node name="AllyStats4" type="VBoxContainer" parent="Control/Players/AllAllies"]
+visible = false
+layout_mode = 2
+script = ExtResource("2_64dmw")
+
+[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats4"]
+layout_mode = 2
+text = "Test"
+
+[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats4"]
+layout_mode = 2
+
+[node name="BattleResults" type="Control" parent="Control"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BattleResultLabel" type="Label" parent="Control/BattleResults"]
+layout_mode = 0
+offset_top = 225.0
+offset_right = 1152.0
+offset_bottom = 365.0
+
+[node name="Skills" type="Control" parent="Control"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = -164.0
+offset_right = 201.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Control/Skills"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7jqjx")
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="CenterContainer" type="GridContainer" parent="Control/Skills/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+columns = 2
+
+[node name="HBoxContainer" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("5_0lafe")
+
+[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Test"
+
+[node name="BoxContainer3" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer3"]
+layout_mode = 2
+texture = ExtResource("4_1yf0d")
+
+[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer3"]
+layout_mode = 2
+text = "Test"
+
+[node name="BoxContainer" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer"]
+layout_mode = 2
+texture = ExtResource("4_1yf0d")
+
+[node name="Skill 1" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer"]
+layout_mode = 2
 text = "Skill 1"
 icon_alignment = 2
 
-[node name="Skill 2" type="Button" parent="Control/Skills/ColorRect/HBoxContainer"]
+[node name="BoxContainer2" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
 layout_mode = 2
-theme_override_icons/icon = ExtResource("4_1yf0d")
+
+[node name="TextureRect2" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer2"]
+layout_mode = 2
+texture = ExtResource("5_0lafe")
+
+[node name="Skill 2" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer2"]
+layout_mode = 2
 text = "Skill 2"
 icon_alignment = 2
+
+[node name="HBoxContainer2" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/HBoxContainer2"]
+layout_mode = 2
+texture = ExtResource("5_0lafe")
+
+[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Test"
+
+[node name="BoxContainer4" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer4"]
+layout_mode = 2
+texture = ExtResource("4_1yf0d")
+
+[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer4"]
+layout_mode = 2
+text = "Test"
+
+[node name="BoxContainer5" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer5"]
+layout_mode = 2
+texture = ExtResource("5_0lafe")
+
+[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer5"]
+layout_mode = 2
+text = "Skill 5"
+
+[node name="BoxContainer6" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer6"]
+layout_mode = 2
+texture = ExtResource("4_1yf0d")
+
+[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer6"]
+layout_mode = 2
+text = "Skill 4"
+
+[node name="BoxContainer7" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="TextureRect2" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer7"]
+layout_mode = 2
+texture = ExtResource("4_1yf0d")
+
+[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer7"]
+layout_mode = 2
+text = "Skill 3"
 
 [connection signal="pressed" from="Control/ActionButtons/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="Control/ActionButtons/Skills" to="." method="_on_skills_pressed"]

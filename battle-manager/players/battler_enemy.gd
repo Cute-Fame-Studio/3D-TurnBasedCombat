@@ -8,8 +8,9 @@ enum AIType {AGGRESSIVE, DEFENSIVE}
 
 func _ready():
 	super._ready()
-	remove_from_group("players")
-	add_to_group("enemies")
+	if stats and stats.is_enemy:
+		remove_from_group("players")
+		add_to_group("enemies")
 
 func choose_action():
 	var all_players = get_tree().get_nodes_in_group("players")
@@ -23,9 +24,8 @@ func choose_action():
 
 func aggressive_action(players: Array):
 	var target = get_weakest_target(players)
-	var damage = attack_anim(target)
-	print("%s attacks %s with %d damage!" % [character_name, target.character_name, damage])
-	target.take_damage(damage)
+	if target:
+		attack_anim(target)
 
 func defensive_action(players: Array):
 	if float(current_health) / max_health < 0.3:

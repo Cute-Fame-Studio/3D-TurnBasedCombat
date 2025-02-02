@@ -33,6 +33,9 @@ func _ready():
 		return
 	if not hud.is_connected("action_selected", _on_action_selected):
 		hud.action_selected.connect(_on_action_selected)
+	for player in players:
+		if not player.anim_damage.is_connected(_on_anim_damage):
+			player.anim_damage.connect(_on_anim_damage)
 	initialize_battle()
 	# Checking Toggles!
 	ActionButtons.get_node("Attack").disabled = not Attack_Toggle
@@ -46,6 +49,7 @@ func initialize_battle():
 	enemies = get_tree().get_nodes_in_group("enemies")
 	
 	for player in players:
+		
 		hud.on_add_character(player)
 		player.battle_idle()
 		player.anim_damage.connect(_on_anim_damage)
@@ -62,7 +66,7 @@ func initialize_battle():
 
 func count_allies():
 	# For now, Should be one.
-	battle_settings.Ally_Party = 1
+	battle_settings.ally_party = 1
 
 func start_next_turn():
 	if is_battle_over():
@@ -99,7 +103,7 @@ func _on_action_selected(action: String, target, skill:CharacterAbilities):
 	print("Current character: ", current_character.name)
 	match action:
 		"attack":
-			current_character.attack_anim()
+			current_character.attack_anim(target)
 			# perform_attack(current_character, target)
 		"defend":
 			perform_defend(current_character)
@@ -115,8 +119,10 @@ func _on_action_selected(action: String, target, skill:CharacterAbilities):
 	end_turn()
 	
 func _on_anim_damage():
-	var damage = current_character.get_attack_damage()
-	damage_calculation(current_character, current_target, damage)
+	print("MANAGER: Processing animation damage")
+	if current_character and current_target:
+		var damage = current_character.get_attack_damage(current_target) # Get damage for current target
+		damage_calculation(current_character, current_target, damage)
 
 func process_exp_gain(user, target):
 	if not target:
@@ -127,10 +133,8 @@ func process_exp_gain(user, target):
 
 # Updating this just to follow pattern being used in battler_enemy
 func perform_attack(attacker, target):
-	var damage = attacker.attack_anim(target)
-	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
-	target.take_damage(damage)
-	update_hud()
+	current_target = target
+	attacker.attack_anim(target)
 
 func perform_defend(character):
 	character.defend()
@@ -152,7 +156,7 @@ func damage_calculation(attacker, target, damage):
 	damage = Formulas.physical_damage(attacker, target, damage)
 	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
 	target.take_damage(damage)
-	hud.update_health_bars()  # Add this line
+	hud.update_health_bars()
 	update_hud()
 
 func heal_calculation(user, target, amount):
@@ -162,15 +166,22 @@ func heal_calculation(user, target, amount):
 	update_hud()
 
 func enemy_turn(character:Enemy) -> void:
+	var target = players[randi() % players.size()]
+	current_target = target
+	current_character = character
 	character.choose_action()
 	update_hud()
 	end_turn()
 
 func end_turn():
-	await current_battler.wait_attack()
+	if skip_turn:
+		current_turn = (current_turn + 1) % turn_order.size()
+		start_next_turn()
+	else:
+		await current_battler.wait_attack()
 	
-	current_turn = (current_turn + 1) % turn_order.size()
-	start_next_turn()
+		current_turn = (current_turn + 1) % turn_order.size()
+		start_next_turn()
 
 func update_hud():
 	hud.update_character_info()
@@ -203,7 +214,7 @@ func escape_battle():
 	# Check if escape successful
 	if roll <= escape_threshold:
 		print("Escape successful! (Rolled %d, needed %d or less)" % [roll, escape_threshold])
-		end_battle(0) # Use your existing escape scene transition
+		end_battle(1) # Use your existing escape scene transition
 		return true
 	else:
 		print("Escape failed! (Rolled %d, needed %d or less)" % [roll, escape_threshold])
@@ -211,18 +222,20 @@ func escape_battle():
 		end_turn() # Enemy gets a turn after failed escape
 		return false
 
-func end_battle(_state: int = 1):
+func end_battle(state: int = 1):
 	#0 always ends the battle abruptly. 1, Will end the battle and return to normal, 2 will end the battle with game over.
-	if 0:
+	if state == 0:
 		print("cutscene will play.")
 		pass
-	if 1 or all_defeated(enemies):
+	if state == 1 or all_defeated(enemies):
 		hud.show_battle_result("Victory! All enemies have been defeated.")
 		for player in players:
 			player.gain_experience(100)
+		for enemy in enemies:
+			enemy.queue_free()
 			# Be sure to toggle Enemy's off on the scene you left.
 			get_tree().change_scene_to_file(GameMap)
-	if 2 or all_defeated(players):
+	elif state == 2 or all_defeated(players):
 		hud.show_battle_result("Game Over. All players have been defeated.")
 		hud.hide_action_buttons()
 

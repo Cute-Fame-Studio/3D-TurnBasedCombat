@@ -2,18 +2,22 @@ extends CanvasLayer
 
 signal action_selected(action: String, target, skill:CharacterAbilities)
 
-@onready var action_buttons: VBoxContainer = $Control/ActionButtons
-@onready var character_info: VBoxContainer = $Control/PlayerStats
-@onready var enemy_stats: VBoxContainer = $Control/EnemyStats
-@onready var battle_result_label: Label = $Control/BattleResultLabel
+@onready var action_buttons: BoxContainer = $Control/ActionButtons
+@onready var ally_stats: BoxContainer = $Control/Players/AllAllies/AllyStats
+@onready var enemy_stats: BoxContainer = $Control/Enemies/AllEnemies/EnemyStats
+@onready var battle_result = $Control/BattleResults
+@onready var battle_result_label: Label = $Control/BattleResults/BattleResultLabel # I personally think this should be removed.
 @onready var skill_select: Control = $Control/Skills
 
 var activeBattler: Node = null
 var enemy: Node = null
 
+var active_allies = []
+var active_enemies = []
+
 # Health bar-related nodes
-@onready var player_health_bar: ProgressBar = $Control/PlayerStats/PlayerHealthBar
-@onready var enemy_health_bar: ProgressBar = $Control/EnemyStats/EnemyHealthBar
+@onready var player_health_bar = $Control/Players/AllAllies/AllyStats/PlayerHealthBar
+@onready var enemy_health_bar = $Control/Enemies/AllEnemies/EnemyStats/EnemyHealthBar
 
 
 func _ready():
@@ -31,13 +35,24 @@ func on_start_combat(enemy_node: Node):
 	update_health_bars()
 
 func on_add_character(character: Node):
-# Update the CharacterInfo VBoxContainer with the new character info
-# You might need to implement a method in PlayerInfo to handle this
-	update_health_bars()
-	if character_info.has_method("add_character"):
-		character_info.add_character(character)
+	if character.is_in_group("players"):
+		if ally_stats.has_method("update_player_stats"):
+			ally_stats.update_player_stats(character)
 	else:
-		print("Warning: PlayerInfo node doesn't have an add_character method")
+		if ally_stats.has_method("update_enemy_stats"):
+			enemy_stats.update_enemy_stats(character)
+
+# Modify update_health_bars
+func update_health_bars():
+	for i in range(active_allies.size()):
+		var ally = active_allies[i]
+		var container = $Control/Players/AllAllies.get_child(i)
+		container.update_character_info(ally)
+		
+	for i in range(active_enemies.size()):
+		var enemy = active_enemies[i]
+		var container = $Control/Enemies/AllEnemies.get_child(i)
+		container.update_character_info(enemy)
 
 func set_activebattler(character: Node):
 	activeBattler = character
@@ -50,21 +65,13 @@ func hide_action_buttons():
 	action_buttons.hide()
 
 func update_character_info():
-# Update this method based on how your CharacterInfo node is structured
-	if character_info.has_method("update_player_info") and activeBattler:
-		character_info.update_player_info(activeBattler)
-	if enemy_stats.has_method("update_enemy_info") and enemy:
-		enemy_stats.update_enemy_stats(enemy) # Needs some fixing, The reason why the enemy has a player name.
+	if enemy and enemy_stats:
+		enemy_stats.update_enemy_stats(enemy)
 		
-
-func update_health_bars():
-	if activeBattler and player_health_bar:
-		player_health_bar.max_value = activeBattler.max_health
-		player_health_bar.value = activeBattler.current_health
-		
-	if enemy and enemy_health_bar:
-		enemy_health_bar.max_value = enemy.max_health
-		enemy_health_bar.value = enemy.current_health
+	if ally_stats.has_method("update_player_stats") and activeBattler:
+		ally_stats.update_player_stats(activeBattler)
+	if ally_stats.has_method("update_enemy_stats") and enemy:
+		enemy_stats.update_enemy_stats(enemy)
 
 func show_battle_result(result: String):
 	battle_result_label.text = result
@@ -111,7 +118,7 @@ func _on_items_pressed() -> void:
 
 func _on_run_pressed() -> void:
 	hide_action_buttons()
-	action_selected.emit("run", null)
+	action_selected.emit("run", null, null)
 
 # Add other action button handlers as needed (Skills, Item, Run)
 

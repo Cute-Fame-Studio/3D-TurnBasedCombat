@@ -13,7 +13,9 @@ var speed: int
 
 var current_health: int
 var is_defending: bool = false
+var current_target = null
 
+@onready var basic_attack_animation = "attack"
 @onready var state_machine = $AnimationTree["parameters/playback"]
 @onready var skill_node: Node = get_node("SkillList")
 @onready var skill_list: Array[Resource] = skill_node.get_skills()
@@ -28,13 +30,13 @@ func _ready():
 		speed = stats.speed
 		
 		current_health = max_health
+		add_to_group("players")
 		for skill:CharacterAbilities in skill_list:
 			match skill.damage_type:
 				"Physical":
 					skill.use_skill.connect(skill_attack)
 				"Healing":
 					skill.use_skill.connect(skill_heal)
-		add_to_group("players")
 	else:
 		push_error("BattlerStats resource not set!")
 	print("Current Element: ", stats.element)
@@ -43,6 +45,7 @@ func is_defeated() -> bool:
 	return current_health <= 0
 
 func get_attack_damage(target) -> int:
+	print("PLAYER: calculating damage for target: ", target.name)
 	var damage = attack + randi() % 5
 	return Formulas.physical_damage(self, target, damage)
 
@@ -78,14 +81,17 @@ func battle_run():
 
 func battle_item():
 	pass 
-	# Intergrate gloot. Trying to do this alone may cause mistakes.
+	# Intergrate a simple inventory system. Trying to do this alone may cause mistakes.
 
 func battle_idle():
 	state_machine.travel("battle_idle")
 
 func attack_anim(target) -> int:
+	print("PLAYER: Starting attack for target: ", target.name)
+	current_target = target
 	state_machine.travel("attack")
-	return get_attack_damage(target) # Needing to transfer to dealing damage through animation. Not after! 
+	return 0 # Don't return damage here, handled by animation
+	#return get_attack_damage(target) # Needing to transfer to dealing damage through animation. Not after! 
 	# Some animations may do damage multiple times during their attack, It is better to dynamically show the damage being dealt.
 
 #func deal_damage():
@@ -121,6 +127,7 @@ func get_exp_stat():
 # Call methods
 # # #
 func call_attack():
+	print("PLAYER: Animation hit point reached")
 	anim_damage.emit()
 
 # # #

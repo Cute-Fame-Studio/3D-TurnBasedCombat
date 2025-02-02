@@ -6,13 +6,13 @@ var activeBattler
 # These variables do not NEED to have stuff filled out. 
 # These variables would/can be a place to define what sound an animation player will play.
 # It's goal is to not keep data hard to change, And keeping reuseability.
-var Hit_Sound: AudioStream
-var Critical_Sound: AudioStream
-var Miss_Sound : AudioStream
-var Escape_Sound: AudioStream
-var Enemy_Defeat_Sound: AudioStream = null
-var Boss_Defeat_Sound: AudioStream = null
-var Ally_Party: int = 0
+var hit_sound: AudioStream
+var critical_sound: AudioStream
+var miss_sound : AudioStream
+var escape_sound: AudioStream
+var enemy_defeat_sound: AudioStream = null
+var boss_defeat_sound: AudioStream = null
+var ally_party: int = 0
 
 # Set damage calculation type (based on other game damage calcs)
 var Global_Damage_Calc_Type : Damage_Calc_Type = Damage_Calc_Type.PKMN

@@ -19828,7 +19828,7 @@ xfade_time = 0.2
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_v16q4"]
 states/Start/position = Vector2(210, 94)
 states/attack/node = SubResource("AnimationNodeAnimation_3rsfg")
-states/attack/position = Vector2(658, 87)
+states/attack/position = Vector2(658, 88)
 states/battle_idle/node = SubResource("AnimationNodeAnimation_f8jrq")
 states/battle_idle/position = Vector2(463, 100)
 states/jump/node = SubResource("AnimationNodeAnimation_gyp3t")

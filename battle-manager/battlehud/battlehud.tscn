@@ -1,8 +1,8 @@
 [gd_scene load_steps=9 format=3 uid="uid://cyjcaceen0235"]
 
-[ext_resource type="Script" path="res://battle-manager/battlehud/battlehud.gd" id="1_0qukq"]
-[ext_resource type="Script" path="res://battle-manager/battlehud/battler_info.gd" id="2_64dmw"]
-[ext_resource type="Theme" uid="uid://crdk7x2bxdhob" path="res://theme_test.tres" id="2_uiugx"]
+[ext_resource type="Script" uid="uid://835wmi7qej15" path="res://battle-manager/battlehud/battlehud.gd" id="1_0qukq"]
+[ext_resource type="Script" uid="uid://dbbsrqrispnmb" path="res://battle-manager/battlehud/battler_info.gd" id="2_64dmw"]
+[ext_resource type="Theme" uid="uid://crdk7x2bxdhob" path="res://replace/theme_test.tres" id="2_uiugx"]
 [ext_resource type="Texture2D" uid="uid://isjjmhovpspw" path="res://icon.svg" id="4_1yf0d"]
 [ext_resource type="Texture2D" uid="uid://i6v7uo8qdg1d" path="res://Placeholder.svg" id="5_0lafe"]
 
@@ -239,6 +239,7 @@ offset_right = 1152.0
 offset_bottom = 365.0
 
 [node name="Skills" type="Control" parent="Control"]
+visible = false
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -268,107 +269,59 @@ size_flags_horizontal = 6
 size_flags_vertical = 6
 columns = 2
 
-[node name="HBoxContainer" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/HBoxContainer"]
-layout_mode = 2
-texture = ExtResource("5_0lafe")
-
-[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Test"
-
-[node name="BoxContainer3" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer3"]
-layout_mode = 2
-texture = ExtResource("4_1yf0d")
-
-[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer3"]
-layout_mode = 2
-text = "Test"
-
 [node name="BoxContainer" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
 layout_mode = 2
+theme_override_constants/separation = 65
+alignment = 1
 
-[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer"]
+[node name="BoxContainer" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer"]
 layout_mode = 2
-texture = ExtResource("4_1yf0d")
+alignment = 1
 
-[node name="Skill 1" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer"]
-layout_mode = 2
-text = "Skill 1"
-icon_alignment = 2
-
-[node name="BoxContainer2" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
-layout_mode = 2
-
-[node name="TextureRect2" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer2"]
+[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer"]
 layout_mode = 2
 texture = ExtResource("5_0lafe")
 
-[node name="Skill 2" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer2"]
-layout_mode = 2
-text = "Skill 2"
-icon_alignment = 2
-
-[node name="HBoxContainer2" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/HBoxContainer2"]
-layout_mode = 2
-texture = ExtResource("5_0lafe")
-
-[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/HBoxContainer2"]
+[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer"]
 layout_mode = 2
 text = "Test"
 
-[node name="BoxContainer4" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+[node name="BoxContainer2" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer4"]
+[node name="Requirements" type="Label" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer2"]
 layout_mode = 2
-texture = ExtResource("4_1yf0d")
+text = "5MP"
 
-[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer4"]
-layout_mode = 2
-text = "Test"
-
-[node name="BoxContainer5" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer5"]
+[node name="SkillExample#1" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer2"]
 layout_mode = 2
 texture = ExtResource("5_0lafe")
 
-[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer5"]
+[node name="BoxContainer4" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer"]
 layout_mode = 2
-text = "Skill 5"
+theme_override_constants/separation = 30
 
-[node name="BoxContainer6" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+[node name="BoxContainer4" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer6"]
+[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4/BoxContainer4"]
 layout_mode = 2
 texture = ExtResource("4_1yf0d")
 
-[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer6"]
+[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4/BoxContainer4"]
 layout_mode = 2
-text = "Skill 4"
+text = "Test"
 
-[node name="BoxContainer7" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+[node name="BoxContainer3" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4"]
 layout_mode = 2
 
-[node name="TextureRect2" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer7"]
+[node name="Requirements" type="Label" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4/BoxContainer3"]
 layout_mode = 2
-texture = ExtResource("4_1yf0d")
+text = "5MP"
 
-[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer7"]
+[node name="SkillExample#2" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4/BoxContainer3"]
 layout_mode = 2
-text = "Skill 3"
+texture = ExtResource("5_0lafe")
 
 [connection signal="pressed" from="Control/ActionButtons/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="Control/ActionButtons/Skills" to="." method="_on_skills_pressed"]

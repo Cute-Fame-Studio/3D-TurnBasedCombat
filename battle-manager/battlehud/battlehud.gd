@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-signal action_selected(action: String, target, skill:CharacterAbilities)
+signal action_selected(action: String, target, skill:Skill)
 
 @onready var action_buttons: BoxContainer = $Control/ActionButtons
 @onready var ally_stats: BoxContainer = $Control/Players/AllAllies/AllyStats
@@ -106,11 +106,10 @@ func _on_defend_pressed():
 
 func _on_skills_pressed():
 	hide_action_buttons()
-	# Please setup the code below this later!
 	skill_select.visible = true
-	# Skills will instance a button and automatically get their theme. If a theme needs to be specified!
-	# An setting to specify what variation in that theme should be used.
-	action_selected.emit("skills", enemy, activeBattler.skill_list[0])
+	# Make sure activeBattler.skill_list contains Skill resources
+	if activeBattler.skill_list.size() > 0:
+		action_selected.emit("skills", enemy, activeBattler.skill_list[0])
 
 func _on_items_pressed() -> void:
 	hide_action_buttons()

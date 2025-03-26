@@ -23,21 +23,17 @@ resources_spreadsheet_view/fold_docks=false
 
 config/name="Turn-Based Combat"
 run/main_scene="res://maps/battle_scenes/test.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-GlobalBattleSettings="*res://database/battle/GlobalBattleSettings.gd"
-SaveLoader="*res://assets/save-system/save_loader.gd"
+GlobalBattleSettings="*res://assets/globals/battle-settings/GlobalBattleSettings.gd"
+SaveLoader="*res://assets/globals/save-system/save_loader.gd"
 
 [dotnet]
 
 project/assembly_name="Turn-Based Combat"
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/resources_spreadsheet_view/plugin.cfg")
 
 [global_group]
 

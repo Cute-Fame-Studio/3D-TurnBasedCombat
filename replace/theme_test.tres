@@ -1,0 +1,12 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://crdk7x2bxdhob"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h0lgr"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[resource]
+Base/base_type = &"Button"
+Button/styles/normal = SubResource("StyleBoxFlat_h0lgr")

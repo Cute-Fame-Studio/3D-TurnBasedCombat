@@ -1,0 +1,2 @@
+(Formula's Example/Explanation)
+'(Offense - Defense) * ElementalMultiplier'

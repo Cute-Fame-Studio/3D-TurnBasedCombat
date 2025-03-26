@@ -17,7 +17,7 @@ var current_battler
 # Defualt animation should check for weapon's later down the road, And adapt to using them with unique animations.
 @export var default_animation = "Locomotion-Library/idle2" # Unused, But i reccomend gettomg the stats and animation from the database.
 # Added by repo owner, Fame. To test compatibility with returning after a battle.
-@export var GameMap = "res://maps/regular_map/backtogame.tscn"
+@export var game_map = "res://maps/regular_map/backtogame.tscn"
 @onready var hud: CanvasLayer = $BattleHUD
 
 # Toggles For Battles
@@ -26,6 +26,8 @@ var current_battler
 @export var Defend_Toggle: bool = true
 @export var Item_Toggle: bool = true
 @export var Run_Toggle: bool = true
+
+var is_animating: bool = false
 
 func _ready():
 	if not hud:
@@ -96,28 +98,28 @@ func player_turn(character):
 	hud.set_activebattler(character)
 	hud.show_action_buttons(character)
 
-func _on_action_selected(action: String, target, skill:CharacterAbilities):
+func _on_action_selected(action: String, target, skill:Skill):
 	print("Action selected: ", action, " Target: ", target.name if target else "None")
 	current_character = turn_order[current_turn]
 	current_target = target
 	print("Current character: ", current_character.name)
+	is_animating = true
+	hud.hide_action_buttons()
+	
 	match action:
 		"attack":
 			current_character.attack_anim(target)
-			# perform_attack(current_character, target)
 		"defend":
-			perform_defend(current_character)
+			current_character.defend()
 		"skills":
-			perform_skill(current_character, target, skill)
+			current_character.use_skill(skill, target)
 		"item":
-			perform_item(current_character)
+			current_character.battle_item()
 		"run":
 			escape_battle()
 	
-	process_exp_gain(current_character, target) # EDIT: Temp exp access/effect - gain exp on turn end
-	
 	end_turn()
-	
+
 func _on_anim_damage():
 	print("MANAGER: Processing animation damage")
 	if current_character and current_target:
@@ -141,10 +143,22 @@ func perform_defend(character):
 	print("%s is defending!" % character.character_name)
 
 # Don't forget that game's also allow skill's to heal players, So use a universal term and if statements.
-func perform_skill(attacker, target, skill:CharacterAbilities) -> void:
-	var damage = attacker.use_skill(skill, target)
-	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
-	target.take_damage(damage)
+func perform_skill(user, target, skill:Skill) -> void:
+	if not skill.can_use(user):
+		print("Not enough SP/HP to use skill!")
+		return
+		
+	skill.apply_costs(user)
+	
+	var damage = 0
+	match skill.effect_type:
+		"Damage":
+			damage = Formulas.calculate_damage(user, target, skill)
+			target.take_damage(damage)
+		"Heal":
+			var healing = skill.base_power
+			heal_calculation(user, target, healing)
+			
 	update_hud()
 
 func perform_item(user):
@@ -176,16 +190,17 @@ func enemy_turn(character:Enemy) -> void:
 func end_turn():
 	if skip_turn:
 		current_turn = (current_turn + 1) % turn_order.size()
+		is_animating = false
 		start_next_turn()
 	else:
 		await current_battler.wait_attack()
-	
 		current_turn = (current_turn + 1) % turn_order.size()
+		is_animating = false
 		start_next_turn()
 
 func update_hud():
 	hud.update_character_info()
-	if turn_order[current_turn] in players:
+	if turn_order[current_turn] in players and not is_animating:
 		hud.show_action_buttons(turn_order[current_turn])
 	else:
 		hud.hide_action_buttons()
@@ -234,7 +249,7 @@ func end_battle(state: int = 1):
 		for enemy in enemies:
 			enemy.queue_free()
 			# Be sure to toggle Enemy's off on the scene you left.
-			get_tree().change_scene_to_file(GameMap)
+			get_tree().change_scene_to_file(game_map)
 	elif state == 2 or all_defeated(players):
 		hud.show_battle_result("Game Over. All players have been defeated.")
 		hud.hide_action_buttons()

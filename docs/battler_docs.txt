@@ -1,0 +1,5 @@
+(Script used for functional turn based players.)
+res://battle-manager/players/battler_ally.gd
+
+(Script used for functional turn based enemys.)
+res://battle-manager/players/battler_enemy.gd

@@ -1,0 +1,5 @@
+(Skills)
+res://database/skills/
+
+(States, Not implemented.)
+res://database/skills/states/

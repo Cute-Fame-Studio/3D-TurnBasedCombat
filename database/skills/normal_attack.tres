@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://w5n4kf04c1fp"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_pveml"]
+
+[resource]
+script = ExtResource("1_pveml")
+skill_name = "Normal Attack"
+description = "Basic Attack"
+skill_color = ""
+skill_tags = ""
+base_power = 0
+critical_rate = 0
+hit_chance = 100
+element = 0
+target_type = 0
+effect_type = ""
+skill_type = 0
+hp_restored = 0
+sp_restored = 0
+is_healing_skill = false
+animation_name = ""

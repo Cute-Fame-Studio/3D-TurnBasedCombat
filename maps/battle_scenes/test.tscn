@@ -1,8 +1,8 @@
 [gd_scene load_steps=8 format=3 uid="uid://b56ncgnrwugct"]
 
-[ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://assets/testplayer/y_bot-ally.tscn" id="1_2aqym"]
+[ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://assets/allies/y_bot-ally.tscn" id="1_2aqym"]
 [ext_resource type="PackedScene" uid="uid://bvhah4cfn4txb" path="res://battle-manager/BattleManager.tscn" id="1_t14x8"]
-[ext_resource type="PackedScene" uid="uid://clmhyw21qciy4" path="res://assets/testplayer/y_bot-enemy.tscn" id="2_a11mn"]
+[ext_resource type="PackedScene" uid="uid://clmhyw21qciy4" path="res://assets/allies/y_bot-enemy.tscn" id="2_a11mn"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2ddfu"]
 sky_top_color = Color(0.447336, 0.519571, 0.620102, 1)

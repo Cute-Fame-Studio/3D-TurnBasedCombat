@@ -1,7 +1,6 @@
 ## 3D Turn Based Battle System
 
-Animation state's will be used for basic animation cycling, But for stuff like skill's. I thought about using the database approach! (This may not need to be enforced, But commenting on this can help me redact the: AnimationID, Meaning all animations will have to find their own name, And identifer in the animation state itself. [Could be easier])
-
+Animation state's will be used for basic animation cycling when attacking, Additionally you'll need to add a keyframe in your own animations.
 
 
 
@@ -25,12 +24,7 @@ This battle system was gonna be used in my own projects, But as a collabrative e
 ### [Getting Started](https://github.com/Cute-Fame-Studio/3D-TurnBasedCombat/blob/3a52040dce2baa93689853395029f7fb2f1c978d/gettingstarted.md)
 ### [TaskBoard/ToDo](https://github.com/orgs/Cute-Fame-Studio/projects/2)
 
-- Dependencies (Included With The Project.)
-
--- [ResourceTables](https://github.com/don-tnowe/godot-resources-as-sheets-plugin) (Pre-Setup)
-
-
-Godot 4.3 (Stable)+
+Godot 4.0 - 4.4 (Stable).
 
 ## Current Progress
 <img src="https://github.com/user-attachments/assets/df5e2b88-03ee-42b5-90db-7724e2879f78" width=55% height=55%>

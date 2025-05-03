@@ -1,0 +1,43 @@
+[gd_scene load_steps=2 format=3 uid="uid://xtvr2wp8ojvb"]
+
+[ext_resource type="Texture2D" uid="uid://desmmvfvehe3b" path="res://assets/images/icons/Asset 11.png" id="1_1gef3"]
+
+[node name="SkillRow" type="Button"]
+custom_minimum_size = Vector2(259, 40)
+anchors_preset = -1
+anchor_right = 0.224826
+anchor_bottom = 0.0617284
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBox#Icon" type="TextureRect" parent="HBoxContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("1_1gef3")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HBox#SkillName" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Skill Name"
+
+[node name="HBox#SkillCost" type="Label" parent="HBoxContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "15 SP"
+horizontal_alignment = 2

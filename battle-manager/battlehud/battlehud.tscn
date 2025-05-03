@@ -1,10 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://cyjcaceen0235"]
+[gd_scene load_steps=8 format=3 uid="uid://cyjcaceen0235"]
 
 [ext_resource type="Script" uid="uid://835wmi7qej15" path="res://battle-manager/battlehud/battlehud.gd" id="1_0qukq"]
 [ext_resource type="Script" uid="uid://dbbsrqrispnmb" path="res://battle-manager/battlehud/battler_info.gd" id="2_64dmw"]
 [ext_resource type="Theme" uid="uid://crdk7x2bxdhob" path="res://replace/theme_test.tres" id="2_uiugx"]
-[ext_resource type="Texture2D" uid="uid://isjjmhovpspw" path="res://icon.svg" id="4_1yf0d"]
-[ext_resource type="Texture2D" uid="uid://i6v7uo8qdg1d" path="res://Placeholder.svg" id="5_0lafe"]
+[ext_resource type="PackedScene" uid="uid://xtvr2wp8ojvb" path="res://battle-manager/battlehud/skill-button-preset.tscn" id="4_t5sg5"]
 
 [sub_resource type="GDScript" id="GDScript_mbt63"]
 resource_name = "EnemyStats"
@@ -253,6 +252,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Control/Skills"]
+clip_contents = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -262,66 +262,19 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_7jqjx")
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
+metadata/_edit_use_anchors_ = true
 
-[node name="CenterContainer" type="GridContainer" parent="Control/Skills/ScrollContainer"]
+[node name="BoxContainer" type="BoxContainer" parent="Control/Skills/ScrollContainer"]
 layout_mode = 2
-size_flags_horizontal = 6
-size_flags_vertical = 6
-columns = 2
+size_flags_horizontal = 3
+vertical = true
 
-[node name="BoxContainer" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer"]
+[node name="SkillRow" parent="Control/Skills/ScrollContainer/BoxContainer" instance=ExtResource("4_t5sg5")]
 layout_mode = 2
-theme_override_constants/separation = 65
-alignment = 1
+size_flags_vertical = 4
 
-[node name="BoxContainer" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer"]
+[node name="SkillRow2" parent="Control/Skills/ScrollContainer/BoxContainer" instance=ExtResource("4_t5sg5")]
 layout_mode = 2
-alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer"]
-layout_mode = 2
-texture = ExtResource("5_0lafe")
-
-[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer"]
-layout_mode = 2
-text = "Test"
-
-[node name="BoxContainer2" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer"]
-layout_mode = 2
-
-[node name="Requirements" type="Label" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer2"]
-layout_mode = 2
-text = "5MP"
-
-[node name="SkillExample#1" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer2"]
-layout_mode = 2
-texture = ExtResource("5_0lafe")
-
-[node name="BoxContainer4" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 30
-
-[node name="BoxContainer4" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4"]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4/BoxContainer4"]
-layout_mode = 2
-texture = ExtResource("4_1yf0d")
-
-[node name="Button" type="Button" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4/BoxContainer4"]
-layout_mode = 2
-text = "Test"
-
-[node name="BoxContainer3" type="BoxContainer" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4"]
-layout_mode = 2
-
-[node name="Requirements" type="Label" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4/BoxContainer3"]
-layout_mode = 2
-text = "5MP"
-
-[node name="SkillExample#2" type="TextureRect" parent="Control/Skills/ScrollContainer/CenterContainer/BoxContainer/BoxContainer4/BoxContainer3"]
-layout_mode = 2
-texture = ExtResource("5_0lafe")
 
 [connection signal="pressed" from="Control/ActionButtons/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="Control/ActionButtons/Skills" to="." method="_on_skills_pressed"]

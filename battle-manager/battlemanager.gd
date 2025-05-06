@@ -108,11 +108,16 @@ func _on_action_selected(action: String, target, skill:Skill):
 	
 	match action:
 		"attack":
-			current_character.attack_anim(target)
+			# Consider using default_attack skill instead
+			if current_character.default_attack:
+				current_character.use_skill(current_character.default_attack, target)
+			else:
+				current_character.attack_anim(target)
 		"defend":
 			current_character.defend()
-		"skills":
-			current_character.use_skill(skill, target)
+		"skill":  # Changed from "skills"
+			if skill:
+				current_character.use_skill(skill, target)
 		"item":
 			current_character.battle_item()
 		"run":
@@ -136,7 +141,10 @@ func process_exp_gain(user, target):
 # Updating this just to follow pattern being used in battler_enemy
 func perform_attack(attacker, target):
 	current_target = target
-	attacker.attack_anim(target)
+	if attacker.default_attack:
+		attacker.use_skill(attacker.default_attack, target)
+	else:
+		attacker.attack_anim(target)
 
 func perform_defend(character):
 	character.defend()
@@ -147,18 +155,8 @@ func perform_skill(user, target, skill:Skill) -> void:
 	if not skill.can_use(user):
 		print("Not enough SP/HP to use skill!")
 		return
-		
-	skill.apply_costs(user)
 	
-	var damage = 0
-	match skill.effect_type:
-		"Damage":
-			damage = Formulas.calculate_damage(user, target, skill)
-			target.take_damage(damage)
-		"Heal":
-			var healing = skill.base_power
-			heal_calculation(user, target, healing)
-			
+	user.use_skill(skill, target)
 	update_hud()
 
 func perform_item(user):
@@ -194,6 +192,7 @@ func end_turn():
 		start_next_turn()
 	else:
 		await current_battler.wait_attack()
+		current_battler.regenerate_sp() # Add SP regeneration
 		current_turn = (current_turn + 1) % turn_order.size()
 		is_animating = false
 		start_next_turn()

@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://xtvr2wp8ojvb"]
+[gd_scene load_steps=4 format=3 uid="uid://xtvr2wp8ojvb"]
 
 [ext_resource type="Texture2D" uid="uid://desmmvfvehe3b" path="res://assets/images/icons/Asset 11.png" id="1_1gef3"]
+[ext_resource type="Script" uid="uid://bp8uc3di8qowc" path="res://battle-manager/battlehud/skill_button.gd" id="1_rlbxm"]
+[ext_resource type="Resource" uid="uid://ddoo4r86oyqyr" path="res://database/skills/fireball.tres" id="2_f222w"]
 
 [node name="SkillRow" type="Button"]
 custom_minimum_size = Vector2(259, 40)
@@ -10,6 +12,8 @@ anchor_bottom = 0.0617284
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+script = ExtResource("1_rlbxm")
+current_skill = ExtResource("2_f222w")
 metadata/_edit_use_anchors_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]

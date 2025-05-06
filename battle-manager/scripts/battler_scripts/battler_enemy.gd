@@ -25,7 +25,10 @@ func choose_action():
 func aggressive_action(players: Array):
 	var target = get_weakest_target(players)
 	if target:
-		attack_anim(target)
+		if default_attack:
+			use_skill(default_attack, target)
+		else:
+			attack_anim(target)
 
 func defensive_action(players: Array):
 	if float(current_health) / max_health < 0.3:

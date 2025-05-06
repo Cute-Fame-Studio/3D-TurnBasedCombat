@@ -4,18 +4,19 @@
 
 [resource]
 script = ExtResource("1_pveml")
-skill_name = "Normal Attack"
+skill_name = "Attack"
 description = "Basic Attack"
 skill_color = ""
 skill_tags = ""
-base_power = 0
-critical_rate = 0
+base_power = 10
+critical_rate = 5
 hit_chance = 100
+sp_cost = 0
+hp_cost = 0
 element = 0
-target_type = 0
-effect_type = ""
+target_type = 1
 skill_type = 0
-hp_restored = 0
-sp_restored = 0
-is_healing_skill = false
-animation_name = ""
+hp_delta = 0
+sp_delta = 0
+effect_type = "Damage"
+animation_name = "attack"

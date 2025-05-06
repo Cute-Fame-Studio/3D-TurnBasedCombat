@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://ddoo4r86oyqyr"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_udlog"]
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_udlog"]
+
+[resource]
+script = ExtResource("1_udlog")
+skill_name = "Fireball"
+description = "Fireball"
+skill_color = "red"
+skill_tags = "fire,magic,projectile"
+icon = SubResource("NoiseTexture3D_udlog")
+base_power = 65
+critical_rate = 10
+hit_chance = 95
+sp_cost = 15
+hp_cost = 0
+element = 3
+target_type = 1
+skill_type = 0
+hp_delta = 0
+sp_delta = 0
+effect_type = "Damage"
+animation_name = "attack"

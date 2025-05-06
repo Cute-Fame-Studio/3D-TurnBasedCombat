@@ -2,6 +2,9 @@ extends CanvasLayer
 
 signal action_selected(action: String, target, skill:Skill)
 
+@export var skill_button_scene: PackedScene
+@onready var skill_container = $Control/Skills/ScrollContainer/BoxContainer
+
 @onready var action_buttons: BoxContainer = $Control/ActionButtons
 @onready var ally_stats: BoxContainer = $Control/Players/AllAllies/AllyStats
 @onready var enemy_stats: BoxContainer = $Control/Enemies/AllEnemies/EnemyStats
@@ -19,6 +22,8 @@ var active_enemies = []
 @onready var player_health_bar = $Control/Players/AllAllies/AllyStats/PlayerHealthBar
 @onready var enemy_health_bar = $Control/Enemies/AllEnemies/EnemyStats/EnemyHealthBar
 
+# Add SP bar reference
+@onready var player_sp_bar = $Control/Players/AllAllies/AllyStats/PlayerSPBar
 
 func _ready():
 	skill_select.visible = false
@@ -80,9 +85,15 @@ func show_battle_result(result: String):
 # Health bar update functions
 func update_player_health_bar():
 	if activeBattler:
+		# Health bar
 		player_health_bar.max_value = activeBattler.max_health
 		player_health_bar.value = activeBattler.current_health
 		player_health_bar.show()
+		
+		# SP bar
+		player_sp_bar.max_value = activeBattler.max_sp
+		player_sp_bar.value = activeBattler.current_sp
+		player_sp_bar.show()
 
 func update_enemy_health_bar():
 	if enemy:
@@ -104,12 +115,28 @@ func _on_defend_pressed():
 	hide_action_buttons()
 	action_selected.emit("defend", null, null)
 
-func _on_skills_pressed():
+func setup_skill_list(battler: Node) -> void:
+	# Clear existing skill buttons
+	for child in skill_container.get_children():
+		child.queue_free()
+	
+	# Create new skill buttons
+	if battler.skill_list.size() > 0:
+		for skill in battler.skill_list:
+			var button = skill_button_scene.instantiate()
+			skill_container.add_child(button)
+			# Pass the skill resource directly since it should already be a Skill resource
+			button.setup(skill)
+			button.skill_selected.connect(_on_skill_selected)
+
+func _on_skill_selected(skill: Resource) -> void:
+	skill_select.visible = false
+	action_selected.emit("skill", enemy, skill)
+
+func _on_skills_pressed() -> void:
 	hide_action_buttons()
+	setup_skill_list(activeBattler)
 	skill_select.visible = true
-	# Make sure activeBattler.skill_list contains Skill resources
-	if activeBattler.skill_list.size() > 0:
-		action_selected.emit("skills", enemy, activeBattler.skill_list[0])
 
 func _on_items_pressed() -> void:
 	hide_action_buttons()

@@ -20,8 +20,9 @@ enum TARGETS_TYPES {
 @export var hit_chance : int = 100
 @export var sp_cost : int = 0
 @export var hp_cost : int = 0
-@export var formula : String 
-@export var element : GlobalBattleSettings.Elements
+@export var element : GlobalBattleSettings.Elements = GlobalBattleSettings.Elements.Physical
+@export var target_type : TARGETS_TYPES = TARGETS_TYPES.SINGLE_TARGETS
+@export var skill_type : GlobalBattleSettings.SkillTypes = GlobalBattleSettings.SkillTypes.SKILLS
 
 ## Effects
 @export var hp_delta : int = 0  # Positive for healing, negative for HP cost
@@ -31,9 +32,16 @@ enum TARGETS_TYPES {
 ## Animation & Visuals
 @export var animation_name : String = ""
 
-func can_use(user) -> bool:
-	return user.current_sp >= abs(sp_cost) && user.current_hp > abs(hp_cost)
+func can_use(user: Node) -> bool:
+	# Change current_hp to current_health to match battler_ally.gd
+	if hp_cost > 0 and user.current_health <= hp_cost:
+		return false
+	if sp_cost > 0 and user.current_sp <= sp_cost:
+		return false
+	return true
 
-func apply_costs(user) -> void:
-	user.current_hp += hp_delta
-	user.current_sp += sp_delta
+func apply_costs(user: Node) -> void:
+	if hp_cost > 0:
+		user.current_health -= hp_cost
+	if sp_cost > 0:
+		user.current_sp -= sp_cost

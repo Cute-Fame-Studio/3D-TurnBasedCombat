@@ -4,6 +4,7 @@ extends CharacterBody3D
 signal anim_damage()
 
 @export var stats: BattlerStats 
+@export var default_attack: Skill # Basic attack as a skill
 
 var character_name: String
 var max_health: int
@@ -12,31 +13,40 @@ var defense: int
 var speed: int
 
 var current_health: int
+var current_sp: int = 100  # Add SP variables
+var max_sp: int = 100      # Add max SP
 var is_defending: bool = false
 var current_target = null
 
 @onready var basic_attack_animation = "attack"
 @onready var state_machine = $AnimationTree["parameters/playback"]
 @onready var skill_node: Node = get_node("SkillList")
-@onready var skill_list: Array[Resource] = skill_node.get_skills()
+@onready var skill_list: Array[Skill] = []
 @onready var exp_node: Experience = get_node("Experience")
 
 func _ready():
 	if stats:
+		# Basic stats
 		character_name = stats.character_name
 		max_health = stats.max_health
 		attack = stats.attack
 		defense = stats.defense
 		speed = stats.speed
 		
+		# SP stats
+		max_sp = stats.max_sp
+		current_sp = max_sp
 		current_health = max_health
+		
 		add_to_group("players")
-		for skill:CharacterAbilities in skill_list:
-			match skill.damage_type:
-				"Physical":
-					skill.use_skill.connect(skill_attack)
-				"Healing":
-					skill.use_skill.connect(skill_heal)
+		
+		if skill_node and skill_node.has_method("get_skills"):
+			for skill in skill_node.get_skills():
+				if skill is Skill:
+					skill_list.append(skill)
+		
+		if default_attack:
+			skill_list.append(default_attack)
 	else:
 		push_error("BattlerStats resource not set!")
 	print("Current Element: ", stats.element)
@@ -98,21 +108,18 @@ func attack_anim(target) -> int:
 	#return get_attack_damage(target)
 
 func use_skill(skill:Skill, target) -> int:
-	match skill.effect_type:
-		"Damage":
-			return skill_attack(target, skill)
-		"Heal":
-			return skill_heal(skill)
-		_:
-			return skill_attack(target, skill)
-
-func skill_attack(target, skill:Skill):
-	state_machine.travel(skill.animation_name)
-	return Formulas.calculate_damage(self, target, skill)
-
-func skill_heal(skill:Skill):
-	state_machine.travel(skill.animation_name)
-	return skill.base_power
+	if skill.can_use(self):
+		state_machine.travel(skill.animation_name)
+		skill.apply_costs(self)
+		
+		match skill.effect_type:
+			"Damage":
+				return Formulas.calculate_damage(self, target, skill)
+			"Heal":
+				return skill.base_power
+			_:
+				return 0
+	return 0
 
 func wait_attack():
 	if self.is_defending:
@@ -135,7 +142,8 @@ func call_attack():
 # # #
 func on_save_game(save_data):
 	var new_data = BattlerData.new()
-	new_data.current_hp = current_health
+	new_data.current_health = current_health  # Using consistent property name
+	new_data.current_sp = current_sp
 	new_data.current_exp = get_exp_stat().get_total_exp()
 	new_data.current_level = get_exp_stat().get_current_level()
 	new_data.skill_list = skill_list
@@ -144,9 +152,18 @@ func on_save_game(save_data):
 
 func on_load_game(load_data):
 	var save_data = load_data["charNameOrID"] as BattlerData
-	if save_data == null: print("Battler data is empty."); return
+	if save_data == null: 
+		print("Battler data is empty.")
+		return
 	
-	current_health = save_data.current_hp
+	current_health = save_data.current_health  # Using consistent property name
+	current_sp = save_data.current_sp
 	get_exp_stat().exp_total = save_data.current_exp
 	get_exp_stat().char_level = save_data.current_level
 	skill_node.character_skills = save_data.skill_list
+
+func regenerate_sp():
+	if stats and current_sp < max_sp:
+		var regen_amount = stats.sp_regen
+		current_sp = min(current_sp + regen_amount, max_sp)
+		print("%s recovered %d SP. SP: %d/%d" % [character_name, regen_amount, current_sp, max_sp])

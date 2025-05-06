@@ -52,6 +52,7 @@ func add_character(character: Node):
 
 [node name="BattleHUD" type="CanvasLayer" groups=["BattleHud"]]
 script = ExtResource("1_0qukq")
+skill_button_scene = ExtResource("4_t5sg5")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -132,6 +133,9 @@ text = "Test"
 [node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats"]
 layout_mode = 2
 
+[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats"]
+layout_mode = 2
+
 [node name="EnemyStats2" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
 visible = false
 layout_mode = 2
@@ -188,6 +192,9 @@ layout_mode = 2
 text = "Test"
 
 [node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats"]
+layout_mode = 2
+
+[node name="PlayerSPBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats"]
 layout_mode = 2
 
 [node name="AllyStats2" type="VBoxContainer" parent="Control/Players/AllAllies"]

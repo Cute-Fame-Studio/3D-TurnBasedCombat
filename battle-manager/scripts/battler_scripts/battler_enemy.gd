@@ -1,10 +1,10 @@
 class_name Enemy
 extends "res://battle-manager/scripts/battler_scripts/battler_ally.gd"
 
-enum AIType {AGGRESSIVE, DEFENSIVE}
+enum AIType {AGGRESSIVE, DEFENSIVE, CUSTOM, SMART}
 
 @export var ai_type: AIType = AIType.AGGRESSIVE
-
+@export var custom_ai : GDScript
 
 func _ready():
 	super._ready()
@@ -21,6 +21,10 @@ func choose_action():
 			aggressive_action(valid_targets)
 		AIType.DEFENSIVE:
 			defensive_action(valid_targets)
+		AIType.CUSTOM:
+			custom_action(valid_targets)
+		AIType.SMART:
+			smart_action(valid_targets)
 
 func aggressive_action(players: Array):
 	var target = get_weakest_target(players)
@@ -35,6 +39,12 @@ func defensive_action(players: Array):
 		defend()
 	else:
 		aggressive_action(players)
+
+func smart_action(players: Array):
+	pass
+
+func custom_action(players: Array):
+	pass
 
 func get_weakest_target(targets: Array) -> Node:
 	var weakest = null

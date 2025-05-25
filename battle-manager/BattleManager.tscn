@@ -5,12 +5,5 @@
 
 [node name="Battle-Manager" type="Node3D"]
 script = ExtResource("1_duov8")
-default_animation = null
-game_map = null
-Attack_Toggle = null
-Skills_Toggle = null
-Defend_Toggle = null
-Item_Toggle = null
-Run_Toggle = null
 
 [node name="BattleHUD" parent="." instance=ExtResource("5_se261")]

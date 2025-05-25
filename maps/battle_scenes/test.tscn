@@ -22,13 +22,7 @@ volumetric_fog_density = 0.02
 albedo_color = Color(0.192279, 0.227401, 0.23218, 1)
 
 [node name="Battle-Manager" instance=ExtResource("1_t14x8")]
-default_animation = null
-game_map = null
-Attack_Toggle = null
-Skills_Toggle = null
-Defend_Toggle = null
-Item_Toggle = null
-Run_Toggle = null
+game_map = "res://maps/regular_map/backtogame.tscn"
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." index="1"]
 environment = SubResource("Environment_misr6")

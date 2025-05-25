@@ -17,7 +17,7 @@ var current_battler
 # Defualt animation should check for weapon's later down the road, And adapt to using them with unique animations.
 @export var default_animation = "Locomotion-Library/idle2" # Unused, But i reccomend gettomg the stats and animation from the database.
 # Added by repo owner, Fame. To test compatibility with returning after a battle.
-@export var game_map = "res://maps/regular_map/backtogame.tscn"
+@export var game_map = "null"
 @onready var hud: CanvasLayer = $BattleHUD
 
 # Toggles For Battles
@@ -26,6 +26,8 @@ var current_battler
 @export var Defend_Toggle: bool = true
 @export var Item_Toggle: bool = true
 @export var Run_Toggle: bool = true
+
+var defending_players = ["ally_name", "null"]
 
 var is_animating: bool = false
 

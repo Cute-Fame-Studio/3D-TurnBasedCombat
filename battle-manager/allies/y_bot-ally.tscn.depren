@@ -1,0 +1,6 @@
+[gd_scene load_steps=42 format=3 uid="uid://bcqxqucgohr4x"]
+
+[ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://battle-manager/allies/YBot.glb" id="1_2a5t1"]
+[ext_resource type="Script" uid="uid://grs8x8ujsmun" path="res://battle-manager/scripts/battler_scripts/battler.gd" id="2_y13mn"]
+[ext_resource type="Script" uid="uid://ck8aeete0o2pe" path="res://battle-manager/skills/skill_list.gd" id="3_da0b1"]
+[ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://BattlerStats.gd" id="3_elcrg"]

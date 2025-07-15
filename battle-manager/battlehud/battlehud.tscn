@@ -13,7 +13,7 @@ script/source = "extends VBoxContainer
 @onready var name_label = $EnemyNameLabel
 @onready var health_bar = $EnemyHealthBar
 
-func add_character(character: Node):
+func add_character(_character: Node):
 	pass
 
 func update_enemy_stats(character: Node):
@@ -148,6 +148,9 @@ text = "Test"
 [node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats2"]
 layout_mode = 2
 
+[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats2"]
+layout_mode = 2
+
 [node name="EnemyStats3" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
 visible = false
 layout_mode = 2
@@ -160,6 +163,9 @@ text = "Test"
 [node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats3"]
 layout_mode = 2
 
+[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats3"]
+layout_mode = 2
+
 [node name="EnemyStats4" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
 visible = false
 layout_mode = 2
@@ -170,6 +176,9 @@ layout_mode = 2
 text = "Test"
 
 [node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats4"]
+layout_mode = 2
+
+[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats4"]
 layout_mode = 2
 
 [node name="Players" type="Control" parent="Control"]

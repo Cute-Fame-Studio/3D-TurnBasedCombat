@@ -1,4 +1,7 @@
+class_name BattleManager
 extends Node3D
+
+enum BattleEndCondition { WIN, DEFEAT, ESCAPE }
 
 var skip_turn = false # Please please please, Change the functionality or entirely remove this down the line.
 var players: Array = []
@@ -6,8 +9,8 @@ var enemies: Array = []
 var turn_order: Array = []
 var current_turn: int = 0
 
-var current_character
-var current_target
+var current_character:Battler
+var current_target:Battler
 
 @onready var ActionButtons = find_child("ActionButtons")
 # For referencing and setting variables in the battle settings.
@@ -16,9 +19,10 @@ var current_target
 var current_battler
 # Defualt animation should check for weapon's later down the road, And adapt to using them with unique animations.
 @export var default_animation = "Locomotion-Library/idle2" # Unused, But i reccomend gettomg the stats and animation from the database.
+@export var default_attack:Skill
 # Added by repo owner, Fame. To test compatibility with returning after a battle.
 @export var game_map = "null"
-@onready var hud: CanvasLayer = $BattleHUD
+@onready var hud: BattleHud = $BattleHUD
 
 # Toggles For Battles
 @export var Attack_Toggle: bool = true
@@ -32,6 +36,8 @@ var defending_players = ["ally_name", "null"]
 var is_animating: bool = false
 
 func _ready():
+	SignalBus.select_target.connect(target_selected)
+	
 	if not hud:
 		push_error("BattleHUD node not found. Please make sure it's added to the scene.")
 		return
@@ -52,19 +58,20 @@ func initialize_battle():
 	players = get_tree().get_nodes_in_group("players")
 	enemies = get_tree().get_nodes_in_group("enemies")
 	
-	for player in players:
-		
+	for player:Battler in players:
+		print("Have players: ", players)
 		hud.on_add_character(player)
 		player.battle_idle()
 		player.anim_damage.connect(_on_anim_damage)
 	
 	# Ensure players are at the start of the turn order
 	turn_order = players + enemies
+	print("Current turn order: ", turn_order)
 	
-	if enemies.size() > 0:
-		hud.on_start_combat(enemies[0])  # Assuming single enemy for now
-		enemies[0].battle_idle()
-		enemies[0].anim_damage.connect(_on_anim_damage)
+	for enemy:Battler in enemies:
+		hud.on_start_combat(enemy)  # Assuming single enemy for now
+		enemy.battle_idle()
+		enemy.anim_damage.connect(_on_anim_damage)
 
 	start_next_turn()
 
@@ -72,9 +79,22 @@ func count_allies():
 	# For now, Should be one.
 	battle_settings.ally_party = 1
 
+# See _ready() -> SignalBus.select_target.connect() ... Emitted from Battler
+func target_selected(target:Battler) -> void:
+	# Will want special handling so the player cannot just select an enemy and
+	# override the current enemy's target on their turn
+	current_target = target
+	hud.enemy = target
+
 func start_next_turn():
 	if is_battle_over():
-		end_battle(1)
+		if all_defeated(players):
+			end_battle(BattleEndCondition.DEFEAT)
+		elif all_defeated(enemies):
+			end_battle(BattleEndCondition.WIN)
+		else:
+			#Fallthrough
+			end_battle()
 		return
 
 	current_character = turn_order[current_turn]
@@ -100,8 +120,8 @@ func player_turn(character):
 	hud.set_activebattler(character)
 	hud.show_action_buttons(character)
 
-func _on_action_selected(action: String, target, skill:Skill):
-	print("Action selected: ", action, " Target: ", target.name if target else "None")
+func _on_action_selected(action: String, target:Battler, skill:Skill):
+	#print("Action selected: ", action, " Target: ", target.name if target else "None")
 	current_character = turn_order[current_turn]
 	current_target = target
 	print("Current character: ", current_character.name)
@@ -141,7 +161,7 @@ func process_exp_gain(user, target):
 	user.gain_experience(exp_gained)
 
 # Updating this just to follow pattern being used in battler_enemy
-func perform_attack(attacker, target):
+func perform_attack(attacker:Battler, target:Battler):
 	current_target = target
 	if attacker.default_attack:
 		attacker.use_skill(attacker.default_attack, target)
@@ -153,7 +173,7 @@ func perform_defend(character):
 	print("%s is defending!" % character.character_name)
 
 # Don't forget that game's also allow skill's to heal players, So use a universal term and if statements.
-func perform_skill(user, target, skill:Skill) -> void:
+func perform_skill(user:Battler, target:Battler, skill:Skill) -> void:
 	if not skill.can_use(user):
 		print("Not enough SP/HP to use skill!")
 		return
@@ -179,11 +199,12 @@ func heal_calculation(user, target, amount):
 	hud.update_health_bars()  # Add this line
 	update_hud()
 
-func enemy_turn(character:Enemy) -> void:
-	var target = players[randi() % players.size()]
-	current_target = target
-	current_character = character
-	character.choose_action()
+func enemy_turn(character:Battler) -> void:
+	var all_players = get_tree().get_nodes_in_group("players")
+	var valid_targets = all_players.filter(func(p): return not p.is_in_group("enemies"))
+	var all_enemies = get_tree().get_nodes_in_group("enemies")
+	
+	AIManager.choose_action(character, valid_targets, all_enemies, self)
 	update_hud()
 	end_turn()
 
@@ -230,7 +251,7 @@ func escape_battle():
 	# Check if escape successful
 	if roll <= escape_threshold:
 		print("Escape successful! (Rolled %d, needed %d or less)" % [roll, escape_threshold])
-		end_battle(1) # Use your existing escape scene transition
+		end_battle(BattleEndCondition.ESCAPE) # Use your existing escape scene transition
 		return true
 	else:
 		print("Escape failed! (Rolled %d, needed %d or less)" % [roll, escape_threshold])
@@ -238,22 +259,23 @@ func escape_battle():
 		end_turn() # Enemy gets a turn after failed escape
 		return false
 
-func end_battle(state: int = 1):
-	#0 always ends the battle abruptly. 1, Will end the battle and return to normal, 2 will end the battle with game over.
-	if state == 0:
-		print("cutscene will play.")
-		pass
-	if state == 1 or all_defeated(enemies):
-		hud.show_battle_result("Victory! All enemies have been defeated.")
-		for player in players:
-			player.gain_experience(100)
-		for enemy in enemies:
-			enemy.queue_free()
-			# Be sure to toggle Enemy's off on the scene you left.
-			get_tree().change_scene_to_file(game_map)
-	elif state == 2 or all_defeated(players):
-		hud.show_battle_result("Game Over. All players have been defeated.")
-		hud.hide_action_buttons()
+func end_battle(state: BattleEndCondition = BattleEndCondition.WIN):
+	# ESCAPE always ends the battle abruptly. WIN, Will end the battle and return to normal, DEFEAT will end the battle with game over.
+	match state:
+		BattleEndCondition.ESCAPE:
+			print("cutscene will play.")
+			pass
+		BattleEndCondition.WIN:
+			hud.show_battle_result("Victory! All enemies have been defeated.")
+			for player in players:
+				player.gain_experience(100)
+			for enemy in enemies:
+				enemy.queue_free()
+				# Be sure to toggle Enemy's off on the scene you left.
+				get_tree().change_scene_to_file(game_map)
+		BattleEndCondition.DEFEAT:
+			hud.show_battle_result("Game Over. All players have been defeated.")
+			hud.hide_action_buttons()
 
 func update_button_states():
 	ActionButtons.get_node("Attack").disabled = not Attack_Toggle

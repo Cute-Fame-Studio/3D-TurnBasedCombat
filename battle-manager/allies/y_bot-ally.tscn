@@ -1,10 +1,11 @@
 [gd_scene load_steps=42 format=3 uid="uid://bcqxqucgohr4x"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://battle-manager/allies/YBot.glb" id="1_2a5t1"]
-[ext_resource type="Script" uid="uid://drddo6ubmbfk4" path="res://battle-manager/scripts/battler_scripts/battler_ally.gd" id="2_y13mn"]
+[ext_resource type="Script" uid="uid://grs8x8ujsmun" path="res://battle-manager/scripts/battler_scripts/battler.gd" id="2_y13mn"]
 [ext_resource type="Script" uid="uid://ck8aeete0o2pe" path="res://battle-manager/skills/skill_list.gd" id="3_da0b1"]
 [ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://BattlerStats.gd" id="3_elcrg"]
-[ext_resource type="Resource" uid="uid://w5n4kf04c1fp" path="res://database/skills/normal_attack.tres" id="4_o14sq"]
+[ext_resource type="Resource" uid="uid://w5n4kf04c1fp" path="res://database/skills/normal_attack.tres" id="4_bkxmv"]
+[ext_resource type="Material" uid="uid://bxmsjeam54lba" path="res://battle-manager/allies/default_material.tres" id="4_o14sq"]
 [ext_resource type="Script" uid="uid://wn06g6ffxnqr" path="res://battle-manager/scripts/experience.gd" id="6_d755s"]
 [ext_resource type="Resource" uid="uid://ddoo4r86oyqyr" path="res://database/skills/fireball.tres" id="6_g2us4"]
 [ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="6_o14sq"]
@@ -19,10 +20,6 @@ defense = 5
 speed = 5
 sp_regen = 5
 element = 0
-is_enemy = false
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fy8m0"]
-albedo_color = Color(0.661078, 0.740406, 0.987524, 1)
 
 [sub_resource type="Animation" id="Animation_axh5h"]
 length = 0.001
@@ -19846,13 +19843,15 @@ graph_offset = Vector2(-11, 129.5)
 [sub_resource type="BoxShape3D" id="BoxShape3D_0fjwj"]
 size = Vector3(1, 1.80408, 1)
 
-[node name="Ally1" groups=["battler_data", "players"] instance=ExtResource("1_2a5t1")]
+[node name="Ally1" node_paths=PackedStringArray("skill_node") groups=["battler_data"] instance=ExtResource("1_2a5t1")]
 script = ExtResource("2_y13mn")
 stats = SubResource("Resource_1w7ms")
-default_attack = ExtResource("4_o14sq")
+default_attack = ExtResource("4_bkxmv")
+skill_node = NodePath("SkillList")
 
 [node name="Alpha_Surface" parent="Armature/GeneralSkeleton" index="1"]
-material_override = SubResource("StandardMaterial3D_fy8m0")
+unique_name_in_owner = true
+material_override = ExtResource("4_o14sq")
 
 [node name="AnimationPlayer" parent="." index="1"]
 libraries = {

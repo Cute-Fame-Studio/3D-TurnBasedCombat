@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3 uid="uid://bcqxqucgohr4x"]
+[gd_scene load_steps=43 format=3 uid="uid://bcqxqucgohr4x"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://battle-manager/allies/YBot.glb" id="1_2a5t1"]
 [ext_resource type="Script" uid="uid://grs8x8ujsmun" path="res://battle-manager/scripts/battler_scripts/battler.gd" id="2_y13mn"]
@@ -19843,11 +19843,15 @@ graph_offset = Vector2(-11, 129.5)
 [sub_resource type="BoxShape3D" id="BoxShape3D_0fjwj"]
 size = Vector3(1, 1.80408, 1)
 
-[node name="Ally1" node_paths=PackedStringArray("skill_node") groups=["battler_data"] instance=ExtResource("1_2a5t1")]
+[sub_resource type="ViewportTexture" id="ViewportTexture_bh2ey"]
+viewport_path = NodePath("DamageIndicator")
+
+[node name="Ally1" node_paths=PackedStringArray("skill_node", "damage_indicator_subviewport") groups=["battler_data"] instance=ExtResource("1_2a5t1")]
 script = ExtResource("2_y13mn")
 stats = SubResource("Resource_1w7ms")
 default_attack = ExtResource("4_bkxmv")
 skill_node = NodePath("SkillList")
+damage_indicator_subviewport = NodePath("DamageIndicator")
 
 [node name="Alpha_Surface" parent="Armature/GeneralSkeleton" index="1"]
 unique_name_in_owner = true
@@ -19878,3 +19882,11 @@ script = ExtResource("6_d755s")
 
 [node name="BattlerTarget" type="Marker3D" parent="." index="6"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+
+[node name="DamageIndicator" type="SubViewport" parent="." index="7"]
+transparent_bg = true
+
+[node name="DamageIndicatorSprite" type="Sprite3D" parent="." index="8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.92571, 0)
+billboard = 1
+texture = SubResource("ViewportTexture_bh2ey")

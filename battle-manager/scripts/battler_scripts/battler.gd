@@ -63,6 +63,7 @@ var mouse_hover:bool = false :
 @export var skill_node: SkillList
 @onready var skill_list: Array[Skill] = []
 @onready var exp_node: Experience = get_node("Experience")
+@export var damage_indicator_subviewport:SubViewport
 
 func _ready():	
 	SignalBus.select_target.connect(check_select_target)
@@ -137,13 +138,17 @@ func get_attack_damage(target) -> int:
 	var damage = attack + randi() % 5
 	return Formulas.physical_damage(self, target, damage)
 
+@onready var floating_damage_num:PackedScene = preload("res://battle-manager/damage_number.tscn")
 func take_damage(amount: int):
 	var damage_reduction = defense
 	if is_defending:
 		damage_reduction *= 2
 		is_defending = false
-
+	
+	var damage_num:DamageNumber = floating_damage_num.instantiate()
 	var damage_taken = max(0, amount - damage_reduction)
+	damage_num.value = damage_taken
+	damage_indicator_subviewport.add_child(damage_num)
 	current_health -= damage_taken
 	if current_health < 0:
 		current_health = 0

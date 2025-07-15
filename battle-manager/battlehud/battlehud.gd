@@ -1,3 +1,4 @@
+class_name BattleHud
 extends CanvasLayer
 
 signal action_selected(action: String, target, skill:Skill)
@@ -26,6 +27,7 @@ var active_enemies = []
 @onready var player_sp_bar = $Control/Players/AllAllies/AllyStats/PlayerSPBar
 
 func _ready():
+	print("Inside BattleHUD _ready()")
 	skill_select.visible = false
 	battle_result_label.hide()
 	hide_action_buttons()
@@ -55,9 +57,9 @@ func update_health_bars():
 		container.update_character_info(ally)
 		
 	for i in range(active_enemies.size()):
-		var enemy = active_enemies[i]
+		var target_enemy = active_enemies[i]
 		var container = $Control/Enemies/AllEnemies.get_child(i)
-		container.update_character_info(enemy)
+		container.update_character_info(target_enemy)
 
 func set_activebattler(character: Node):
 	activeBattler = character

@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://b56ncgnrwugct"]
+[gd_scene load_steps=12 format=3 uid="uid://b56ncgnrwugct"]
 
 [ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://battle-manager/allies/y_bot-ally.tscn" id="1_2aqym"]
 [ext_resource type="PackedScene" uid="uid://bvhah4cfn4txb" path="res://battle-manager/BattleManager.tscn" id="1_t14x8"]
-[ext_resource type="PackedScene" uid="uid://clmhyw21qciy4" path="res://battle-manager/allies/y_bot-enemy.tscn" id="2_a11mn"]
+[ext_resource type="Resource" uid="uid://w5n4kf04c1fp" path="res://database/skills/normal_attack.tres" id="4_q6nlu"]
+[ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://BattlerStats.gd" id="4_xecl5"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2ddfu"]
 sky_top_color = Color(0.447336, 0.519571, 0.620102, 1)
@@ -21,8 +22,57 @@ volumetric_fog_density = 0.02
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3fc4g"]
 albedo_color = Color(0.192279, 0.227401, 0.23218, 1)
 
+[sub_resource type="Resource" id="Resource_yxp8s"]
+script = ExtResource("4_xecl5")
+character_name = "Player"
+max_health = 100
+max_sp = 100
+attack = 10
+defense = 5
+speed = 5
+sp_regen = 5
+element = 0
+metadata/_custom_type_script = "uid://d2mintfjxyqei"
+
+[sub_resource type="Resource" id="Resource_o35h0"]
+script = ExtResource("4_xecl5")
+character_name = "Enemy1"
+max_health = 100
+max_sp = 100
+attack = 10
+defense = 5
+speed = 5
+sp_regen = 5
+element = 0
+metadata/_custom_type_script = "uid://d2mintfjxyqei"
+
+[sub_resource type="Resource" id="Resource_q6nlu"]
+script = ExtResource("4_xecl5")
+character_name = "Enemy2"
+max_health = 100
+max_sp = 100
+attack = 10
+defense = 5
+speed = 5
+sp_regen = 5
+element = 0
+metadata/_custom_type_script = "uid://d2mintfjxyqei"
+
 [node name="Battle-Manager" instance=ExtResource("1_t14x8")]
+default_attack = ExtResource("4_q6nlu")
 game_map = "res://maps/regular_map/backtogame.tscn"
+
+[node name="Control" parent="BattleHUD" index="0"]
+mouse_filter = 1
+
+[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats2" index="2"]
+layout_mode = 2
+
+[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats3" index="2"]
+layout_mode = 2
+
+[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats4" index="2"]
+layout_mode = 2
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." index="1"]
 environment = SubResource("Environment_misr6")
@@ -39,11 +89,19 @@ material = SubResource("StandardMaterial3D_3fc4g")
 
 [node name="Ally1" parent="." index="3" instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.260986, -1.00599)
+stats = SubResource("Resource_yxp8s")
 
-[node name="Enemy" parent="." index="4" instance=ExtResource("2_a11mn")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.25, 2)
+[node name="Enemy1" parent="." index="4" instance=ExtResource("1_2aqym")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.09563, 0.260986, 1.38908)
+stats = SubResource("Resource_o35h0")
+team = 1
 
-[node name="Camera3D" type="Camera3D" parent="." index="5"]
+[node name="Enemy2" parent="." index="5" instance=ExtResource("1_2aqym")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 1.12607, 0.260986, 1.38908)
+stats = SubResource("Resource_q6nlu")
+team = 1
+
+[node name="Camera3D" type="Camera3D" parent="." index="6"]
 transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -2.08627)
 
 [editable path="BattleHUD"]

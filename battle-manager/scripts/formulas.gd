@@ -46,8 +46,8 @@ static func element_wheel(attack_element, defend_element) -> float:
 ## Calculates damage based on stats, skill, and designated global damage calculation type.[br]
 ## [br]
 ## [color=cyan]Function Parameters:[/color][br]
-## [Ally] or [Enemy] [param attacker][br]
-## [Ally] or [Enemy]  [param target][br]
+## [Battler] [param attacker][br]
+## [Battler]  [param target][br]
 ## [Skill]  [param skill][br]
 ## [br]
 ## [color=cyan]Global Damage Calculation Types:[/color][br]
@@ -65,22 +65,15 @@ static func element_wheel(attack_element, defend_element) -> float:
 ## [color=orange]!All listed formulas have their value multiplied by the type[br]
 ## effectiveness value returned by [method element_wheel].[br]
 ## [color=red]!!Minimum value that can be returned by all formulas is [b]1[/b].[/color][br]
-static func calculate_damage(attacker: Node, target: Node, skill: Skill) -> int:
-	var base_damage = attacker.attack + skill.base_power
-	
-	# Get elemental multiplier
-	var multiplier = 1.0
-	if ELEMENT_MATRIX.has(skill.element) and ELEMENT_MATRIX[skill.element].has(target.stats.element):
-		multiplier = ELEMENT_MATRIX[skill.element][target.stats.element]
-	
-	# Apply element multiplier and defense reduction
-	var defense_reduction = target.defense * 0.5  # Reduce defense impact
-	var final_damage = (base_damage - defense_reduction) * multiplier
-	
-	print("Element damage multiplier: %s vs %s = x%f" % [
-		GlobalBattleSettings.Elements.keys()[skill.element],
-		GlobalBattleSettings.Elements.keys()[target.stats.element],
-		multiplier
-	])
-	
-	return max(1, int(final_damage))  # Ensure minimum 1 damage
+static func calculate_damage(attacker:Battler, target:Battler, skill:Skill) -> int:
+	var atk:float = float(attacker.stats.attack)
+	var def:float = float(target.stats.defense)
+	var damage:int = 1
+	match GlobalBattleSettings.Global_Damage_Calc_Type:
+		GlobalBattleSettings.Damage_Calc_Type.PKMN:
+			damage = max(1, int((((((2.0 * attacker.exp_node.char_level) / 5.0 + 2) * skill.base_power * (atk / def)) / 50.0) + 2) * element_wheel(skill.element, target.stats.element)))
+		GlobalBattleSettings.Damage_Calc_Type.DRGNQST:
+			damage = max(1, int(((atk - (def / 2.0) + (((atk - (def/2.0) + 1.0) * randf_range(0, 255)) / 256.0)) / 4) * (skill.base_power / 50.0) * element_wheel(skill.element, target.stats.element)))
+		_:
+			damage = max(1, atk-def * (skill.base_power/50) * element_wheel(skill.element, target.stats.element))
+	return damage

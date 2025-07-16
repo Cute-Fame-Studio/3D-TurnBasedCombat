@@ -1,7 +1,7 @@
 class_name BattleHud
 extends CanvasLayer
 
-signal action_selected(action: String, target, skill:Skill)
+signal action_selected(action: String, skill:Skill)
 
 @export var skill_button_scene: PackedScene
 @onready var skill_container = $Control/Skills/ScrollContainer/BoxContainer
@@ -108,14 +108,14 @@ func _on_attack_pressed():
 	print("Attack button pressed")
 	if enemy:
 		print("Emitting action_selected signal with target: ", enemy.name)
-		action_selected.emit("attack", enemy, null)
+		action_selected.emit("attack", null)
 		hide_action_buttons()
 	else:
 		print("Error: No enemy target set")
 
 func _on_defend_pressed():
 	hide_action_buttons()
-	action_selected.emit("defend", null, null)
+	action_selected.emit("defend", null)
 
 func setup_skill_list(battler: Node) -> void:
 	# Clear existing skill buttons
@@ -133,7 +133,7 @@ func setup_skill_list(battler: Node) -> void:
 
 func _on_skill_selected(skill: Resource) -> void:
 	skill_select.visible = false
-	action_selected.emit("skill", enemy, skill)
+	action_selected.emit("skill", skill)
 
 func _on_skills_pressed() -> void:
 	hide_action_buttons()
@@ -142,11 +142,11 @@ func _on_skills_pressed() -> void:
 
 func _on_items_pressed() -> void:
 	hide_action_buttons()
-	action_selected.emit("item", null, null)
+	action_selected.emit("item", null)
 
 func _on_run_pressed() -> void:
 	hide_action_buttons()
-	action_selected.emit("run", null, null)
+	action_selected.emit("run", null)
 
 # Add other action button handlers as needed (Skills, Item, Run)
 

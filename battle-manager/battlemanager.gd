@@ -11,6 +11,7 @@ var current_turn: int = 0
 
 var current_character:Battler
 var current_target:Battler
+var in_target_selection:bool = false
 
 @onready var ActionButtons = find_child("ActionButtons")
 # For referencing and setting variables in the battle settings.
@@ -53,6 +54,19 @@ func _ready():
 	ActionButtons.get_node("Defend").disabled = not Defend_Toggle
 	ActionButtons.get_node("Items").disabled = not Item_Toggle
 	ActionButtons.get_node("Run").disabled = not Run_Toggle
+
+func _input(event: InputEvent) -> void:
+	# Cancel is currently bound to Escape key
+	if event.is_action_pressed("Cancel") and in_target_selection:
+		_cancel_action_target_selection()
+	# Confirm is currently bound to Enter key
+	elif event.is_action_pressed("Confirm") and in_target_selection and current_target:
+		if !queued_action.is_empty() and queued_skill:
+			_use_action_on_target()
+		else:
+			printerr("MANAGER: Action and/or Skill not queued!")
+			print("Action: ", queued_action)
+			print("Skill: ", queued_skill)
 
 func initialize_battle():
 	players = get_tree().get_nodes_in_group("players")
@@ -112,7 +126,7 @@ func start_next_turn():
 	else:
 		print("Enemy's turn")
 		enemy_turn(current_character)
-
+	
 	update_hud()
 
 func player_turn(character):
@@ -120,31 +134,58 @@ func player_turn(character):
 	hud.set_activebattler(character)
 	hud.show_action_buttons(character)
 
-func _on_action_selected(action: String, target:Battler, skill:Skill):
-	#print("Action selected: ", action, " Target: ", target.name if target else "None")
-	current_character = turn_order[current_turn]
-	current_target = target
-	print("Current character: ", current_character.name)
+var queued_action:String
+var queued_skill:Skill
+func _on_action_selected(action: String, skill:Skill):
+	match action:
+		"defend":
+			current_character.defend()
+			end_turn()
+			return
+		"run":
+			escape_battle()
+			return
+	
+	queued_action = action
+	if !skill:
+		skill = current_character.default_attack
+	queued_skill = skill
+	_do_target_selection()
+
+func _do_target_selection() -> void:
+	in_target_selection = true
+	current_target = null
+	hud.hide_action_buttons()
+	SignalBus.allow_select_target.emit(true)
+
+func _cancel_action_target_selection() -> void:
+	in_target_selection = false
+	hud.show_action_buttons(current_character)
+	SignalBus.allow_select_target.emit(false)
+
+func _use_action_on_target() -> void:
+	# This is redundant...?
+	# current_character = turn_order[current_turn]
+	in_target_selection = false
 	is_animating = true
 	hud.hide_action_buttons()
 	
-	match action:
+	match queued_action:
 		"attack":
 			# Consider using default_attack skill instead
 			if current_character.default_attack:
-				current_character.use_skill(current_character.default_attack, target)
+				current_character.use_skill(current_character.default_attack, current_target)
 			else:
-				current_character.attack_anim(target)
-		"defend":
-			current_character.defend()
+				current_character.attack_anim(current_target)
 		"skill":  # Changed from "skills"
-			if skill:
-				current_character.use_skill(skill, target)
+			if queued_skill:
+				current_character.use_skill(queued_skill, current_target)
 		"item":
 			current_character.battle_item()
-		"run":
-			escape_battle()
 	
+	queued_action = ""
+	queued_skill = null
+	SignalBus.allow_select_target.emit(false)
 	end_turn()
 
 func _on_anim_damage():

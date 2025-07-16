@@ -32,6 +32,11 @@ var current_target = null
 # Targeting controls
 @onready var material:Material = %Alpha_Surface.material_override
 @onready var select_outline:Shader = preload("res://assets/shaders/battler_select_shader.gdshader")
+var is_selectable:bool = false :
+	set(selectable):
+		is_selectable = selectable
+		if !is_selectable:
+			is_targeted = false
 var is_targeted:bool = false :
 	set(targeted):
 		is_targeted = targeted
@@ -47,7 +52,7 @@ var is_targeted:bool = false :
 var mouse_hover:bool = false :
 	set(hovering):
 		mouse_hover = hovering
-		if hovering and !is_targeted:
+		if hovering and is_selectable and !is_targeted:
 			var shader_mat:ShaderMaterial = ShaderMaterial.new()
 			shader_mat.shader = select_outline
 			shader_mat.set_shader_parameter("color", Color(Color.WHITE))
@@ -55,6 +60,8 @@ var mouse_hover:bool = false :
 			shader_mat.set_shader_parameter("alpha", 0.2)
 			material.next_pass = shader_mat
 		elif !hovering and !is_targeted:
+			material.next_pass = null
+		elif !is_selectable:
 			material.next_pass = null
 
 @export_group("Special Dependencies")
@@ -67,6 +74,7 @@ var mouse_hover:bool = false :
 
 func _ready():	
 	SignalBus.select_target.connect(check_select_target)
+	SignalBus.allow_select_target.connect(set_selectable)
 	if !default_attack:
 		default_attack = load("res://database/skills/normal_attack.tres")
 	
@@ -80,7 +88,13 @@ func _ready():
 	if stats:
 		# Basic stats
 		character_name = stats.character_name
+		%BattlerNameLabel.text = character_name
+		
 		max_health = stats.max_health
+		current_health = max_health
+		%BattlerHealthBar.max_value = max_health
+		%BattlerHealthBar.value = current_health
+		
 		attack = stats.attack
 		defense = stats.defense
 		speed = stats.speed
@@ -88,7 +102,6 @@ func _ready():
 		# SP stats
 		max_sp = stats.max_sp
 		current_sp = max_sp
-		current_health = max_health
 		
 		if skill_node:
 			var updated_skill_list:Array[Skill] = skill_node.get_skills()
@@ -109,13 +122,16 @@ func _ready():
 	print("Current Element: ", stats.element)
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("Select") and mouse_hover:
+	if event.is_action_pressed("Select") and is_selectable and mouse_hover:
 		select_target()
 
 func _mouse_enter() -> void: has_hover(true)
 func _mouse_exit() -> void: has_hover(false)
 func has_hover(hover:bool = false) -> void:
 	mouse_hover = hover
+
+func set_selectable(can_target:bool) -> void:
+	is_selectable = can_target
 
 func check_select_target(target:Battler) -> void:
 	if target != self and is_targeted:
@@ -150,6 +166,7 @@ func take_damage(amount: int):
 	damage_num.value = damage_taken
 	damage_indicator_subviewport.add_child(damage_num)
 	current_health -= damage_taken
+	%BattlerHealthBar.value = current_health
 	if current_health < 0:
 		current_health = 0
 	print("%s took %d damage. Health: %d/%d" % [character_name, damage_taken, current_health, max_health])
@@ -158,6 +175,7 @@ func take_healing(amount: int):
 	var healing = min(amount, max_health - current_health)
 
 	current_health += healing
+	%BattlerHealthBar.value = current_health
 	print("%s received %d healing. Health: %d/%d" % [character_name, healing, current_health, max_health])
 	return healing
 

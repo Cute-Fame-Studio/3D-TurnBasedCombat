@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" load_steps=2 format=3 uid="uid://dff8h0io4jqux"]
+
+[ext_resource type="Script" uid="uid://m02b4cy78or" path="res://database/items/items_template.gd" id="1_lakn7"]
+
+[resource]
+script = ExtResource("1_lakn7")
+item_name = "Basic Heal"
+description = ""
+item_tags = ""
+base_power = 0
+critical_rate = 0
+effectiveness = 100
+element = 0
+target_type = 1
+skill_type = 0
+hp_delta = 0
+sp_delta = 0
+effect_type = "Damage"
+animation_name = ""

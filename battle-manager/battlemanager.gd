@@ -26,11 +26,12 @@ var current_battler
 @onready var hud: BattleHud = $BattleHUD
 
 # Toggles For Battles
-@export var Attack_Toggle: bool = true
-@export var Skills_Toggle: bool = true
-@export var Defend_Toggle: bool = true
-@export var Item_Toggle: bool = true
-@export var Run_Toggle: bool = true
+@export_group("Toggle Buttons")
+@export var attack_toggle: bool = true
+@export var skills_toggle: bool = true
+@export var defend_toggle: bool = true
+@export var item_toggle: bool = true
+@export var run_toggle: bool = true
 
 var defending_players = ["ally_name", "null"]
 
@@ -49,11 +50,11 @@ func _ready():
 			player.anim_damage.connect(_on_anim_damage)
 	initialize_battle()
 	# Checking Toggles!
-	ActionButtons.get_node("Attack").disabled = not Attack_Toggle
-	ActionButtons.get_node("Skills").disabled = not Skills_Toggle
-	ActionButtons.get_node("Defend").disabled = not Defend_Toggle
-	ActionButtons.get_node("Items").disabled = not Item_Toggle
-	ActionButtons.get_node("Run").disabled = not Run_Toggle
+	ActionButtons.get_node("Attack").disabled = not attack_toggle
+	ActionButtons.get_node("Skills").disabled = not skills_toggle
+	ActionButtons.get_node("Defend").disabled = not defend_toggle
+	ActionButtons.get_node("Items").disabled = not item_toggle
+	ActionButtons.get_node("Run").disabled = not run_toggle
 
 func _input(event: InputEvent) -> void:
 	# Cancel is currently bound to Escape key
@@ -319,8 +320,8 @@ func end_battle(state: BattleEndCondition = BattleEndCondition.WIN):
 			hud.hide_action_buttons()
 
 func update_button_states():
-	ActionButtons.get_node("Attack").disabled = not Attack_Toggle
-	ActionButtons.get_node("Skills").disabled = not Skills_Toggle
-	ActionButtons.get_node("Defend").disabled = not Defend_Toggle
-	ActionButtons.get_node("Items").disabled = not Item_Toggle
-	ActionButtons.get_node("Skills").disabled = not Run_Toggle
+	ActionButtons.get_node("Attack").disabled = not attack_toggle
+	ActionButtons.get_node("Skills").disabled = not skills_toggle
+	ActionButtons.get_node("Defend").disabled = not defend_toggle
+	ActionButtons.get_node("Items").disabled = not item_toggle
+	ActionButtons.get_node("Skills").disabled = not run_toggle

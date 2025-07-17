@@ -24,12 +24,19 @@ enum Elements {
 	FIRE = 3,
 	WATER = 4,
 	MAGIC = 5,
+	NONE = 6, # In theory this would ensure everyone can be effected.
 	ENDLIST}
 
 enum SkillTypes {
 	SKILLS = 0,
 	HEALING = 1, #Placerholder.
 	HEALTHREDUCTIONATTACKS = 2,
+	ENDLIST}
+
+enum ItemTypes {
+	HEALING = 0,
+	THROWABLE = 1,
+	BUFFS = 2,
 	ENDLIST}
 
 enum WeaponTypes {

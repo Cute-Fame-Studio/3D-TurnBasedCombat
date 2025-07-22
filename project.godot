@@ -36,6 +36,7 @@ GlobalBattleSettings="*res://assets/globals/battle-settings/GlobalBattleSettings
 SaveLoader="*res://assets/globals/save-system/save_loader.gd"
 AIManager="*res://battle-manager/ai_manager.gd"
 SignalBus="*res://signal_bus.gd"
+ItemHandler="*res://battle-manager/inventory/item_handler.gd"
 
 [dotnet]
 

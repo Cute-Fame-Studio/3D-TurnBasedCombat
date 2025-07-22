@@ -12,6 +12,7 @@ var current_turn: int = 0
 var current_character:Battler
 var current_target:Battler
 var in_target_selection:bool = false
+var in_menu_selection:bool = false
 
 @onready var ActionButtons = find_child("ActionButtons")
 # For referencing and setting variables in the battle settings.
@@ -45,6 +46,8 @@ func _ready():
 		return
 	if not hud.is_connected("action_selected", _on_action_selected):
 		hud.action_selected.connect(_on_action_selected)
+	if not hud.is_connected("menu_opened", _do_menu_selection):
+		hud.menu_opened.connect(_do_menu_selection)
 	for player in players:
 		if not player.anim_damage.is_connected(_on_anim_damage):
 			player.anim_damage.connect(_on_anim_damage)
@@ -58,16 +61,23 @@ func _ready():
 
 func _input(event: InputEvent) -> void:
 	# Cancel is currently bound to Escape key
-	if event.is_action_pressed("Cancel") and in_target_selection:
-		_cancel_action_target_selection()
+	if event.is_action_pressed("Cancel"):
+		print("Pressed cancel")
+		if in_target_selection:
+			print("Cancelling Target Selection")
+			_cancel_action_target_selection()
+		elif in_menu_selection:
+			print("Cancelling Menu Selection")
+			_cancel_menu_selection()
 	# Confirm is currently bound to Enter key
 	elif event.is_action_pressed("Confirm") and in_target_selection and current_target:
-		if !queued_action.is_empty() and queued_skill:
+		if !queued_action.is_empty() and (queued_skill or queued_item):
 			_use_action_on_target()
 		else:
-			printerr("MANAGER: Action and/or Skill not queued!")
+			printerr("MANAGER: Action and/or Skill/Item not queued!")
 			print("Action: ", queued_action)
 			print("Skill: ", queued_skill)
+			print("Item: ", queued_item)
 
 func initialize_battle():
 	players = get_tree().get_nodes_in_group("players")
@@ -137,7 +147,8 @@ func player_turn(character):
 
 var queued_action:String
 var queued_skill:Skill
-func _on_action_selected(action: String, skill:Skill):
+var queued_item:Item
+func _on_action_selected(action: String, usable:Resource = current_character.default_attack):
 	match action:
 		"defend":
 			current_character.defend()
@@ -148,9 +159,15 @@ func _on_action_selected(action: String, skill:Skill):
 			return
 	
 	queued_action = action
-	if !skill:
-		skill = current_character.default_attack
-	queued_skill = skill
+	if action == "attack":
+		if current_character.default_attack:
+			queued_skill = current_character.default_attack
+		else:
+			queued_skill = default_attack
+	if usable is Skill:
+		queued_skill = usable
+	elif usable is Item:
+		queued_item = usable
 	_do_target_selection()
 
 func _do_target_selection() -> void:
@@ -159,33 +176,49 @@ func _do_target_selection() -> void:
 	hud.hide_action_buttons()
 	SignalBus.allow_select_target.emit(true)
 
+func _do_menu_selection() -> void:
+	in_menu_selection = true
+	current_target = null
+	hud.hide_action_buttons()
+
 func _cancel_action_target_selection() -> void:
 	in_target_selection = false
-	hud.show_action_buttons(current_character)
+	if in_menu_selection:
+		_do_menu_selection()
+	else:
+		hud.show_action_buttons(current_character)
 	SignalBus.allow_select_target.emit(false)
 
+func _cancel_menu_selection() -> void:
+	in_menu_selection = false
+	hud.item_select.hide()
+	hud.skill_select.hide()
+	hud.show_action_buttons(current_character)
+
 func _use_action_on_target() -> void:
-	# This is redundant...?
-	# current_character = turn_order[current_turn]
 	in_target_selection = false
+	in_menu_selection = false
 	is_animating = true
 	hud.hide_action_buttons()
 	
 	match queued_action:
 		"attack":
 			# Consider using default_attack skill instead
+			battler_attacking = true
 			if current_character.default_attack:
 				current_character.use_skill(current_character.default_attack, current_target)
 			else:
 				current_character.attack_anim(current_target)
 		"skill":  # Changed from "skills"
 			if queued_skill:
+				battler_attacking = true
 				current_character.use_skill(queued_skill, current_target)
 		"item":
-			current_character.battle_item()
+			current_character.battle_item(queued_item, current_target)
 	
 	queued_action = ""
 	queued_skill = null
+	queued_item = null
 	SignalBus.allow_select_target.emit(false)
 	end_turn()
 
@@ -250,13 +283,17 @@ func enemy_turn(character:Battler) -> void:
 	update_hud()
 	end_turn()
 
+var battler_attacking:bool = false
 func end_turn():
 	if skip_turn:
 		current_turn = (current_turn + 1) % turn_order.size()
 		is_animating = false
 		start_next_turn()
 	else:
-		await current_battler.wait_attack()
+		# TODO: If use item, await other animation??
+		if battler_attacking:
+			await current_battler.wait_attack()
+			battler_attacking = false
 		current_battler.regenerate_sp() # Add SP regeneration
 		current_turn = (current_turn + 1) % turn_order.size()
 		is_animating = false

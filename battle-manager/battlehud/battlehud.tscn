@@ -52,7 +52,6 @@ func add_character(_character: Node):
 
 [node name="BattleHUD" type="CanvasLayer" groups=["BattleHud"]]
 script = ExtResource("1_0qukq")
-skill_button_scene = ExtResource("4_t5sg5")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -317,6 +316,45 @@ layout_mode = 2
 size_flags_vertical = 4
 
 [node name="SkillRow2" parent="Control/Skills/ScrollContainer/BoxContainer" instance=ExtResource("4_t5sg5")]
+layout_mode = 2
+
+[node name="Items" type="Control" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = -164.0
+offset_right = 201.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Control/Items"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7jqjx")
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="BoxContainer" type="BoxContainer" parent="Control/Items/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+vertical = true
+
+[node name="SkillRow" parent="Control/Items/ScrollContainer/BoxContainer" instance=ExtResource("4_t5sg5")]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="SkillRow2" parent="Control/Items/ScrollContainer/BoxContainer" instance=ExtResource("4_t5sg5")]
 layout_mode = 2
 
 [connection signal="pressed" from="Control/ActionButtons/Attack" to="." method="_on_attack_pressed"]

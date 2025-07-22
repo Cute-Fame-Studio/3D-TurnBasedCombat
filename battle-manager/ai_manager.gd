@@ -20,6 +20,7 @@ func aggressive_action(this:Battler, players: Array, battle_manager:BattleManage
 	var target = get_weakest_target(players)
 	if target:
 		battle_manager.current_target = target
+		battle_manager.battler_attacking = true
 		this.attack_anim(target)
 
 func defensive_action(this:Battler, players: Array, battle_manager:BattleManager):

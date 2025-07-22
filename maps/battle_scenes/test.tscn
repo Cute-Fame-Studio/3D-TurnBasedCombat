@@ -1,9 +1,11 @@
-[gd_scene load_steps=12 format=3 uid="uid://b56ncgnrwugct"]
+[gd_scene load_steps=17 format=3 uid="uid://b56ncgnrwugct"]
 
 [ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://battle-manager/allies/y_bot-ally.tscn" id="1_2aqym"]
 [ext_resource type="PackedScene" uid="uid://bvhah4cfn4txb" path="res://battle-manager/BattleManager.tscn" id="1_t14x8"]
 [ext_resource type="Resource" uid="uid://w5n4kf04c1fp" path="res://database/skills/normal_attack.tres" id="4_q6nlu"]
 [ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://BattlerStats.gd" id="4_xecl5"]
+[ext_resource type="Script" uid="uid://m02b4cy78or" path="res://database/items/items_template.gd" id="5_xecl5"]
+[ext_resource type="Script" uid="uid://c2j4t3rigq4gk" path="res://battle-manager/inventory/inventory.gd" id="6_yxp8s"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2ddfu"]
 sky_top_color = Color(0.447336, 0.519571, 0.620102, 1)
@@ -33,6 +35,56 @@ speed = 5
 sp_regen = 5
 element = 0
 metadata/_custom_type_script = "uid://d2mintfjxyqei"
+
+[sub_resource type="Resource" id="Resource_daget"]
+script = ExtResource("5_xecl5")
+item_name = "Other item"
+description = "Does other stuff"
+item_tags = "Hrmm"
+is_battle_item = true
+is_key_item = false
+is_stackable = true
+base_power = 0
+critical_rate = 0
+effectiveness = 100
+element = 0
+target_type = 1
+skill_type = 0
+hp_delta = 0
+sp_delta = 0
+effect_type = "Damage"
+animation_name = ""
+metadata/_custom_type_script = "uid://m02b4cy78or"
+
+[sub_resource type="Resource" id="Resource_fa7uu"]
+script = ExtResource("5_xecl5")
+item_name = "Crazy Item"
+description = "Does crazy stuff"
+item_tags = "AHHH"
+is_battle_item = true
+is_key_item = false
+is_stackable = true
+base_power = 0
+critical_rate = 0
+effectiveness = 100
+element = 0
+target_type = 1
+skill_type = 0
+hp_delta = 0
+sp_delta = 0
+effect_type = "Damage"
+animation_name = ""
+metadata/_custom_type_script = "uid://m02b4cy78or"
+
+[sub_resource type="Resource" id="Resource_4yi8j"]
+script = ExtResource("6_yxp8s")
+has_max_limit = true
+max_size = 30
+collection = Dictionary[ExtResource("5_xecl5"), int]({
+SubResource("Resource_daget"): 5,
+SubResource("Resource_fa7uu"): 3
+})
+metadata/_custom_type_script = "uid://c2j4t3rigq4gk"
 
 [sub_resource type="Resource" id="Resource_o35h0"]
 script = ExtResource("4_xecl5")
@@ -90,6 +142,7 @@ material = SubResource("StandardMaterial3D_3fc4g")
 [node name="Ally1" parent="." index="3" instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.260986, -1.00599)
 stats = SubResource("Resource_yxp8s")
+inventory = SubResource("Resource_4yi8j")
 
 [node name="Enemy1" parent="." index="4" instance=ExtResource("1_2aqym")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.09563, 0.260986, 1.38908)

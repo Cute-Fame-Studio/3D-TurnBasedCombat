@@ -5,6 +5,7 @@ signal anim_damage()
 enum TEAM {ALLY, ENEMY}
 
 @export var stats: BattlerStats
+@export var inventory: Inventory
 @export var default_attack:Skill # Basic attack as a skill
 @export_group("Team and AI Controls")
 ## Define the battler's Team - Allies are Player-controlled
@@ -190,9 +191,11 @@ func gain_experience(amount: int):
 func battle_run():
 	pass
 
-func battle_item():
-	pass 
-	# Intergrate a simple inventory system. Trying to do this alone may cause mistakes.
+func battle_item(item:Item, target:Battler) -> void:
+	# TODO: Check if user can legally use this item/take this action
+	if inventory.remove_item_from_collection(item) == Inventory.Resolution.SUCCESS:
+		ItemHandler.use_item(item, target)
+	# Integrate a simple inventory system. Trying to do this alone may cause mistakes.
 
 func battle_idle():
 	state_machine.travel("battle_idle")

@@ -12,6 +12,12 @@ enum TARGETS_TYPES {
 @export var description : String = ""
 @export var item_tags : String = ""
 @export var icon : Resource
+@export var is_battle_item:bool = true
+@export var is_key_item:bool = false:
+	set(key_item):
+		is_key_item = key_item
+		is_stackable = !key_item
+@export var is_stackable:bool = true
 
 ## Mechanics  
 @export var base_power : int = 0

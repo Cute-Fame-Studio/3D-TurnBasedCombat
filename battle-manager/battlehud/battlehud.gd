@@ -2,9 +2,13 @@ class_name BattleHud
 extends CanvasLayer
 
 signal action_selected(action: String, skill:Skill)
+signal menu_opened
 
-@export var skill_button_scene: PackedScene
+@onready var skill_button_scene: PackedScene = preload("res://battle-manager/battlehud/skill-button-preset.tscn")
 @onready var skill_container = $Control/Skills/ScrollContainer/BoxContainer
+
+@onready var item_button_scene: PackedScene = preload("res://battle-manager/battlehud/item-button-preset.tscn")
+@onready var item_container = $Control/Items/ScrollContainer/BoxContainer
 
 @onready var action_buttons: BoxContainer = $Control/ActionButtons
 @onready var ally_stats: BoxContainer = $Control/Players/AllAllies/AllyStats
@@ -12,6 +16,7 @@ signal action_selected(action: String, skill:Skill)
 @onready var battle_result = $Control/BattleResults
 @onready var battle_result_label: Label = $Control/BattleResults/BattleResultLabel # I personally think this should be removed.
 @onready var skill_select: Control = $Control/Skills
+@onready var item_select: Control = $Control/Items
 
 var activeBattler: Node = null
 var enemy: Node = null
@@ -29,6 +34,7 @@ var active_enemies = []
 func _ready():
 	print("Inside BattleHUD _ready()")
 	skill_select.visible = false
+	item_select.visible = false
 	battle_result_label.hide()
 	hide_action_buttons()
 
@@ -130,10 +136,34 @@ func setup_skill_list(battler: Node) -> void:
 			# Pass the skill resource directly since it should already be a Skill resource
 			button.setup(skill)
 			button.skill_selected.connect(_on_skill_selected)
+	menu_opened.emit()
+
+func setup_item_list(battler: Battler) -> void:
+	# Clear existing skill buttons
+	for child in item_container.get_children():
+		child.queue_free()
+	# If no items, no point in continuing to do logic here
+	if !battler.inventory or battler.inventory.collection.is_empty():
+		return
+	
+	# Create new skill buttons
+	for item:Item in battler.inventory.collection.keys():
+		if !item.is_battle_item:
+			continue
+		var button = item_button_scene.instantiate()
+		item_container.add_child(button)
+		# Pass the skill resource directly since it should already be a Skill resource
+		button.setup(item, battler.inventory.collection.get(item))
+		button.item_selected.connect(_on_item_selected)
+	menu_opened.emit()
 
 func _on_skill_selected(skill: Resource) -> void:
 	skill_select.visible = false
 	action_selected.emit("skill", skill)
+
+func _on_item_selected(item: Item) -> void:
+	item_select.visible = false
+	action_selected.emit("item", item)
 
 func _on_skills_pressed() -> void:
 	hide_action_buttons()
@@ -142,7 +172,8 @@ func _on_skills_pressed() -> void:
 
 func _on_items_pressed() -> void:
 	hide_action_buttons()
-	action_selected.emit("item", null)
+	setup_item_list(activeBattler)
+	item_select.visible = true
 
 func _on_run_pressed() -> void:
 	hide_action_buttons()

@@ -35,7 +35,7 @@ config/icon="res://icon.svg"
 GlobalBattleSettings="*res://assets/globals/battle-settings/GlobalBattleSettings.gd"
 SaveLoader="*res://assets/globals/save-system/save_loader.gd"
 AIManager="*res://battle-manager/ai_manager.gd"
-SignalBus="*res://signal_bus.gd"
+SignalBus="*res://assets/globals/signal_bus.gd"
 ItemHandler="*res://battle-manager/inventory/item_handler.gd"
 
 [dotnet]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://bcqxqucgohr4x"]
+[gd_scene load_steps=47 format=3 uid="uid://bcqxqucgohr4x"]
 
 [ext_resource type="PackedScene" uid="uid://unpqnv34y004" path="res://battle-manager/allies/YBot.glb" id="1_2a5t1"]
 [ext_resource type="Script" uid="uid://grs8x8ujsmun" path="res://battle-manager/scripts/battler_scripts/battler.gd" id="2_y13mn"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://wn06g6ffxnqr" path="res://battle-manager/scripts/experience.gd" id="6_d755s"]
 [ext_resource type="Resource" uid="uid://ddoo4r86oyqyr" path="res://database/skills/fireball.tres" id="6_g2us4"]
 [ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="6_o14sq"]
+[ext_resource type="Resource" uid="uid://wfkodiihxt64" path="res://database/skills/counter_skill.tres" id="9_8psyq"]
 
 [sub_resource type="Resource" id="Resource_1w7ms"]
 script = ExtResource("3_elcrg")
@@ -19884,7 +19885,7 @@ shape = SubResource("BoxShape3D_0fjwj")
 
 [node name="SkillList" type="Node" parent="." index="4"]
 script = ExtResource("3_da0b1")
-character_skills = Array[ExtResource("6_o14sq")]([ExtResource("6_g2us4")])
+character_skills = Array[ExtResource("6_o14sq")]([ExtResource("6_g2us4"), ExtResource("9_8psyq")])
 
 [node name="Experience" type="Node" parent="." index="5"]
 script = ExtResource("6_d755s")

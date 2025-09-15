@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://wfkodiihxt64"]
+
+[ext_resource type="Script" uid="uid://tlfmm6knj1y4" path="res://database/states/counter.gd" id="1_77flv"]
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_wobk6"]
+
+[resource]
+script = ExtResource("1_wobk6")
+skill_name = "Counter"
+description = "Enter a defensive stance that counters attacks"
+skill_color = ""
+skill_tags = ""
+base_power = 0
+critical_rate = 0
+hit_chance = 100
+sp_cost = 0
+hp_cost = 0
+element = 0
+target_type = 4
+skill_type = 0
+hp_delta = 0
+sp_delta = 0
+effect_type = 2
+animation_name = ""
+applies_state = ExtResource("1_77flv")
+state_apply_chance = 100

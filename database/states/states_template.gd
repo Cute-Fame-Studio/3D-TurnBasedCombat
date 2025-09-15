@@ -1,11 +1,17 @@
-extends Node
+class_name State
+extends Resource
 
+enum StateType {
+	DOT,           # Damage over time (poison, burn)
+	COUNTER,       # Counter attacks
+	BUFF,         # Stat increases
+	DEBUFF        # Stat decreases
+}
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+@export var state_name: String = ""
+@export var state_description: String = ""
+@export var state_type: StateType
+@export var damage_per_turn: int = 0
+@export var turns_active: int = -1  # -1 means infinite until cured
+@export var can_be_cured: bool = true
+@export var damage_reduction: float = 1.0  # 1.0 = normal damage, 0.5 = half damage, etc.

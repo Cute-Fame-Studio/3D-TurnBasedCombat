@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CounterState" load_steps=3 format=3 uid="uid://bk3jcsfo0eoev"]
+
+[ext_resource type="Script" uid="uid://tlfmm6knj1y4" path="res://database/states/counter.gd" id="1_05ang"]
+[ext_resource type="Resource" uid="uid://w5n4kf04c1fp" path="res://database/skills/normal_attack.tres" id="1_75s6r"]
+
+[resource]
+script = ExtResource("1_05ang")
+counter_damage_multiplier = 1.5
+counter_skill = ExtResource("1_75s6r")
+state_name = "counter"
+state_description = "counter"
+state_type = 1
+damage_per_turn = 0
+turns_active = 1
+can_be_cured = true
+damage_reduction = 1.0

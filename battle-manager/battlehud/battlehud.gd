@@ -128,12 +128,12 @@ func setup_skill_list(battler: Node) -> void:
 	for child in skill_container.get_children():
 		child.queue_free()
 	
-	# Create new skill buttons
+	# Create new skill buttons using visible skills only
 	if battler.skill_list.size() > 0:
-		for skill in battler.skill_list:
+		var visible_skills = battler.skill_node.get_visible_skills()
+		for skill in visible_skills:
 			var button = skill_button_scene.instantiate()
 			skill_container.add_child(button)
-			# Pass the skill resource directly since it should already be a Skill resource
 			button.setup(skill)
 			button.skill_selected.connect(_on_skill_selected)
 	menu_opened.emit()

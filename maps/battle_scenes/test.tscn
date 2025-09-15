@@ -112,7 +112,6 @@ metadata/_custom_type_script = "uid://d2mintfjxyqei"
 
 [node name="Battle-Manager" instance=ExtResource("1_t14x8")]
 default_attack = ExtResource("4_q6nlu")
-game_map = "res://maps/regular_map/backtogame.tscn"
 
 [node name="Control" parent="BattleHUD" index="0"]
 mouse_filter = 1
@@ -140,7 +139,7 @@ size = Vector3(100, 0.5, 100)
 material = SubResource("StandardMaterial3D_3fc4g")
 
 [node name="Ally1" parent="." index="3" instance=ExtResource("1_2aqym")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.260986, -1.00599)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.260986, -1.00599)
 stats = SubResource("Resource_yxp8s")
 inventory = SubResource("Resource_4yi8j")
 
@@ -155,6 +154,6 @@ stats = SubResource("Resource_q6nlu")
 team = 1
 
 [node name="Camera3D" type="Camera3D" parent="." index="6"]
-transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -2.08627)
+transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -3.08627)
 
 [editable path="BattleHUD"]

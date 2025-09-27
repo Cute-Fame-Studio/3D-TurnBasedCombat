@@ -26,14 +26,6 @@ albedo_color = Color(0.192279, 0.227401, 0.23218, 1)
 
 [sub_resource type="Resource" id="Resource_yxp8s"]
 script = ExtResource("4_xecl5")
-character_name = "Player"
-max_health = 100
-max_sp = 100
-attack = 10
-defense = 5
-speed = 5
-sp_regen = 5
-element = 0
 metadata/_custom_type_script = "uid://d2mintfjxyqei"
 
 [sub_resource type="Resource" id="Resource_daget"]
@@ -41,19 +33,6 @@ script = ExtResource("5_xecl5")
 item_name = "Other item"
 description = "Does other stuff"
 item_tags = "Hrmm"
-is_battle_item = true
-is_key_item = false
-is_stackable = true
-base_power = 0
-critical_rate = 0
-effectiveness = 100
-element = 0
-target_type = 1
-skill_type = 0
-hp_delta = 0
-sp_delta = 0
-effect_type = "Damage"
-animation_name = ""
 metadata/_custom_type_script = "uid://m02b4cy78or"
 
 [sub_resource type="Resource" id="Resource_fa7uu"]
@@ -61,25 +40,10 @@ script = ExtResource("5_xecl5")
 item_name = "Crazy Item"
 description = "Does crazy stuff"
 item_tags = "AHHH"
-is_battle_item = true
-is_key_item = false
-is_stackable = true
-base_power = 0
-critical_rate = 0
-effectiveness = 100
-element = 0
-target_type = 1
-skill_type = 0
-hp_delta = 0
-sp_delta = 0
-effect_type = "Damage"
-animation_name = ""
 metadata/_custom_type_script = "uid://m02b4cy78or"
 
 [sub_resource type="Resource" id="Resource_4yi8j"]
 script = ExtResource("6_yxp8s")
-has_max_limit = true
-max_size = 30
 collection = Dictionary[ExtResource("5_xecl5"), int]({
 SubResource("Resource_daget"): 5,
 SubResource("Resource_fa7uu"): 3
@@ -89,25 +53,11 @@ metadata/_custom_type_script = "uid://c2j4t3rigq4gk"
 [sub_resource type="Resource" id="Resource_o35h0"]
 script = ExtResource("4_xecl5")
 character_name = "Enemy1"
-max_health = 100
-max_sp = 100
-attack = 10
-defense = 5
-speed = 5
-sp_regen = 5
-element = 0
 metadata/_custom_type_script = "uid://d2mintfjxyqei"
 
 [sub_resource type="Resource" id="Resource_q6nlu"]
 script = ExtResource("4_xecl5")
 character_name = "Enemy2"
-max_health = 100
-max_sp = 100
-attack = 10
-defense = 5
-speed = 5
-sp_regen = 5
-element = 0
 metadata/_custom_type_script = "uid://d2mintfjxyqei"
 
 [node name="Battle-Manager" instance=ExtResource("1_t14x8")]

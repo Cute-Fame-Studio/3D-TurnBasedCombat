@@ -23,7 +23,7 @@ var current_battler
 @export var default_animation = "Locomotion-Library/idle2" # Unused, But i reccomend gettomg the stats and animation from the database.
 @export var default_attack:Skill
 # Added by repo owner, Fame. To test compatibility with returning after a battle.
-@export var game_map = "null"
+@export var game_map = "res://replace/regular_map/backtogame.tscn"
 @onready var hud: BattleHud = $BattleHUD
 
 # Toggles For Battles

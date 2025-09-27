@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://1hjacbe5v8of"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_1m4de"]
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_udlog"]
+
+[resource]
+script = ExtResource("1_1m4de")
+skill_name = "Heal"
+description = "Heal Yourself"
+skill_color = "red"
+skill_tags = "fire,magic,projectile"
+icon = SubResource("NoiseTexture3D_udlog")
+sp_cost = 15
+element = 5
+target_type = 4
+hp_delta = 50
+animation_name = "attack"

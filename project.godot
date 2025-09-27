@@ -27,7 +27,7 @@ config/description="[Open Source] Godot 4 Turn Based Battle System made for the 
 Repository: https://github.com/Cute-Fame-Studio/3D-TurnBasedCombat"
 config/version="1.0"
 run/main_scene="res://maps/battle_scenes/test.tscn"
-config/features=PackedStringArray("4.4", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]

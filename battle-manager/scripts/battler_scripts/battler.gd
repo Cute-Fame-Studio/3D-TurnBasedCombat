@@ -22,7 +22,7 @@ var character_name: String
 var max_health: int
 var attack: int
 var defense: int
-var speed: int
+var agility: int
 
 var current_health: int
 var current_sp: int = 100  # Add SP variables
@@ -112,7 +112,7 @@ func _ready():
 		
 		attack = stats.attack
 		defense = stats.defense
-		speed = stats.speed
+		agility = stats.agility
 		
 		# SP stats
 		max_sp = stats.max_sp

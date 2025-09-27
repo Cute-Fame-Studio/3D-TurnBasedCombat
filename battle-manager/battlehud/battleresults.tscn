@@ -1,0 +1,289 @@
+[gd_scene load_steps=7 format=3 uid="uid://cn21e4r3htvwd"]
+
+[ext_resource type="Texture2D" uid="uid://i6v7uo8qdg1d" path="res://Placeholder.svg" id="1_23vvh"]
+[ext_resource type="Texture2D" uid="uid://desmmvfvehe3b" path="res://assets/images/icons/Asset 11.png" id="2_1ilkb"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_1ilkb"]
+
+[sub_resource type="Theme" id="Theme_1ilkb"]
+Label/font_sizes/font_size = 16
+
+[sub_resource type="Gradient" id="Gradient_8qws1"]
+colors = PackedColorArray(0.37413925, 0.37413928, 0.37413922, 1, 0.7162962, 0.7162962, 0.7162962, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_xpspd"]
+gradient = SubResource("Gradient_8qws1")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 441.0
+grow_vertical = 2
+color = Color(0.28485027, 0.2848503, 0.28485018, 0.4862745)
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+offset_left = 104.0
+offset_right = 326.0
+offset_bottom = 39.0
+theme_override_font_sizes/font_size = 28
+text = "Battle Results"
+vertical_alignment = 3
+uppercase = true
+
+[node name="BoxContainer" type="BoxContainer" parent="."]
+layout_mode = 0
+offset_top = 199.0
+offset_right = 441.0
+offset_bottom = 604.0
+theme_override_constants/separation = 8
+vertical = true
+
+[node name="BoxContainer2" type="BoxContainer" parent="BoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="BoxContainer/BoxContainer2"]
+clip_contents = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("1_23vvh")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="BoxContainer/BoxContainer2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Experince"
+
+[node name="Label2" type="Label" parent="BoxContainer/BoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "100"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="BoxContainer"]
+layout_mode = 2
+
+[node name="BoxContainer3" type="BoxContainer" parent="BoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="BoxContainer/BoxContainer3"]
+clip_contents = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("2_1ilkb")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="BoxContainer/BoxContainer3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Cash/Gold"
+
+[node name="Label2" type="Label" parent="BoxContainer/BoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "£10"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="BoxContainer"]
+layout_mode = 2
+
+[node name="BoxContainer" type="BoxContainer" parent="BoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="BoxContainer/BoxContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_1ilkb")
+
+[node name="Label" type="Label" parent="BoxContainer/BoxContainer"]
+layout_mode = 2
+text = "ITEMS"
+
+[node name="BoxContainer4" type="BoxContainer" parent="BoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = SubResource("Theme_1ilkb")
+alignment = 2
+vertical = true
+
+[node name="BoxContainer3" type="BoxContainer" parent="BoxContainer/BoxContainer4"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer3"]
+layout_mode = 2
+text = "Trash"
+
+[node name="Label2" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "X1"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="BoxContainer4" type="BoxContainer" parent="BoxContainer/BoxContainer4"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer4"]
+layout_mode = 2
+text = "Opened Soda"
+
+[node name="Label2" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "X1"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="HSeparator4" type="HSeparator" parent="BoxContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 0
+offset_left = 670.0
+offset_right = 1150.0
+offset_bottom = 126.0
+columns = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+texture = SubResource("GradientTexture2D_xpspd")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="GridContainer/VBoxContainer"]
+layout_mode = 2
+text = "Your Character"
+
+[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer"]
+layout_mode = 2
+value = 48.0
+rounded = true
+show_percentage = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="GridContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Lv. 20"
+
+[node name="Label3" type="Label" parent="GridContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "X1.0"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="GridContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer2"]
+clip_contents = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+texture = SubResource("GradientTexture2D_xpspd")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="GridContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Your Character"
+
+[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer2"]
+layout_mode = 2
+value = 48.0
+rounded = true
+show_percentage = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="GridContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "Lv. 20"
+
+[node name="Label3" type="Label" parent="GridContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "X1.0"
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="GridContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer3"]
+clip_contents = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+texture = SubResource("GradientTexture2D_xpspd")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="GridContainer/VBoxContainer3"]
+layout_mode = 2
+text = "Your Character"
+
+[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer3"]
+layout_mode = 2
+value = 48.0
+rounded = true
+show_percentage = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer3"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="GridContainer/VBoxContainer3/HBoxContainer"]
+layout_mode = 2
+text = "Lv. 20"
+
+[node name="Label3" type="Label" parent="GridContainer/VBoxContainer3/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "X1.0"
+
+[node name="VBoxContainer4" type="VBoxContainer" parent="GridContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer4"]
+clip_contents = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+texture = SubResource("GradientTexture2D_xpspd")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="GridContainer/VBoxContainer4"]
+layout_mode = 2
+text = "Your Character"
+
+[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer4"]
+layout_mode = 2
+value = 48.0
+rounded = true
+show_percentage = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer4"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="GridContainer/VBoxContainer4/HBoxContainer"]
+layout_mode = 2
+text = "Lv. 20"
+
+[node name="Label3" type="Label" parent="GridContainer/VBoxContainer4/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "X1.0"

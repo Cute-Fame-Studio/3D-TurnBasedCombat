@@ -53,29 +53,37 @@ var mouse_hover: bool = false:
 
 var is_valid_target: bool = false
 var is_default_target: bool = false
+var is_keyboard_selected: bool = false  # Track if selected via keyboard
+var is_mouse_selected: bool = false    # Track if selected via mouse
 
 func _update_highlight() -> void:
 	if !is_selectable or !is_valid_target:
 		material.next_pass = null
 		return
 		
-	if is_targeted or (mouse_hover and is_selectable) or is_default_target:
+	# Clear any existing highlight first
+	material.next_pass = null
+	
+	# Mouse hover takes priority over everything else
+	if mouse_hover and is_selectable:
+		# White hover outline (highest priority)
+		var hover_mat = ShaderMaterial.new()
+		hover_mat.shader = select_outline
+		hover_mat.set_shader_parameter("color", Color.WHITE)
+		hover_mat.set_shader_parameter("thickness", 0.02)
+		hover_mat.set_shader_parameter("alpha", 0.6)
+		material.next_pass = hover_mat
+	elif is_targeted or is_mouse_selected or is_keyboard_selected or is_default_target:
+		# Main selection outline (cyan for all input methods)
 		var shader_mat = ShaderMaterial.new()
 		shader_mat.shader = select_outline
-		shader_mat.set_shader_parameter("color", Color.YELLOW)
-		shader_mat.set_shader_parameter("thickness", 0.02)
-		# Different alpha values for different states
-		var alpha = 1.0
-		if is_targeted:
-			alpha = 1.0  # Fully opaque when selected
-		elif mouse_hover:
-			alpha = 0.8  # Slightly transparent when hovered
-		elif is_default_target:
-			alpha = 0.6  # More transparent for default target
-		shader_mat.set_shader_parameter("alpha", alpha)
+		shader_mat.set_shader_parameter("color", Color.CYAN)
+		shader_mat.set_shader_parameter("thickness", 0.025)
+		shader_mat.set_shader_parameter("alpha", 1.0)
 		material.next_pass = shader_mat
-	else:
-		material.next_pass = null
+		
+		# Add debug info to confirm which battler is highlighted
+		print("Highlighting battler: ", character_name, " with cyan outline")
 
 @export_group("Special Dependencies")
 @onready var basic_attack_animation = "attack"
@@ -137,19 +145,32 @@ func _ready():
 	print("Current Element: ", stats.element)
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("Select") and is_selectable and mouse_hover:
+	if event.is_action_pressed("Select") and is_selectable and is_valid_target:
+		print("=== MOUSE INPUT DEBUG ===")
+		print("Battler: ", character_name)
+		print("Event: ", event)
+		print("Is selectable: ", is_selectable)
+		print("Is valid target: ", is_valid_target)
+		# Allow selection if valid target, regardless of hover state
 		select_target()
 	elif event is InputEventScreenTouch and event.pressed and is_valid_target:
-		# For touchscreen devices, treat touch as hover
-		has_hover(true)
+		# For touchscreen devices, treat touch as selection
+		if is_selectable:
+			select_target()
 	elif event is InputEventScreenTouch and !event.pressed:
-		# Touch release
+		# Touch release - clear hover state
 		has_hover(false)
 
 func _mouse_enter() -> void: 
+	print("=== MOUSE ENTER DEBUG ===")
+	print("Battler: ", character_name)
+	print("Is valid target: ", is_valid_target)
 	if is_valid_target:
 		has_hover(true)
+		
 func _mouse_exit() -> void: 
+	print("=== MOUSE EXIT DEBUG ===")
+	print("Battler: ", character_name)
 	has_hover(false)
 func has_hover(hover:bool = false) -> void:
 	# Only allow hover if this battler is a valid target
@@ -166,8 +187,7 @@ func set_selectable(can_target: bool) -> void:
 	is_selectable = can_target and is_valid_target
 	
 	if !is_selectable:
-		is_targeted = false
-		material.next_pass = null
+		clear_all_selections()
 	_update_highlight()
 
 func check_select_target(target:Battler) -> void:
@@ -185,23 +205,61 @@ func _clear_default_selection() -> void:
 		_update_highlight()
 
 func select_target() -> void:
+	print("=== TARGET SELECTION DEBUG ===")
+	print("Battler: ", character_name)
+	print("Is selectable: ", is_selectable)
+	print("Is valid target: ", is_valid_target)
+	print("Is targeted: ", is_targeted)
+	
 	# Will probably want to also add logic that prevents selecting invalid targets
+	# Clear all other selection states first
+	is_keyboard_selected = false
+	is_default_target = false
+	is_mouse_selected = true
 	is_targeted = true
+	print("Emitting select_target signal for: ", character_name)
 	SignalBus.select_target.emit(self)
 
 func deselect_as_target() -> void:
 	is_targeted = false
+	is_mouse_selected = false
+	is_keyboard_selected = false
+	is_default_target = false
+	# Force update the highlight to clear it
+	_update_highlight()
 
 func set_as_default_target() -> void:
+	# Clear other selection states first
+	is_mouse_selected = false
+	is_keyboard_selected = false
 	is_default_target = true
 	is_targeted = true
+	# Force update the highlight
+	_update_highlight()
+
+func set_as_keyboard_target() -> void:
+	# Clear other selection types first
+	is_mouse_selected = false
+	is_default_target = false
+	is_keyboard_selected = true
+	is_targeted = true
+	# Force update the highlight
+	_update_highlight()
+
+func clear_all_selections() -> void:
+	is_targeted = false
+	is_mouse_selected = false
+	is_keyboard_selected = false
+	is_default_target = false
+	mouse_hover = false
+	material.next_pass = null
 
 
 func is_defeated() -> bool:
 	return current_health <= 0
 
 func get_attack_damage(target) -> int:
-	print("PLAYER: calculating damage for target: ", target.name)
+	print("PLAYER: calculating damage for target: ", target.character_name)
 	var damage = attack + randi() % 5
 	return Formulas.physical_damage(self, target, damage)
 
@@ -259,7 +317,7 @@ func battle_idle():
 	state_machine.travel("battle_idle")
 
 func attack_anim(target) -> int:
-	print("PLAYER: Starting attack for target: ", target.name)
+	print("PLAYER: Starting attack for target: ", target.character_name)
 	current_target = target
 	state_machine.travel("attack")
 	return 0 # Don't return damage here, handled by animation
@@ -326,9 +384,57 @@ func on_load_game(load_data):
 
 func regenerate_sp():
 	if stats and current_sp < max_sp:
-		var regen_amount = stats.sp_regen
+		var regen_amount = 5  # Default SP regeneration
+		if stats.has_method("get") and stats.get("sp_regen") != null:
+			regen_amount = stats.sp_regen
 		current_sp = min(current_sp + regen_amount, max_sp)
 		print("%s recovered %d SP. SP: %d/%d" % [character_name, regen_amount, current_sp, max_sp])
+
+func can_target_with_skill(skill: Skill, target: Battler) -> bool:
+	print("=== CAN TARGET WITH SKILL DEBUG ===")
+	print("Skill: ", skill.skill_name)
+	print("Target: ", target.character_name)
+	print("Target team: ", target.team)
+	print("Self team: ", team)
+	
+	if !skill or !target:
+		print("Skill or target is null!")
+		return false
+	
+	# Check if skill can be used (costs)
+	if !skill.can_use(self):
+		print("Skill cannot be used due to costs!")
+		return false
+	
+	# Check target type compatibility
+	match skill.target_type:
+		Skill.TARGETS_TYPES.SELF_TARGET:
+			var result = target == self
+			print("SELF_TARGET check: ", result)
+			return result
+		Skill.TARGETS_TYPES.SINGLE_ENEMY:
+			var result = target.team == TEAM.ENEMY and target != self
+			print("SINGLE_ENEMY check: ", result)
+			return result
+		Skill.TARGETS_TYPES.MULTIPLE_ENEMIES:
+			var result = target.team == TEAM.ENEMY and target != self
+			print("MULTIPLE_ENEMIES check: ", result)
+			return result
+		Skill.TARGETS_TYPES.SINGLE_ALLY:
+			var result = target.team == TEAM.ALLY and target != self
+			print("SINGLE_ALLY check: ", result)
+			return result
+		Skill.TARGETS_TYPES.MULTIPLE_ALLIES:
+			var result = target.team == TEAM.ALLY and target != self
+			print("MULTIPLE_ALLIES check: ", result)
+			return result
+		Skill.TARGETS_TYPES.ALL_TARGETS:
+			var result = target != self
+			print("ALL_TARGETS check: ", result)
+			return result
+		_:
+			print("Unknown target type!")
+			return false
 		
 var active_states: Dictionary = {}  # {state_name: State}
 

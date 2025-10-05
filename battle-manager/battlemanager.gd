@@ -114,16 +114,36 @@ func count_allies():
 
 # See _ready() -> SignalBus.select_target.connect() ... Emitted from Battler
 func target_selected(target: Battler) -> void:
+	print("=== BATTLE MANAGER TARGET SELECTED ===")
+	print("Received target: ", target.character_name)
+	print("In target selection: ", in_target_selection)
+	print("Target is selectable: ", target.is_selectable)
+	
 	if !in_target_selection or !target.is_selectable:
+		print("Target selection rejected - not in selection or not selectable")
 		return
 		
-	# Clear previous controller target if using mouse
-	if current_controller_target:
-		current_controller_target.is_targeted = false
-		current_controller_target.is_default_target = false
-		current_controller_target = null
+	# Clear ALL targets' selection states first - only ONE highlight allowed
+	for battler in valid_targets:
+		if battler is Battler:
+			battler.deselect_as_target()
+	
+	# Clear controller target reference
+	current_controller_target = null
+	
+	# Save this as the last selected target for future reference
+	last_selected_target = target
+	
+	# Update keyboard index to match mouse selection
+	if target in valid_targets:
+		keyboard_target_index = valid_targets.find(target)
 	
 	current_target = target
+	print("Set current_target to: ", current_target.character_name)
+	print("About to call _use_action_on_target")
+	print("=== VISUAL CONFIRMATION ===")
+	print("Target with cyan highlight should be: ", target.character_name)
+	print("Target that will be attacked: ", current_target.character_name)
 	_use_action_on_target()
 
 func start_next_turn():
@@ -164,6 +184,11 @@ var queued_action:String
 var queued_skill:Skill
 var queued_item:Item
 func _on_action_selected(action: String, usable:Resource = current_character.default_attack):
+	print("=== ACTION SELECTED ===")
+	print("Action: ", action)
+	print("Usable: ", usable)
+	print("Current character: ", current_character.character_name)
+	
 	match action:
 		"defend":
 			current_character.defend()
@@ -181,13 +206,16 @@ func _on_action_selected(action: String, usable:Resource = current_character.def
 			queued_skill = default_attack
 	if usable is Skill:
 		queued_skill = usable
+		print("Set queued_skill to: ", queued_skill.skill_name)
 	elif usable is Item:
 		queued_item = usable
 	_do_target_selection()
 
 var current_controller_target: Battler = null
-var valid_targets: Array[Battler] = []
+var valid_targets: Array = []  # Array of Battler objects
 var current_default_selector: Battler = null  # Track who has the default selection
+var last_selected_target: Battler = null  # Remember last target for next selection
+var keyboard_target_index: int = 0  # Track keyboard navigation position
 
 # Modify _do_target_selection to set target validity
 func _do_target_selection() -> void:
@@ -198,17 +226,16 @@ func _do_target_selection() -> void:
 	current_target = null
 	valid_targets.clear()
 	
-	# First, invalidate all targets
+	# First, clear all targeting states
 	for battler in get_tree().get_nodes_in_group("players") + get_tree().get_nodes_in_group("enemies"):
-		battler.is_valid_target = false
-		battler.is_selectable = false
-		battler.is_targeted = false
-		battler.is_default_target = false
-		battler.mouse_hover = false
+		if battler is Battler:
+			battler.clear_all_selections()
+			battler.is_valid_target = false
+			battler.is_selectable = false
 	
 	# Get fresh data from scene to avoid array corruption issues
-	var current_enemies: Array[Battler] = []
-	var current_players: Array[Battler] = []
+	var current_enemies: Array = []
+	var current_players: Array = []
 	
 	for node in get_tree().get_nodes_in_group("enemies"):
 		if node is Battler:
@@ -218,12 +245,29 @@ func _do_target_selection() -> void:
 		if node is Battler:
 			current_players.append(node as Battler)
 	
-	# Set valid targets based on skill type
+	# Set valid targets based on skill type with proper validation
 	if queued_skill:
+		print("=== SKILL TARGETING ===")
+		print("Skill name: ", queued_skill.skill_name)
 		print("Skill target type: ", queued_skill.target_type)
 		print("Current character in players: ", current_character in current_players)
 		print("Current enemies: ", current_enemies)
 		print("Current players: ", current_players)
+		
+		# Check if skill can be used at all
+		print("Checking if skill can be used...")
+		print("Current character SP: ", current_character.current_sp)
+		print("Current character HP: ", current_character.current_health)
+		print("Skill SP cost: ", queued_skill.sp_cost)
+		print("Skill HP cost: ", queued_skill.hp_cost)
+		
+		if !queued_skill.can_use(current_character):
+			print("Cannot use skill - insufficient SP/HP!")
+			_cancel_action_target_selection()
+			return
+		
+		print("Skill can be used! Proceeding with targeting...")
+		
 		match queued_skill.target_type:
 			Skill.TARGETS_TYPES.SELF_TARGET:
 				valid_targets = [current_character]
@@ -245,19 +289,56 @@ func _do_target_selection() -> void:
 				valid_targets = current_players + current_enemies
 				_auto_select_multiple_targets()
 				return
+		
+		# Filter valid targets based on skill requirements
+		print("Filtering valid targets based on skill requirements...")
+		var filtered_targets: Array = []
+		for target in valid_targets:
+			if target is Battler:
+				var can_target = current_character.can_target_with_skill(queued_skill, target)
+				print("Can target ", target.character_name, ": ", can_target)
+				if can_target:
+					filtered_targets.append(target)
+		print("Filtered targets count: ", filtered_targets.size())
+		valid_targets = filtered_targets
 
+	# Check if we have any valid targets
+	if valid_targets.is_empty():
+		print("No valid targets found for this skill!")
+		_cancel_action_target_selection()
+		return
+	
 	# Enable only valid targets
 	print("Valid targets found: ", valid_targets.size())
 	for target in valid_targets:
-		target.is_valid_target = true
-		target.is_selectable = true
-		print("Enabled target: ", target.character_name)
+		if target is Battler:
+			target.is_valid_target = true
+			target.is_selectable = true
+			print("Enabled target: ", target.character_name)
+			print("  - Is valid target: ", target.is_valid_target)
+			print("  - Is selectable: ", target.is_selectable)
 
-	# Set initial controller target
+	# Set initial controller target - prioritize last selected target
 	if valid_targets.size() > 0:
-		current_controller_target = valid_targets[0]
+		var initial_target = valid_targets[0]
+		
+		# If we have a last selected target and it's still valid, use it
+		if last_selected_target and last_selected_target in valid_targets:
+			initial_target = last_selected_target
+			keyboard_target_index = valid_targets.find(last_selected_target)
+		else:
+			keyboard_target_index = 0
+		
+		# Clear all targets first, then set ONLY the default target
+		for battler in valid_targets:
+			if battler is Battler:
+				battler.deselect_as_target()
+		
+		current_controller_target = initial_target
 		current_default_selector = current_controller_target
 		current_controller_target.set_as_default_target()
+		
+		print("Default target set to: ", current_controller_target.character_name)
 	
 	SignalBus.allow_select_target.emit(true)
 	print("=== Target Selection Complete ===\n")
@@ -265,13 +346,15 @@ func _do_target_selection() -> void:
 # Helper function for multiple target selection
 func _auto_select_multiple_targets() -> void:
 	for target in valid_targets:
-		target.is_valid_target = true
-		target.is_selectable = true
-		target.is_targeted = true
-	current_target = valid_targets[0]
-	_use_action_on_target()
+		if target is Battler:
+			target.is_valid_target = true
+			target.is_selectable = true
+			target.is_targeted = true
+	if valid_targets.size() > 0 and valid_targets[0] is Battler:
+		current_target = valid_targets[0]
+		_use_action_on_target()
 
-# Add controller input handling
+# Enhanced controller input handling with better visual feedback
 func _unhandled_input(event: InputEvent) -> void:
 	if !in_target_selection or valid_targets.is_empty():
 		return
@@ -286,25 +369,35 @@ func _unhandled_input(event: InputEvent) -> void:
 		_cancel_action_target_selection()
 
 func _cycle_controller_target(direction: int) -> void:
-	if current_controller_target:
-		current_controller_target.is_targeted = false
-		current_controller_target.is_default_target = false
+	# Clear ALL targets' selection states first - only ONE highlight allowed
+	for battler in valid_targets:
+		if battler is Battler:
+			battler.deselect_as_target()
 	
-	var current_index = valid_targets.find(current_controller_target)
-	var new_index = (current_index + direction) % valid_targets.size()
-	if new_index < 0:
-		new_index = valid_targets.size() - 1
+	# Calculate new index with proper wrapping
+	keyboard_target_index += direction
+	if keyboard_target_index >= valid_targets.size():
+		keyboard_target_index = 0
+	elif keyboard_target_index < 0:
+		keyboard_target_index = valid_targets.size() - 1
 	
-	current_controller_target = valid_targets[new_index]
-	current_default_selector = current_controller_target
-	current_controller_target.set_as_default_target()
+	# Set new keyboard target
+	if valid_targets.size() > 0 and valid_targets[keyboard_target_index] is Battler:
+		current_controller_target = valid_targets[keyboard_target_index]
+		current_default_selector = current_controller_target
+		current_controller_target.set_as_keyboard_target()
+		
+		print("Keyboard navigation: Selected ", current_controller_target.character_name)
+		print("Current keyboard index: ", keyboard_target_index)
+		print("Valid targets size: ", valid_targets.size())
 
 func _cancel_action_target_selection() -> void:
-	print("DEBUG: enemies array before cancel: ", enemies)
+	print("Cancelling target selection")
 	in_target_selection = false
 	current_target = null
 	current_controller_target = null
 	current_default_selector = null
+	keyboard_target_index = 0
 	valid_targets.clear()
 	
 	# Clear queued action variables
@@ -312,19 +405,13 @@ func _cancel_action_target_selection() -> void:
 	queued_skill = null
 	queued_item = null
 	
-	# Clear targeting states but keep everyone selectable for next targeting
-	print("DEBUG: enemies array before loop: ", enemies)
+	# Clear all targeting states for all battlers
 	for battler in get_tree().get_nodes_in_group("players") + get_tree().get_nodes_in_group("enemies"):
-		print("DEBUG: Processing battler: ", battler.character_name)
-		battler.is_targeted = false
-		battler.is_default_target = false
-		battler.mouse_hover = false
-		# Reset to default selectable state
-		battler.is_valid_target = true
-		battler.is_selectable = true
-	print("DEBUG: enemies array after loop: ", enemies)
-	
-	print("DEBUG: enemies array after cancel: ", enemies)
+		if battler is Battler:
+			battler.clear_all_selections()
+			# Reset to default selectable state
+			battler.is_valid_target = true
+			battler.is_selectable = true
 	
 	if in_menu_selection:
 		_do_menu_selection()
@@ -344,6 +431,11 @@ func _do_menu_selection() -> void:
 
 # Modify _use_action_on_target to handle states properly
 func _use_action_on_target() -> void:
+	print("=== USING ACTION ON TARGET ===")
+	print("Current target: ", current_target.character_name if current_target else "NULL")
+	print("Queued action: ", queued_action)
+	print("Queued skill: ", queued_skill.skill_name if queued_skill else "NULL")
+	
 	in_target_selection = false
 	in_menu_selection = false
 	is_animating = true
@@ -360,14 +452,17 @@ func _use_action_on_target() -> void:
 				else:
 					# Normal skill handling with damage
 					battler_attacking = true
+					print("Using skill on target: ", current_target.character_name)
 					current_character.use_skill(queued_skill, current_target)
 		"attack":
 			battler_attacking = true
+			print("Performing attack on target: ", current_target.character_name)
 			if current_character.default_attack:
 				current_character.use_skill(current_character.default_attack, current_target)
 			else:
 				current_character.attack_anim(current_target)
 		"item":
+			print("Using item on target: ", current_target.character_name)
 			current_character.battle_item(queued_item, current_target)
 	
 	queued_action = ""
@@ -377,9 +472,13 @@ func _use_action_on_target() -> void:
 	end_turn()
 
 func _on_anim_damage():
+	print("=== ANIMATION DAMAGE DEBUG ===")
+	print("Current character: ", current_character.character_name if current_character else "NULL")
+	print("Current target: ", current_target.character_name if current_target else "NULL")
 	print("MANAGER: Processing animation damage")
 	if current_character and current_target:
 		var damage = current_character.get_attack_damage(current_target) # Get damage for current target
+		print("Calculated damage: ", damage, " for target: ", current_target.character_name)
 		damage_calculation(current_character, current_target, damage)
 
 func process_exp_gain(user, target):
@@ -429,7 +528,20 @@ func heal_calculation(user, target, amount):
 	update_hud()
 
 func enemy_turn(character:Battler) -> void:
-	var available_targets = get_tree().get_nodes_in_group("players").filter(func(p): return not p.is_in_group("enemies"))
+	print("=== ENEMY TURN ===")
+	print("Enemy character: ", character.character_name)
+	
+	# Get all players (allies) as targets for enemies
+	var available_targets: Array = []
+	for node in get_tree().get_nodes_in_group("players"):
+		if node is Battler and !node.is_defeated():
+			available_targets.append(node)
+	
+	print("Available targets for enemy: ", available_targets.size())
+	for target in available_targets:
+		if target is Battler:
+			print("  - ", target.character_name, " (HP: ", target.current_health, "/", target.max_health, ")")
+	
 	var all_enemies = get_tree().get_nodes_in_group("enemies")
 	
 	AIManager.choose_action(character, available_targets, all_enemies, self)

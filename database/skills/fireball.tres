@@ -16,5 +16,4 @@ critical_rate = 10
 hit_chance = 95
 sp_cost = 15
 element = 3
-target_type = 1
 animation_name = "attack"

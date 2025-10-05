@@ -36,6 +36,18 @@ func _update_display() -> void:
 		cost_label.text = str(current_skill.sp_cost) + " SP"
 		if current_skill.icon:
 			icon_rect.texture = current_skill.icon
+		
+		# Check if skill can be used and disable button if not
+		var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+		var can_use = true
+		if battle_manager and battle_manager.current_character:
+			can_use = current_skill.can_use(battle_manager.current_character)
+		
+		disabled = !can_use
+		if !can_use:
+			modulate = Color(0.5, 0.5, 0.5, 0.7)  # Gray out disabled skills
+		else:
+			modulate = Color.WHITE
 	elif current_skill is CharacterAbilities:
 		# Here's where we need to map abilities to proper skill names
 		var skill_name = ""

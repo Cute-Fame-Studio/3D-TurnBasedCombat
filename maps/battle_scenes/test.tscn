@@ -93,17 +93,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.260986, -1.00599)
 stats = SubResource("Resource_yxp8s")
 inventory = SubResource("Resource_4yi8j")
 
-[node name="Enemy1" parent="." index="4" instance=ExtResource("1_2aqym")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.09563, 0.260986, 1.38908)
+[node name="Ally2" parent="." index="4" instance=ExtResource("1_2aqym")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.260986, -1.00599)
+stats = SubResource("Resource_yxp8s")
+inventory = SubResource("Resource_4yi8j")
+
+[node name="Enemy1" parent="." index="5" instance=ExtResource("1_2aqym")]
+transform = Transform3D(-0.9326517, 0, 0.36077818, 0, 1, 0, -0.36077818, 0, -0.9326517, -1.09563, 0.260986, 1.38908)
 stats = SubResource("Resource_o35h0")
 team = 1
 
-[node name="Enemy2" parent="." index="5" instance=ExtResource("1_2aqym")]
+[node name="Enemy2" parent="." index="6" instance=ExtResource("1_2aqym")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 1.12607, 0.260986, 1.38908)
 stats = SubResource("Resource_q6nlu")
 team = 1
 
-[node name="Camera3D" type="Camera3D" parent="." index="6"]
+[node name="Camera3D" type="Camera3D" parent="." index="7"]
 transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -3.08627)
 
 [editable path="BattleHUD"]

@@ -17,7 +17,7 @@ func choose_action(this:Battler, opposing_team:Array, _ally_team:Array, battle_m
 			defensive_action(this, opposing_team, battle_manager)
 
 func aggressive_action(this:Battler, players: Array, battle_manager:BattleManager):
-	var target = get_weakest_target(players)
+	var target = choose_target(this, players)
 	if target:
 		battle_manager.current_target = target
 		battle_manager.battler_attacking = true
@@ -28,6 +28,42 @@ func defensive_action(this:Battler, players: Array, battle_manager:BattleManager
 		this.defend()
 	else:
 		aggressive_action(this, players, battle_manager)
+
+func choose_target(this:Battler, targets: Array) -> Node:
+	print("=== AI TARGET SELECTION ===")
+	print("AI Character: ", this.character_name)
+	print("AI Intelligence: ", this.intelligence)
+	print("Available targets: ", targets.size())
+	for target in targets:
+		if target is Battler:
+			print("  - ", target.character_name, " (HP: ", target.current_health, "/", target.max_health, ")")
+	
+	# Filter out defeated targets
+	var valid_targets = []
+	for target:Battler in targets:
+		if target != this and !target.is_defeated():
+			valid_targets.append(target)
+	
+	if valid_targets.is_empty():
+		print("No valid targets found!")
+		return null
+	
+	# Use intelligence to determine targeting strategy
+	var intelligence = this.intelligence
+	var rand_value = randi() % 100
+	
+	print("Random value: ", rand_value, " vs Intelligence: ", intelligence)
+	
+	if rand_value < intelligence:
+		# Smart targeting - choose based on strategy
+		var chosen = get_weakest_target(valid_targets)
+		print("Smart targeting chose: ", chosen.character_name if chosen else "NULL")
+		return chosen
+	else:
+		# Random targeting - choose any valid target
+		var chosen = valid_targets[randi() % valid_targets.size()]
+		print("Random targeting chose: ", chosen.character_name if chosen else "NULL")
+		return chosen
 
 func get_weakest_target(targets: Array) -> Node:
 	var weakest = null

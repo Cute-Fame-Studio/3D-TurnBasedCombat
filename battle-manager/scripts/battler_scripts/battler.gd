@@ -30,6 +30,29 @@ var max_sp: int = 100      # Add max SP
 var is_defending: bool = false
 var current_target = null
 
+# Walking animation system
+var is_walking: bool = false
+var walk_target_position: Vector3
+var original_position: Vector3
+
+# Per-battler walking settings (override global if set)
+@export_group("Walking Settings", "walking")
+## Distance at which this battler requires walking to target. -1.0 = use global setting
+@export var custom_walking_distance: float = -1.0
+## Speed of walking animation for this battler. -1.0 = use global setting  
+@export var custom_walking_speed: float = -1.0
+## Walking animation name for this battler. Empty = use global setting
+@export var custom_walking_animation: String = ""
+## Whether this battler requires walking before attacking
+@export var requires_walking: bool = true
+## 
+## CUSTOM WALKING SETTINGS EXPLAINED:
+## -1.0 values mean "use the global setting from BattleManager"
+## Set positive values to override global settings for this specific battler
+## Example: Set custom_walking_distance = 5.0 for a big monster that needs more space
+## Example: Set custom_walking_speed = 1.0 for a slow character
+## Example: Set custom_walking_animation = "my_walk_anim" for custom animation
+
 # Targeting controls
 @onready var material:Material = %Alpha_Surface.material_override
 @onready var select_outline:Shader = preload("res://assets/shaders/battler_select_shader.gdshader")
@@ -92,6 +115,7 @@ func _update_highlight() -> void:
 @onready var skill_list: Array[Skill] = []
 @onready var exp_node: Experience = get_node("Experience")
 @export var damage_indicator_subviewport:SubViewport
+@onready var anim_tree: AnimationTree = $AnimationTree
 
 func _ready():	
 	SignalBus.select_target.connect(check_select_target)
@@ -143,8 +167,17 @@ func _ready():
 	elif team == TEAM.ALLY:
 		add_to_group("players")
 	print("Current Element: ", stats.element)
+	
+	# Set up animation parameters
+	anim_tree.set("parameters/conditions/is_turning_right", false)
+	anim_tree.set("parameters/conditions/is_turning_left", false)
 
 func _input(event: InputEvent) -> void:
+	# Check if mouse input is enabled in battle manager
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	if battle_manager and not battle_manager.mouse_input_toggle:
+		return
+		
 	if event.is_action_pressed("Select") and is_selectable and is_valid_target:
 		print("=== MOUSE INPUT DEBUG ===")
 		print("Battler: ", character_name)
@@ -162,6 +195,11 @@ func _input(event: InputEvent) -> void:
 		has_hover(false)
 
 func _mouse_enter() -> void: 
+	# Check if mouse input is enabled in battle manager
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	if battle_manager and not battle_manager.mouse_input_toggle:
+		return
+		
 	print("=== MOUSE ENTER DEBUG ===")
 	print("Battler: ", character_name)
 	print("Is valid target: ", is_valid_target)
@@ -169,6 +207,11 @@ func _mouse_enter() -> void:
 		has_hover(true)
 		
 func _mouse_exit() -> void: 
+	# Check if mouse input is enabled in battle manager
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	if battle_manager and not battle_manager.mouse_input_toggle:
+		return
+		
 	print("=== MOUSE EXIT DEBUG ===")
 	print("Battler: ", character_name)
 	has_hover(false)
@@ -281,6 +324,20 @@ func take_damage(amount: int, attacker: Battler = null) -> void:
 	
 	print("%s took %d damage. Health: %d/%d" % [character_name, damage_taken, current_health, max_health])
 	
+	# Check if this battler is defeated and should be removed
+	if current_health <= 0 and team == TEAM.ENEMY:
+		var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+		if battle_manager and battle_manager.remove_defeated_enemies:
+			print("Removing defeated enemy: ", character_name)
+			# Remove from turn order
+			if battle_manager.turn_order.has(self):
+				battle_manager.turn_order.erase(self)
+			# Remove from enemies array
+			if battle_manager.enemies.has(self):
+				battle_manager.enemies.erase(self)
+			# Remove from scene
+			call_deferred("queue_free")
+	
 	# Handle counter if we have the state
 	if attacker and !attacker.is_defeated():
 		for state in active_states.values():
@@ -299,6 +356,11 @@ func take_healing(amount: int):
 func defend():
 	is_defending = true
 	print("%s is defending. Defense doubled for the next attack." % character_name)
+	
+	# Play defend animation
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	var defend_anim = battle_manager.get_animation("defend") if battle_manager else "defend"
+	state_machine.travel(defend_anim)
 
 func gain_experience(amount: int):
 	print("%s gained %d experience!" % [character_name, amount])
@@ -314,22 +376,56 @@ func battle_item(item:Item, target:Battler) -> void:
 	# Integrate a simple inventory system. Trying to do this alone may cause mistakes.
 
 func battle_idle():
-	state_machine.travel("battle_idle")
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	var anim_name = battle_manager.get_animation("idle") if battle_manager else "idle1"
+	state_machine.travel(anim_name)
 
 func attack_anim(target) -> int:
-	print("PLAYER: Starting attack for target: ", target.character_name)
+	print("PLAYER: Starting attack sequence for target: ", target.character_name)
 	current_target = target
-	state_machine.travel("attack")
-	return 0 # Don't return damage here, handled by animation
-	#return get_attack_damage(target) # Needing to transfer to dealing damage through animation. Not after! 
-	# Some animations may do damage multiple times during their attack, It is better to dynamically show the damage being dealt.
+	
+	# First turn to face walking direction
+	await turn_to_face_target(target)
+	
+	# Start walking if needed
+	if await walk_to_target(target):
+		print("Walking to target")
+		state_machine.travel("walk")  # Changed from "run" to "walk"
+		while is_walking:
+			await get_tree().create_timer(0.016).timeout
+	
+	# Turn to face target again after walking (in case target moved)
+	await turn_to_face_target(target)
+	
+	# Now perform the attack
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	var attack_anim = battle_manager.get_animation("attack") if battle_manager else "attack"
+	state_machine.travel(attack_anim)
+	
+	return 0
 
 #func deal_damage():
 	#return get_attack_damage(target)
 
 func use_skill(skill:Skill, target) -> int:
 	if skill.can_use(self):
-		state_machine.travel(skill.animation_name)
+		# Turn to face target before using skill
+		await turn_to_face_target(target)
+		
+		# Try to walk to target first for damage skills
+		if skill.effect_type == Skill.EFFECT_TYPE.DAMAGE and await walk_to_target(target):
+			# Wait for walking to complete, then use skill
+			await get_tree().create_timer(0.1).timeout
+			while is_walking:
+				await get_tree().create_timer(0.1).timeout
+		
+		# Use skill animation name if available, otherwise use attack animation
+		var anim_name = skill.animation_name
+		if anim_name.is_empty():
+			var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+			anim_name = battle_manager.get_animation("attack") if battle_manager else "attack"
+		
+		state_machine.travel(anim_name)
 		skill.apply_costs(self)
 		
 		match skill.effect_type:
@@ -345,6 +441,146 @@ func wait_attack():
 	if self.is_defending:
 		return
 	await $AnimationTree.animation_finished
+	
+	# If we walked to attack, wait for return movement to complete
+	if original_position != Vector3.ZERO and not is_walking:
+		# Start return movement if not already started
+		return_to_original_position()
+		# Wait for return movement to complete
+		while is_walking:
+			await get_tree().create_timer(0.1).timeout
+	
+	battle_idle()
+
+# Turning animation system
+var is_turning: bool = false
+var turn_target_rotation: float
+
+var is_turning_right: bool = false
+var is_turning_left: bool = false
+
+func turn_to_face_target(target: Battler) -> void:
+	var direction = target.global_position - global_position
+	var target_angle = atan2(direction.x, direction.z)
+	var current_angle = rotation.y
+	var angle_diff = wrapf(target_angle - current_angle, -PI, PI)
+	
+	if abs(angle_diff) > 0.1:
+		is_turning = true
+		turn_target_rotation = target_angle
+		
+		# Start appropriate turn animation
+		if angle_diff > 0:
+			state_machine.travel("turn_right")
+		else:
+			state_machine.travel("turn_left")
+		
+		# Wait for turn animation to complete
+		while is_turning:
+			# Smoothly interpolate rotation to match animation
+			rotation.y = lerp_angle(rotation.y, turn_target_rotation, 0.1)
+			
+			if abs(wrapf(rotation.y - turn_target_rotation, -PI, PI)) < 0.05:
+				rotation.y = turn_target_rotation
+				is_turning = false
+				
+				# Ensure we transition back to idle through the animation system
+				state_machine.travel("idle1")
+			
+			await get_tree().create_timer(0.016).timeout
+	
+	await get_tree().create_timer(0.016).timeout
+
+# Walking animation system functions
+func walk_to_target(target: Battler) -> bool:
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	if not battle_manager:
+		print("No battle manager found, skipping walking")
+		return false
+		
+	# Check if walking is enabled globally and for this battler
+	if not battle_manager.enable_walking_to_target or not requires_walking:
+		return false
+		
+	# Get walking settings (custom or global)
+	var walking_distance = custom_walking_distance if custom_walking_distance > 0 else battle_manager.walking_distance_threshold
+	var walking_speed = custom_walking_speed if custom_walking_speed > 0 else battle_manager.walking_speed
+	var walking_anim = custom_walking_animation if custom_walking_animation != "" else battle_manager.get_animation("walk")  # Changed from "run" to "walk"
+	
+	var distance_to_target = global_position.distance_to(target.global_position)
+	if distance_to_target <= walking_distance:
+		print("Target is close enough, no walking needed")
+		return false
+		
+	# Check if we can actually move (Area3D collision detection)
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(global_position, target.global_position)
+	query.exclude = [self]  # Don't collide with self
+	var result = space_state.intersect_ray(query)
+	
+	if result and result.collider != target:
+		print("Path blocked, cannot walk to target")
+		return false
+		
+	# Store original position for return
+	original_position = global_position
+	
+	# Calculate target position (move closer to target)
+	var direction = (target.global_position - global_position).normalized()
+	walk_target_position = target.global_position - direction * walking_distance
+	
+	# Start walking animation
+	set_walking(true)
+	
+	# Move towards target
+	var tween = create_tween()
+	tween.tween_property(self, "global_position", walk_target_position, 
+		global_position.distance_to(walk_target_position) / walking_speed)
+	tween.tween_callback(_on_walk_complete)
+	
+	return true
+
+func _try_animation(anim_name: String) -> bool:
+	# Try to travel to animation, return false if it fails
+	var current_state = state_machine.get_current_node()
+	if current_state == anim_name:
+		return true
+		
+	# Try to travel to the animation
+	state_machine.travel(anim_name)
+	
+	# Check if the travel was successful by waiting a frame
+	await get_tree().process_frame
+	var new_state = state_machine.get_current_node()
+	return new_state == anim_name
+
+func _on_walk_complete():
+	set_walking(false)
+	battle_idle()
+
+func return_to_original_position():
+	if is_walking or original_position == Vector3.ZERO:
+		return
+		
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	if not battle_manager:
+		return
+		
+	var walking_speed = custom_walking_speed if custom_walking_speed > 0 else battle_manager.walking_speed
+	var walking_anim = custom_walking_animation if custom_walking_animation != "" else battle_manager.get_animation("run")
+		
+	is_walking = true
+	if not await _try_animation(walking_anim):
+		state_machine.travel("idle1")
+	
+	var tween = create_tween()
+	tween.tween_property(self, "global_position", original_position, 
+		global_position.distance_to(original_position) / walking_speed)
+	tween.tween_callback(_on_return_complete)
+
+func _on_return_complete():
+	is_walking = false
+	original_position = Vector3.ZERO
 	battle_idle()
 
 func get_exp_stat():
@@ -469,3 +705,11 @@ func process_states() -> void:
 	# Remove expired states
 	for state_name in states_to_remove:
 		remove_state(state_name)
+
+func set_walking(value: bool):
+	is_walking = value
+	anim_tree.set("parameters/conditions/is_walking", value)
+
+func set_defending(value: bool):
+	is_defending = value
+	anim_tree.set("parameters/conditions/is_defending", value)

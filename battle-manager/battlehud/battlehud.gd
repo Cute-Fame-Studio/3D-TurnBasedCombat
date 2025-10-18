@@ -112,12 +112,14 @@ func update_enemy_health_bar():
 # Action button signals
 func _on_attack_pressed():
 	print("Attack button pressed")
-	if enemy:
-		print("Emitting action_selected signal with target: ", enemy.name)
+	# Check if there are any valid enemies instead of relying on single enemy variable
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	if battle_manager and battle_manager.enemies.size() > 0:
+		print("Emitting action_selected signal")
 		action_selected.emit("attack", null)
 		hide_action_buttons()
 	else:
-		print("Error: No enemy target set")
+		print("Error: No enemies available for targeting")
 
 func _on_defend_pressed():
 	hide_action_buttons()

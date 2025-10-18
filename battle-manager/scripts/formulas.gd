@@ -75,5 +75,5 @@ static func calculate_damage(attacker:Battler, target:Battler, skill:Skill) -> i
 		GlobalBattleSettings.Damage_Calc_Type.DRGNQST:
 			damage = max(1, int(((atk - (def / 2.0) + (((atk - (def/2.0) + 1.0) * randf_range(0, 255)) / 256.0)) / 4) * (skill.base_power / 50.0) * element_wheel(skill.element, target.stats.element)))
 		_:
-			damage = max(1, atk-def * (skill.base_power/50) * element_wheel(skill.element, target.stats.element))
+			damage = max(1, int((atk-def) * (skill.base_power/50.0) * element_wheel(skill.element, target.stats.element)))
 	return damage

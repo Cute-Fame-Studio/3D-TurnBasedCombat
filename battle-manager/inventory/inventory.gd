@@ -133,7 +133,7 @@ func remove_items_from_collection(items:Array[Item] = [], allow_partial_removal:
 		return {}
 	
 	var attempt:int = 0
-	var removals:Dictionary[int, Item] = {}
+	var _removals:Dictionary[int, Item] = {}
 	for item:Item in items:
 		attempt += 1
 		if !collection.has(item):

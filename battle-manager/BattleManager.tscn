@@ -5,5 +5,13 @@
 
 [node name="Battle-Manager" type="Node3D"]
 script = ExtResource("1_duov8")
+animation_dictionary = {
+"attack": "attack",
+"defend": "idle2",
+"idle": "idle1",
+"turn_left": "turn_left",
+"turn_right": "turn_right",
+"walk": "run"
+}
 
 [node name="BattleHUD" parent="." instance=ExtResource("5_se261")]

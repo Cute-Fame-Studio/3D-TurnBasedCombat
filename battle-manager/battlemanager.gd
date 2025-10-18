@@ -33,8 +33,68 @@ var current_battler
 @export var defend_toggle: bool = true
 @export var item_toggle: bool = true
 @export var run_toggle: bool = true
+@export var mouse_input_toggle: bool = true
 
-var defending_players = ["ally_name", "null"]
+# Walking Animation System
+@export_group("Walking Animation System", "walking")
+@export var enable_walking_to_target: bool = true
+@export var walking_distance_threshold: float = 2.0
+@export var walking_speed: float = 3.0
+#@export var walking_animation_name: String = "walk"
+## Global walking settings. Individual battlers can override these with custom values.
+## If a battler has custom_walking_distance > 0, it will use that instead of walking_distance_threshold.
+## Same applies to custom_walking_speed and custom_walking_animation.
+
+# Animation Dictionary System
+@export_group("Animation Dictionary", "animations")
+@export var animation_dictionary: Dictionary = {
+	"run": "run",  # Changed from "run" to "walk"
+	"turn_left": "Locomotion-Library/turn left", 
+	"turn_right": "Locomotion-Library/turn right",
+	"attack": "Locomotion-Library/attack1",
+	"idle": "Locomotion-Library/idle2",
+	"defend": "armature_stand"
+}
+## Dictionary of animation names. Keys are animation types, values are actual animation names.
+## This allows customization without assuming specific animation library names.
+
+# Rotation and Battle Settings
+@export_group("Battle Settings", "battle")
+@export var invert_rotation_axis: bool = true
+@export var remove_defeated_enemies: bool = true
+@export var instant_turning: bool = false
+## Invert rotation axis for characters with unusual pre-existing rotations.
+## Remove defeated enemies entirely from the battle scene.
+## Instant turning skips turn animations for immediate rotation.
+
+# Helper function to get animation name from dictionary
+func get_animation(animation_type: String) -> String:
+	if animation_dictionary.has(animation_type):
+		return animation_dictionary[animation_type]
+	else:
+		print("Warning: Animation type '", animation_type, "' not found in dictionary, using idle1")
+		return "idle1"
+
+# Helper function to clean up defeated enemies
+func cleanup_defeated_enemies():
+	if not remove_defeated_enemies:
+		return
+		
+	# Remove defeated enemies from arrays and scene
+	var enemies_to_remove = []
+	for enemy in enemies:
+		if enemy.is_defeated():
+			enemies_to_remove.append(enemy)
+	
+	for enemy in enemies_to_remove:
+		print("Cleaning up defeated enemy: ", enemy.character_name)
+		# Remove from turn order
+		if turn_order.has(enemy):
+			turn_order.erase(enemy)
+		# Remove from enemies array
+		enemies.erase(enemy)
+		# Remove from scene
+		enemy.queue_free()
 
 var is_animating: bool = false
 
@@ -147,6 +207,7 @@ func target_selected(target: Battler) -> void:
 	_use_action_on_target()
 
 func start_next_turn():
+	# Check if battle is over before proceeding
 	if is_battle_over():
 		if all_defeated(players):
 			end_battle(BattleEndCondition.DEFEAT)
@@ -155,6 +216,12 @@ func start_next_turn():
 		else:
 			#Fallthrough
 			end_battle()
+		return
+		
+	# Ensure we have valid characters in turn order
+	if turn_order.is_empty():
+		print("No characters in turn order, ending battle")
+		end_battle()
 		return
 
 	current_character = turn_order[current_turn]
@@ -556,12 +623,17 @@ func end_turn():
 		start_next_turn()
 	else:
 		if battler_attacking:
+			print("DEBUG: Waiting for attack animation to complete...")
 			await current_battler.wait_attack()
+			print("DEBUG: Attack animation completed, battler_attacking set to false")
 			battler_attacking = false
 			
 		# Process states before SP regen
 		current_battler.process_states()
 		current_battler.regenerate_sp()
+		
+		# Clean up defeated enemies
+		cleanup_defeated_enemies()
 		
 		# Clear targeting states
 		print("DEBUG: enemies array before end_turn clear: ", enemies)
@@ -575,6 +647,7 @@ func end_turn():
 		
 		current_turn = (current_turn + 1) % turn_order.size()
 		is_animating = false
+		print("DEBUG: Starting next turn...")
 		start_next_turn()
 
 func update_hud():

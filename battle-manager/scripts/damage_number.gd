@@ -26,5 +26,5 @@ func _fade_out() -> void:
 	await fade_out_tween.finished
 	call_deferred("queue_free")
 
-func get_oscillation(time_alive:float) -> float:
-	return sin(time_alive * frequency) * amplitude
+func get_oscillation(time:float) -> float:
+	return sin(time * frequency) * amplitude

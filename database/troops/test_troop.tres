@@ -1,3 +1,17 @@
-[gd_resource type="Resource" format=3 uid="uid://d0noky2jlhk4u"]
+[gd_resource type="Resource" script_class="Troops" load_steps=5 format=3 uid="uid://d0noky2jlhk4u"]
+
+[ext_resource type="Script" uid="uid://bqvsfh10bn27f" path="res://database/troops/enemy_group.gd" id="1_6o0q3"]
+[ext_resource type="Script" uid="uid://rub0awaryv0r" path="res://database/troops/troops_template.gd" id="1_abc12"]
+[ext_resource type="PackedScene" uid="uid://bmu11p8vvo71p" path="res://battle-manager/enemy.tscn" id="1_tl6uc"]
+
+[sub_resource type="Resource" id="Resource_tl6uc"]
+script = ExtResource("1_6o0q3")
+group_name = "Test"
+enemy_scenes = Array[PackedScene]([ExtResource("1_tl6uc"), ExtResource("1_tl6uc")])
+metadata/_custom_type_script = "uid://bqvsfh10bn27f"
 
 [resource]
+script = ExtResource("1_abc12")
+troop_name = "Test Troop"
+troop_description = "A test troop for demonstration"
+enemy_group = SubResource("Resource_tl6uc")

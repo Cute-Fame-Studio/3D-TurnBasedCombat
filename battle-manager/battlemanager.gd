@@ -67,6 +67,15 @@ var current_battler
 ## Remove defeated enemies entirely from the battle scene.
 ## Instant turning skips turn animations for immediate rotation.
 
+# Troop System
+@export_group("Troop System", "troop")
+@export var active_troop: Troops = null
+@export var enemy_markers: Node3D = null  # Reference to parent node containing Marker3D nodes for formation positions
+@export var use_procedural_formation: bool = true
+## Active troop to spawn. If set, will override manual enemy placement.
+## Reference to the parent node containing Marker3D children for custom formations.
+## If true, positions will be calculated procedurally based on formation type.
+
 # Helper function to get animation name from dictionary
 func get_animation(animation_type: String) -> String:
 	if animation_dictionary.has(animation_type):
@@ -74,6 +83,189 @@ func get_animation(animation_type: String) -> String:
 	else:
 		print("Warning: Animation type '", animation_type, "' not found in dictionary, using idle1")
 		return "idle1"
+
+# Helper function to calculate enemy positions based on formation
+func get_formation_position(enemy_index: int, total_enemies: int, formation: int, base_marker: Marker3D = null) -> Vector3:
+	var base_position = Vector3.ZERO
+	var base_y = 0.261  # Default Y position (matches ally height)
+	var base_x = 0.0
+	var base_z = 0.0
+	var use_marker = base_marker != null
+	
+	# Use base marker's position if provided
+	if use_marker:
+		base_x = base_marker.global_position.x
+		base_z = base_marker.global_position.z
+		base_y = base_marker.global_position.y
+	
+	match formation:
+		Troops.Formation.FRONT_ROW:
+			# Horizontal line formation (centered on marker or default)
+			var spacing = 2.0
+			var start_x = -(total_enemies - 1) * spacing / 2.0
+			var offset_z = 0.0 if use_marker else 5.0
+			return Vector3(base_x + start_x + enemy_index * spacing, base_y, base_z + offset_z)
+		
+		Troops.Formation.TRIANGLE:
+			# Triangle formation - rows get wider
+			var row = int(sqrt(enemy_index))
+			var pos_in_row = enemy_index - (row * (row + 1) / 2)
+			var spacing = 2.0
+			var row_width = (row + 1) * spacing
+			var start_x = -row_width / 2.0
+			var z_offset = (0.0 if use_marker else 5.0) - (row * 1.5)
+			return Vector3(base_x + start_x + pos_in_row * spacing, base_y, base_z + z_offset)
+		
+		Troops.Formation.CIRCLE_PLAYER:
+			# Circle formation around marker or player (at origin)
+			var angle = (TAU / total_enemies) * enemy_index
+			var radius = 5.0
+			var center_z = base_z + (0.0 if use_marker else 5.0)
+			return Vector3(base_x + cos(angle) * radius, base_y, center_z + sin(angle) * radius)
+		
+		Troops.Formation.CUSTOM_MARKERS:
+			# Will use marker positions instead
+			return base_position
+		
+		_:
+			return base_position
+
+# Spawn enemies from troop data
+func spawn_troop(troop: Troops, parent_node: Node3D = self) -> void:
+	if not troop or not troop.enemy_group or troop.enemy_group.enemy_scenes.is_empty():
+		push_error("Invalid troop or no enemy group/scenes defined!")
+		return
+	
+	print("Spawning troop: ", troop.troop_name)
+	print("Enemy scenes: ", troop.enemy_group.enemy_scenes.size())
+	
+	# Try to find FRONTROW marker for base positioning
+	var front_row_marker: Marker3D = null
+	for node in get_tree().get_nodes_in_group("FRONTROW"):
+		if node is Marker3D:
+			front_row_marker = node
+			break
+	
+	if not front_row_marker:
+		print("FRONTROW marker not found, using default center position")
+	else:
+		print("Using FRONTROW marker at position: ", front_row_marker.global_position)
+	
+	var loaded_scenes = troop.get_enemy_scenes()
+	var marker_index = 0
+	
+	for i in range(loaded_scenes.size()):
+		var enemy_scene = loaded_scenes[i]
+		if not enemy_scene:
+			push_warning("Failed to load enemy scene at index ", i)
+			continue
+		
+		var enemy = enemy_scene.instantiate()
+		if not enemy is Battler:
+			push_warning("Enemy scene is not a Battler at index ", i, " in group: ", troop.enemy_group.group_name)
+			enemy.queue_free()
+			continue
+		
+		# Calculate position based on formation
+		var spawn_position: Vector3
+		
+		if troop.formation == Troops.Formation.CUSTOM_MARKERS:
+			# Use Marker3D positions if available
+			if enemy_markers and marker_index < enemy_markers.get_child_count():
+				spawn_position = enemy_markers.get_child(marker_index).global_position
+				marker_index += 1
+			else:
+				spawn_position = get_formation_position(i, loaded_scenes.size(), Troops.Formation.FRONT_ROW, front_row_marker)
+				push_warning("Custom marker formation requested but no markers found, using front row fallback")
+		else:
+			spawn_position = get_formation_position(i, loaded_scenes.size(), troop.formation, front_row_marker)
+		
+		# Set enemy position
+		enemy.global_position = spawn_position
+		
+		# Face enemy toward player (negative Z direction)
+		# Calculate angle to face player at origin
+		var direction_to_player = Vector3.ZERO - spawn_position
+		enemy.rotation.y = atan2(direction_to_player.x, direction_to_player.z)
+		
+		# Add to scene
+		parent_node.add_child(enemy)
+		
+		# Add to enemies group
+		enemy.add_to_group("enemies")
+		
+		# Apply troop-wide damage reduction if applicable
+		if troop.damage_reduction != 1.0:
+			enemy.damage_multiplier = troop.damage_reduction
+		
+		print("Spawned enemy at index ", i, ": ", enemy.character_name, " at position ", spawn_position)
+
+# Spawn additional enemies during battle (for troop-to-troop battles that continue)
+func spawn_reinforcements(troop: Troops, parent_node: Node3D = self) -> void:
+	if not troop or not troop.enemy_group or troop.enemy_group.enemy_scenes.is_empty():
+		push_error("Invalid troop or no enemy group/scenes defined!")
+		return
+	
+	print("Spawning reinforcements: ", troop.troop_name)
+	
+	# Try to find FRONTROW marker for base positioning
+	var front_row_marker: Marker3D = null
+	for node in get_tree().get_nodes_in_group("FRONTROW"):
+		if node is Marker3D:
+			front_row_marker = node
+			break
+	
+	var loaded_scenes = troop.get_enemy_scenes()
+	var current_enemy_count = enemies.size()
+	
+	for i in range(loaded_scenes.size()):
+		var enemy_scene = loaded_scenes[i]
+		if not enemy_scene:
+			push_warning("Failed to load enemy scene at index ", i)
+			continue
+		
+		var enemy = enemy_scene.instantiate()
+		if not enemy is Battler:
+			push_warning("Enemy scene is not a Battler at index ", i, " in group: ", troop.enemy_group.group_name)
+			enemy.queue_free()
+			continue
+		
+		# Calculate position based on formation
+		var spawn_position = get_formation_position(current_enemy_count + i, current_enemy_count + loaded_scenes.size(), troop.formation, front_row_marker)
+		
+		# Set enemy position
+		enemy.global_position = spawn_position
+		
+		# Face enemy toward player (negative Z direction)
+		# Calculate angle to face player at origin
+		var direction_to_player = Vector3.ZERO - spawn_position
+		enemy.rotation.y = atan2(direction_to_player.x, direction_to_player.z)
+		
+		# Add to scene
+		parent_node.add_child(enemy)
+		
+		# Add to enemies group
+		enemy.add_to_group("enemies")
+		
+		# Add to enemies array
+		enemies.append(enemy)
+		
+		# Add to turn order
+		turn_order.append(enemy)
+		
+		# Apply troop-wide damage reduction if applicable
+		if troop.damage_reduction != 1.0:
+			enemy.damage_multiplier = troop.damage_reduction
+		
+		# Connect damage signal
+		if not enemy.anim_damage.is_connected(_on_anim_damage):
+			enemy.anim_damage.connect(_on_anim_damage)
+		
+		# Set battle idle state
+		enemy.battle_idle()
+		hud.on_start_combat(enemy)
+		
+		print("Spawned reinforcement: ", enemy.character_name, " at position ", spawn_position)
 
 # Helper function to clean up defeated enemies
 func cleanup_defeated_enemies():
@@ -107,6 +299,12 @@ func _ready():
 		return
 	hud.action_selected.connect(_on_action_selected)
 	hud.menu_opened.connect(_do_menu_selection)
+	
+	# Spawn troop if active_troop is set
+	if active_troop:
+		print("Active troop detected: ", active_troop.troop_name)
+		spawn_troop(active_troop, self)
+	
 	for player in players:
 		if not player.anim_damage.is_connected(_on_anim_damage):
 			player.anim_damage.connect(_on_anim_damage)

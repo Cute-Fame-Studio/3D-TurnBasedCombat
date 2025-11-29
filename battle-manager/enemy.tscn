@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://bmu11p8vvo71p"]
+
+[ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://battle-manager/allies/y_bot-ally.tscn" id="1_yb6qq"]
+[ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://BattlerStats.gd" id="2_abxtc"]
+
+[sub_resource type="Resource" id="Resource_pggsg"]
+script = ExtResource("2_abxtc")
+character_name = "Enemy"
+metadata/_custom_type_script = "uid://d2mintfjxyqei"
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_4gyqm"]
+viewport_path = NodePath("DamageIndicator/DamageIndicator")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_qi2p4"]
+viewport_path = NodePath("HealthBar/SubViewport")
+
+[node name="Enemy" instance=ExtResource("1_yb6qq")]
+stats = SubResource("Resource_pggsg")
+team = 1
+
+[node name="GeneralSkeleton" parent="Armature" index="0"]
+bones/0/position = Vector3(-0.0017119393, 0.9463986, -0.087445915)
+bones/1/rotation = Quaternion(-1.5308156e-05, 0.01583408, -0.0012270863, 0.9998739)
+bones/2/rotation = Quaternion(0.02301413, 0.015911365, 0.0027388267, 0.9996048)
+bones/3/rotation = Quaternion(-0.045068186, 0.0152217485, -0.009950133, 0.9988184)
+bones/4/rotation = Quaternion(0.022309057, -0.047138598, 0.0070193564, 0.99861455)
+bones/5/rotation = Quaternion(0.01499479, 0.045454368, -0.0048674233, 0.998842)
+bones/8/rotation = Quaternion(0.016108433, 0.8153838, -0.53816235, -0.21277031)
+bones/9/rotation = Quaternion(0.31069562, -0.6345554, 0.35013422, 0.614991)
+bones/10/rotation = Quaternion(-0.09396038, 0.6163155, 0.012964428, 0.78176636)
+bones/32/rotation = Quaternion(0.062504366, 0.7945442, -0.57565796, 0.18278584)
+bones/33/rotation = Quaternion(0.2933226, 0.6434761, -0.33055708, 0.62500584)
+bones/34/rotation = Quaternion(-0.08720445, -0.5709572, -0.053365737, 0.8145891)
+bones/55/rotation = Quaternion(-0.0004829365, 0.3390976, 0.9397295, -0.043830123)
+bones/56/rotation = Quaternion(0.00051486224, 0.9674287, -0.25304744, -0.0069642295)
+bones/57/rotation = Quaternion(-0.027444124, 0.69867694, -0.71450436, 0.024102258)
+bones/60/rotation = Quaternion(0.0011318345, 0.16462722, 0.98550755, 0.040883273)
+bones/61/rotation = Quaternion(-0.0005259753, 0.96598256, -0.2585089, 0.0071145296)
+bones/62/rotation = Quaternion(-0.13364375, 0.5386045, -0.7825855, -0.2821429)
+
+[node name="DamageIndicatorSprite" parent="DamageIndicator" index="1"]
+texture = SubResource("ViewportTexture_4gyqm")
+
+[node name="BattlerHealthBar" parent="HealthBar" index="0"]
+texture = SubResource("ViewportTexture_qi2p4")

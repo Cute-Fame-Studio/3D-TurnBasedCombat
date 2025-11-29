@@ -1,1 +1,135 @@
-Troops will function as a way to spawn multiple enemies.
+========================================
+TROOP SYSTEM DOCUMENTATION
+========================================
+
+OVERVIEW:
+Troops are a way to spawn multiple enemies with predefined formations. The system uses EnemyGroup resources to organize enemy scenes and Troops resources to manage formations and spawn behavior.
+
+========================================
+KEY RESOURCES
+========================================
+
+1. EnemyGroup (database/troops/enemy_group.gd)
+   - Stores a collection of enemy scenes (PackedScene objects)
+   - Fields:
+	 * group_name: Name of the enemy group
+	 * enemy_scenes: Array[PackedScene] - Drag enemy .tscn files here in inspector
+
+2. Troops (database/troops/troops_template.gd)
+   - Defines a troop encounter
+   - Fields:
+	 * troop_name: Name of the troop
+	 * troop_description: Description of the troop
+	 * enemy_group: Reference to an EnemyGroup resource
+	 * formation: Formation type (enum)
+	 * damage_reduction: Multiplier applied to all enemies (1.0 = normal)
+
+========================================
+FORMATIONS
+========================================
+
+FRONT_ROW:
+- Enemies spawn in a horizontal line facing the player
+- Centered along X axis, positioned in front (positive Z)
+- Uses FRONTROW marker if available for center point (X/Z positioning only)
+- Default Y position: 0.261 (matches ally height) or uses marker Y if present
+
+TRIANGLE:
+- Enemies arranged in widening rows
+- Back row has fewer enemies, front rows expand outward
+- Rows progress forward along Z axis
+- Inherits FRONTROW marker behavior for base positioning
+
+CIRCLE_PLAYER:
+- Enemies form a circle around the player
+- Evenly distributed by angle
+- All spawn at radius 5.0 units from player center
+- Inherits FRONTROW marker behavior for base positioning
+
+CUSTOM_MARKERS:
+- Requires enemy_markers (Node3D) reference in BattleManager
+- Searches for child Marker3D nodes and spawns enemies on them
+- If no markers found, falls back to FRONT_ROW formation
+- Each marker spawns one enemy in order
+
+========================================
+MARKER-BASED POSITIONING
+========================================
+
+FRONTROW Marker:
+- Marker3D node named/grouped as "FRONTROW"
+- Provides base X/Z center point for all procedural formations
+- Y position also inherited (prevents ground clipping)
+- Optional - system uses default (0, 0.261, 0) if not found
+- Recommended setup:
+  * Position at center of battle arena
+  * Y height should match your ground level or desired spawn height
+  * Rename/group as "FRONTROW" so system can find it
+
+Custom Markers (for CUSTOM_MARKERS formation):
+- Requires enemy_markers property set on BattleManager
+- Assign a Node3D containing Marker3D children
+- One marker per enemy in order
+- Allows precise placement for boss fights or specific encounters
+
+========================================
+Y POSITION BEHAVIOR
+========================================
+
+All formations now respect Y positioning:
+- Uses FRONTROW marker's Y if available (best practice)
+- Falls back to 0.261 (default ally height) if no marker
+- If enemies spawn in ground: Create FRONTROW marker at correct Y height
+- Alternative: Use custom marker formation for manual placement
+- Physics/collision can pull enemies down if needed
+
+========================================
+SETUP WORKFLOW
+========================================
+
+1. Create EnemyGroup resource:
+   - Right click in database/troops/
+   - New Resource -> EnemyGroup
+   - Set group_name
+   - Drag enemy .tscn files into enemy_scenes array
+
+2. Create Troops resource:
+   - Right click in database/troops/
+   - New Resource -> Troops
+   - Set troop_name and description
+   - Assign EnemyGroup to enemy_group field
+   - Choose formation type
+   - Optional: Set damage_reduction multiplier
+
+3. Assign to BattleManager:
+   - Set active_troop export variable to your Troops resource
+   - Enemies spawn automatically on battle start
+
+4. For marker-based formations:
+   - Create Marker3D in your battle scene
+   - Name it "FRONTROW" or add to "FRONTROW" group
+   - Position at desired spawn center point
+   - Formations will use it as reference
+
+========================================
+SPAWNING DURING BATTLE
+========================================
+
+Reinforcements can spawn during combat using:
+  BattleManager.spawn_reinforcements(troop_resource)
+
+This adds new enemies mid-battle while maintaining turn order and formations.
+Useful for wave-based encounters or reinforcement mechanics.
+
+========================================
+NOTES FOR NON-AI IMPLEMENTATION
+========================================
+
+Key functions in BattleManager:
+- get_formation_position(index, total, formation, marker): Calculate spawn position
+- spawn_troop(troop, parent): Initial enemy spawning
+- spawn_reinforcements(troop, parent): Mid-battle spawning
+
+The system searches for FRONTROW marker in scene groups on each spawn.
+Formations are procedurally calculated - no need to pre-place markers for
+FRONT_ROW, TRIANGLE, or CIRCLE_PLAYER unless you want custom positioning.

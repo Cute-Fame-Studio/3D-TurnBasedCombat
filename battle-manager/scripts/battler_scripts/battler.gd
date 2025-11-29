@@ -511,21 +511,9 @@ func walk_to_target(target: Battler) -> bool:
 	if distance_to_target <= walking_distance:
 		print("Target is close enough, no walking needed")
 		return false
-		
-	# Check if we can actually move (Area3D collision detection)
-	var space_state = get_world_3d().direct_space_state
-	var query = PhysicsRayQueryParameters3D.create(global_position, target.global_position)
-	query.exclude = [self]  # Don't collide with self
-	var result = space_state.intersect_ray(query)
 	
-	if result and result.collider != target:
-		print("Path blocked, cannot walk to target")
-		return false
-		
 	# Store original position for return
-	original_position = global_position
-	
-	# Calculate target position (move closer to target)
+	original_position = global_position	# Calculate target position (move closer to target)
 	var direction = (target.global_position - global_position).normalized()
 	walk_target_position = target.global_position - direction * walking_distance
 	

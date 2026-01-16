@@ -1,4 +1,4 @@
-[gd_resource type="AnimationNodeStateMachine" load_steps=28 format=3 uid="uid://c7waot7s0me6v"]
+[gd_resource type="AnimationNodeStateMachine" load_steps=32 format=3 uid="uid://c7waot7s0me6v"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3rsfg"]
 animation = &"Locomotion-Library/attack1"
@@ -26,6 +26,9 @@ animation = &"Locomotion-Library/turn left"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_peoh0"]
 animation = &"Locomotion-Library/turn right"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_4t2y6"]
+animation = &"Locomotion-Library/walk"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="idle_to_walk"]
 xfade_time = 0.2
@@ -72,6 +75,7 @@ advance_mode = 2
 advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_4t2y6"]
+xfade_time = 0.2
 advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_0idrr"]
@@ -92,6 +96,17 @@ advance_condition = &"defend"
 switch_mode = 1
 advance_mode = 2
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_1heaf"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_q7yk4"]
+xfade_time = 0.2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_kstkv"]
+xfade_time = 0.2
+advance_condition = &"is_walking"
+
 [resource]
 states/End/position = Vector2(1205, 100)
 states/Start/position = Vector2(210, 94)
@@ -106,12 +121,14 @@ states/jump/position = Vector2(667, 13)
 states/kick/node = SubResource("AnimationNodeAnimation_qu72c")
 states/kick/position = Vector2(463, 286)
 states/run/node = SubResource("AnimationNodeAnimation_lxots")
-states/run/position = Vector2(250, 191)
+states/run/position = Vector2(292, 297)
 states/skill-strong-attack/node = SubResource("AnimationNodeAnimation_shbi4")
 states/skill-strong-attack/position = Vector2(638, 235)
 states/turn_left/node = SubResource("AnimationNodeAnimation_re1va")
 states/turn_left/position = Vector2(973, 213.5)
 states/turn_right/node = SubResource("AnimationNodeAnimation_peoh0")
 states/turn_right/position = Vector2(957, 100)
-transitions = ["idle1", "run", SubResource("idle_to_walk"), "run", "turn_left", SubResource("walk_to_turn"), "run", "turn_right", SubResource("walk_to_turn"), "turn_left", "attack", SubResource("turn_to_attack"), "turn_right", "attack", SubResource("turn_to_attack"), "attack", "idle1", SubResource("AnimationNodeStateMachineTransition_bn3j8"), "idle1", "turn_right", SubResource("idle_to_turn_right"), "idle1", "turn_left", SubResource("idle_to_turn_left"), "turn_right", "idle1", SubResource("turn_to_idle"), "turn_left", "idle1", SubResource("turn_to_idle"), "idle1", "kick", SubResource("AnimationNodeStateMachineTransition_lm7ud"), "idle1", "jump", SubResource("AnimationNodeStateMachineTransition_00hc0"), "turn_left", "turn_right", SubResource("AnimationNodeStateMachineTransition_1rigw"), "turn_right", "turn_left", SubResource("AnimationNodeStateMachineTransition_xdrmx"), "turn_right", "run", SubResource("AnimationNodeStateMachineTransition_k0l0t"), "run", "idle1", SubResource("AnimationNodeStateMachineTransition_4t2y6"), "kick", "idle1", SubResource("AnimationNodeStateMachineTransition_0idrr"), "jump", "idle1", SubResource("AnimationNodeStateMachineTransition_uno5v"), "Start", "run", SubResource("AnimationNodeStateMachineTransition_e4e1w"), "idle1", "defend", SubResource("AnimationNodeStateMachineTransition_ys4go"), "defend", "idle1", SubResource("AnimationNodeStateMachineTransition_xi3w4")]
-graph_offset = Vector2(10.587771, -35.376553)
+states/walk/node = SubResource("AnimationNodeAnimation_4t2y6")
+states/walk/position = Vector2(85.636185, 172.91974)
+transitions = ["idle1", "run", SubResource("idle_to_walk"), "run", "turn_left", SubResource("walk_to_turn"), "run", "turn_right", SubResource("walk_to_turn"), "turn_left", "attack", SubResource("turn_to_attack"), "turn_right", "attack", SubResource("turn_to_attack"), "attack", "idle1", SubResource("AnimationNodeStateMachineTransition_bn3j8"), "idle1", "turn_right", SubResource("idle_to_turn_right"), "idle1", "turn_left", SubResource("idle_to_turn_left"), "turn_right", "idle1", SubResource("turn_to_idle"), "turn_left", "idle1", SubResource("turn_to_idle"), "idle1", "kick", SubResource("AnimationNodeStateMachineTransition_lm7ud"), "idle1", "jump", SubResource("AnimationNodeStateMachineTransition_00hc0"), "turn_left", "turn_right", SubResource("AnimationNodeStateMachineTransition_1rigw"), "turn_right", "turn_left", SubResource("AnimationNodeStateMachineTransition_xdrmx"), "turn_right", "run", SubResource("AnimationNodeStateMachineTransition_k0l0t"), "run", "idle1", SubResource("AnimationNodeStateMachineTransition_4t2y6"), "kick", "idle1", SubResource("AnimationNodeStateMachineTransition_0idrr"), "jump", "idle1", SubResource("AnimationNodeStateMachineTransition_uno5v"), "Start", "run", SubResource("AnimationNodeStateMachineTransition_e4e1w"), "idle1", "defend", SubResource("AnimationNodeStateMachineTransition_ys4go"), "defend", "idle1", SubResource("AnimationNodeStateMachineTransition_xi3w4"), "run", "walk", SubResource("AnimationNodeStateMachineTransition_1heaf"), "walk", "run", SubResource("AnimationNodeStateMachineTransition_q7yk4"), "walk", "idle1", SubResource("AnimationNodeStateMachineTransition_kstkv")]
+graph_offset = Vector2(-23.36382, -30.014421)

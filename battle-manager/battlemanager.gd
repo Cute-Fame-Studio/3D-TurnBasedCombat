@@ -35,24 +35,26 @@ var current_battler
 @export var run_toggle: bool = true
 @export var mouse_input_toggle: bool = true
 
-# Walking Animation System
-@export_group("Walking Animation System", "walking")
-@export var enable_walking_to_target: bool = true
-@export var walking_distance_threshold: float = 2.0
-@export var walking_speed: float = 3.0
-#@export var walking_animation_name: String = "walk"
-## Global walking settings. Individual battlers can override these with custom values.
-## If a battler has custom_walking_distance > 0, it will use that instead of walking_distance_threshold.
-## Same applies to custom_walking_speed and custom_walking_animation.
+# Movement Animation System
+@export_group("Movement Animation System", "movement")
+@export var enable_movement_to_target: bool = true
+@export var movement_distance_threshold: float = 2.0
+@export var movement_speed: float = 4.0
+@export var walking_forward_animation: String = "run"
+@export var play_animation_when_moving_backwards: bool = false
+## Global movement settings. Individual battlers can override these with custom values.
+## If a battler has custom_movement_distance > 0, it will use that instead of movement_distance_threshold.
+## Same applies to custom_movement_speed and custom_movement_animation.
 
 # Animation Dictionary System
 @export_group("Animation Dictionary", "animations")
 @export var animation_dictionary: Dictionary = {
-	"run": "run",  # Changed from "run" to "walk"
+	"run": "Locomotion-Library/walk",  # Fixed from "run" to actual walk animation
+	"walk": "Locomotion-Library/walk",  # Added explicit walk entry
 	"turn_left": "Locomotion-Library/turn left", 
 	"turn_right": "Locomotion-Library/turn right",
 	"attack": "Locomotion-Library/attack1",
-	"idle": "Locomotion-Library/idle2",
+	"idle": "idle1",  # Changed from idle2 to idle1
 	"defend": "armature_stand"
 }
 ## Dictionary of animation names. Keys are animation types, values are actual animation names.
@@ -85,50 +87,23 @@ func get_animation(animation_type: String) -> String:
 		return "idle1"
 
 # Helper function to calculate enemy positions based on formation
-func get_formation_position(enemy_index: int, total_enemies: int, formation: int, base_marker: Marker3D = null) -> Vector3:
-	var base_position = Vector3.ZERO
-	var base_y = 0.261  # Default Y position (matches ally height)
-	var base_x = 0.0
-	var base_z = 0.0
-	var use_marker = base_marker != null
-	
-	# Use base marker's position if provided
-	if use_marker:
-		base_x = base_marker.global_position.x
-		base_z = base_marker.global_position.z
-		base_y = base_marker.global_position.y
+func get_formation_position(index: int, total: int, formation: Troops.Formation, marker: Marker3D = null) -> Vector3:
+	var base_pos = marker.global_position if marker else Vector3.ZERO
+	var spacing: float = 3.0
 	
 	match formation:
 		Troops.Formation.FRONT_ROW:
-			# Horizontal line formation (centered on marker or default)
-			var spacing = 2.0
-			var start_x = -(total_enemies - 1) * spacing / 2.0
-			var offset_z = 0.0 if use_marker else 5.0
-			return Vector3(base_x + start_x + enemy_index * spacing, base_y, base_z + offset_z)
-		
+			return base_pos + Vector3(index * spacing - (total - 1) * spacing / 2.0, 0, 0)
 		Troops.Formation.TRIANGLE:
-			# Triangle formation - rows get wider
-			var row = int(sqrt(enemy_index))
-			var pos_in_row = enemy_index - (row * (row + 1) / 2)
-			var spacing = 2.0
-			var row_width = (row + 1) * spacing
-			var start_x = -row_width / 2.0
-			var z_offset = (0.0 if use_marker else 5.0) - (row * 1.5)
-			return Vector3(base_x + start_x + pos_in_row * spacing, base_y, base_z + z_offset)
-		
+			var row = int(sqrt(index))
+			var col = index - row * row
+			return base_pos + Vector3(col * spacing - row * spacing / 2.0, 0, row * spacing)
 		Troops.Formation.CIRCLE_PLAYER:
-			# Circle formation around marker or player (at origin)
-			var angle = (TAU / total_enemies) * enemy_index
-			var radius = 5.0
-			var center_z = base_z + (0.0 if use_marker else 5.0)
-			return Vector3(base_x + cos(angle) * radius, base_y, center_z + sin(angle) * radius)
-		
-		Troops.Formation.CUSTOM_MARKERS:
-			# Will use marker positions instead
-			return base_position
-		
-		_:
-			return base_position
+			var angle = (TAU * index) / float(total)
+			var radius = 4.0
+			return base_pos + Vector3(cos(angle) * radius, 0, sin(angle) * radius)
+		_:  # CUSTOM_MARKERS and default
+			return base_pos
 
 # Spawn enemies from troop data
 func spawn_troop(troop: Troops, parent_node: Node3D = self) -> void:
@@ -137,7 +112,10 @@ func spawn_troop(troop: Troops, parent_node: Node3D = self) -> void:
 		return
 	
 	print("Spawning troop: ", troop.troop_name)
-	print("Enemy scenes: ", troop.enemy_group.enemy_scenes.size())
+	
+	# Wait for node to be in tree before getting transform
+	if not parent_node.is_inside_tree():
+		await parent_node.tree_entered
 	
 	# Try to find FRONTROW marker for base positioning
 	var front_row_marker: Marker3D = null
@@ -145,11 +123,6 @@ func spawn_troop(troop: Troops, parent_node: Node3D = self) -> void:
 		if node is Marker3D:
 			front_row_marker = node
 			break
-	
-	if not front_row_marker:
-		print("FRONTROW marker not found, using default center position")
-	else:
-		print("Using FRONTROW marker at position: ", front_row_marker.global_position)
 	
 	var loaded_scenes = troop.get_enemy_scenes()
 	var marker_index = 0
@@ -176,29 +149,29 @@ func spawn_troop(troop: Troops, parent_node: Node3D = self) -> void:
 				marker_index += 1
 			else:
 				spawn_position = get_formation_position(i, loaded_scenes.size(), Troops.Formation.FRONT_ROW, front_row_marker)
-				push_warning("Custom marker formation requested but no markers found, using front row fallback")
 		else:
 			spawn_position = get_formation_position(i, loaded_scenes.size(), troop.formation, front_row_marker)
 		
-		# Set enemy position
+		# Add enemy to scene
+		parent_node.add_child(enemy)
 		enemy.global_position = spawn_position
 		
-		# Face enemy toward player (negative Z direction)
-		# Calculate angle to face player at origin
-		var direction_to_player = Vector3.ZERO - spawn_position
-		enemy.rotation.y = atan2(direction_to_player.x, direction_to_player.z)
+		# Rotate 180 degrees on Y axis to face toward players
+		enemy.rotation.y = PI
 		
-		# Add to scene
-		parent_node.add_child(enemy)
+		# Add to enemies array and turn order
+		enemies.append(enemy)
+		turn_order.append(enemy)
 		
-		# Add to enemies group
-		enemy.add_to_group("enemies")
+		# Connect damage signal
+		if not enemy.anim_damage.is_connected(_on_anim_damage):
+			enemy.anim_damage.connect(_on_anim_damage)
 		
-		# Apply troop-wide damage reduction if applicable
-		if troop.damage_reduction != 1.0:
-			enemy.damage_multiplier = troop.damage_reduction
+		# Set battle idle state
+		enemy.battle_idle()
+		hud.on_start_combat(enemy)
 		
-		print("Spawned enemy at index ", i, ": ", enemy.character_name, " at position ", spawn_position)
+		print("Spawned enemy: ", enemy.character_name, " at position ", spawn_position)
 
 # Spawn additional enemies during battle (for troop-to-troop battles that continue)
 func spawn_reinforcements(troop: Troops, parent_node: Node3D = self) -> void:
@@ -236,10 +209,8 @@ func spawn_reinforcements(troop: Troops, parent_node: Node3D = self) -> void:
 		# Set enemy position
 		enemy.global_position = spawn_position
 		
-		# Face enemy toward player (negative Z direction)
-		# Calculate angle to face player at origin
-		var direction_to_player = Vector3.ZERO - spawn_position
-		enemy.rotation.y = atan2(direction_to_player.x, direction_to_player.z)
+		# Rotate 180 degrees on Y axis to face toward players
+		enemy.rotation.y = PI
 		
 		# Add to scene
 		parent_node.add_child(enemy)
@@ -353,7 +324,8 @@ func initialize_battle():
 		print("Have players: ", players)
 		hud.on_add_character(player)
 		player.battle_idle()
-		player.anim_damage.connect(_on_anim_damage)
+		if not player.anim_damage.is_connected(_on_anim_damage):
+			player.anim_damage.connect(_on_anim_damage)
 	
 	# Ensure players are at the start of the turn order
 	turn_order = players + enemies
@@ -362,7 +334,8 @@ func initialize_battle():
 	for enemy in enemies:
 		hud.on_start_combat(enemy)
 		enemy.battle_idle()
-		enemy.anim_damage.connect(_on_anim_damage)
+		if not enemy.anim_damage.is_connected(_on_anim_damage):
+			enemy.anim_damage.connect(_on_anim_damage)
 
 	start_next_turn()
 
@@ -802,6 +775,11 @@ func enemy_turn(character:Battler) -> void:
 		if node is Battler and !node.is_defeated():
 			available_targets.append(node)
 	
+	if available_targets.is_empty():
+		print("No available targets!")
+		end_turn()
+		return
+	
 	print("Available targets for enemy: ", available_targets.size())
 	for target in available_targets:
 		if target is Battler:
@@ -809,6 +787,8 @@ func enemy_turn(character:Battler) -> void:
 	
 	var all_enemies = get_tree().get_nodes_in_group("enemies")
 	
+	# Clear current_target before choosing new one
+	current_target = null
 	AIManager.choose_action(character, available_targets, all_enemies, self)
 	update_hud()
 	end_turn()
@@ -816,6 +796,7 @@ func enemy_turn(character:Battler) -> void:
 var battler_attacking:bool = false
 func end_turn():
 	if skip_turn:
+		skip_turn = false
 		current_turn = (current_turn + 1) % turn_order.size()
 		is_animating = false
 		start_next_turn()
@@ -823,29 +804,26 @@ func end_turn():
 		if battler_attacking:
 			print("DEBUG: Waiting for attack animation to complete...")
 			await current_battler.wait_attack()
-			print("DEBUG: Attack animation completed, battler_attacking set to false")
+			print("DEBUG: Attack animation completed")
 			battler_attacking = false
-			
+		
 		# Process states before SP regen
-		current_battler.process_states()
-		current_battler.regenerate_sp()
+		if current_battler:
+			current_battler.process_states()
+			current_battler.regenerate_sp()
 		
 		# Clean up defeated enemies
 		cleanup_defeated_enemies()
 		
 		# Clear targeting states
-		print("DEBUG: enemies array before end_turn clear: ", enemies)
 		for battler in get_tree().get_nodes_in_group("players") + get_tree().get_nodes_in_group("enemies"):
-			battler.is_valid_target = false
-			battler.is_selectable = false
-			battler.is_targeted = false
-			battler.is_default_target = false
-			battler.mouse_hover = false
-		print("DEBUG: enemies array after end_turn clear: ", enemies)
+			if battler is Battler:
+				battler.clear_all_selections()
+				battler.is_valid_target = false
+				battler.is_selectable = false
 		
 		current_turn = (current_turn + 1) % turn_order.size()
 		is_animating = false
-		print("DEBUG: Starting next turn...")
 		start_next_turn()
 
 func update_hud():

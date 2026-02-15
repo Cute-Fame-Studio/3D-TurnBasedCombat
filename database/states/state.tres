@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="State" format=3 uid="uid://cv461kut2qepr"]
+
+[ext_resource type="Script" uid="uid://ck454uorrpoxa" path="res://database/states/states_template.gd" id="1_3dg81"]
+
+[resource]
+script = ExtResource("1_3dg81")

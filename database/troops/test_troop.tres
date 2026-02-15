@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Troops" load_steps=5 format=3 uid="uid://d0noky2jlhk4u"]
+[gd_resource type="Resource" script_class="Troops" format=3 uid="uid://d0noky2jlhk4u"]
 
 [ext_resource type="Script" uid="uid://bqvsfh10bn27f" path="res://database/troops/enemy_group.gd" id="1_6o0q3"]
 [ext_resource type="Script" uid="uid://rub0awaryv0r" path="res://database/troops/troops_template.gd" id="1_abc12"]

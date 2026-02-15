@@ -13,6 +13,7 @@ var current_character:Battler
 var current_target:Battler
 var in_target_selection:bool = false
 var in_menu_selection:bool = false
+var damage_processed_this_turn: bool = false
 
 @onready var ActionButtons = find_child("ActionButtons")
 # For referencing and setting variables in the battle settings.
@@ -41,20 +42,26 @@ var current_battler
 @export var movement_distance_threshold: float = 2.0
 @export var movement_speed: float = 4.0
 @export var walking_forward_animation: String = "run"
-@export var play_animation_when_moving_backwards: bool = false
-## Global movement settings. Individual battlers can override these with custom values.
-## If a battler has custom_movement_distance > 0, it will use that instead of movement_distance_threshold.
-## Same applies to custom_movement_speed and custom_movement_animation.
 
-# Animation Dictionary System
-@export_group("Animation Dictionary", "animations")
-@export var animation_dictionary: Dictionary = {
-	"run": "Locomotion-Library/walk",  # Fixed from "run" to actual walk animation
-	"walk": "Locomotion-Library/walk",  # Added explicit walk entry
+# Battle Speed Control
+@export_group("Battle Speed Control", "speed")
+@export var speed_multiplier: float = 1.0  ## Multiplier for animation and action speeds. Hold Space to increase.
+@export var speed_key: String = "Confirm"  ## Key to hold for battle speed increase
+@export var speed_increase_amount: float = 3.0  ## How much to multiply speed (3.0 = 3x speed)
+@export var speed_is_toggle: bool = false  ## If true, press once to toggle fast forward. If false, hold to fast forward.
+var is_speed_active: bool = false
+
+# Formation positioning with proper spacing
+@export_group("Formation Spacing", "formation")
+@export_range(1.0, 8.0, 0.5) var formation_spacing: float = 3.0  ## Space between enemies in formation
+
+var animation_dictionary: Dictionary = {
+	"run": "Locomotion-Library/walk",
+	"walk": "Locomotion-Library/walk",
 	"turn_left": "Locomotion-Library/turn left", 
 	"turn_right": "Locomotion-Library/turn right",
 	"attack": "Locomotion-Library/attack1",
-	"idle": "idle1",  # Changed from idle2 to idle1
+	"idle": "idle1",  # This is the STATE MACHINE node name, not the animation name
 	"defend": "armature_stand"
 }
 ## Dictionary of animation names. Keys are animation types, values are actual animation names.
@@ -83,17 +90,25 @@ func get_animation(animation_type: String) -> String:
 	if animation_dictionary.has(animation_type):
 		return animation_dictionary[animation_type]
 	else:
-		print("Warning: Animation type '", animation_type, "' not found in dictionary, using idle1")
-		return "idle1"
+		print("Warning: Animation type '", animation_type, "' not found in dictionary. Available keys: ", animation_dictionary.keys())
+		return "idle1"  # Always fallback to idle1 state node
 
 # Helper function to calculate enemy positions based on formation
 func get_formation_position(index: int, total: int, formation: Troops.Formation, marker: Marker3D = null) -> Vector3:
 	var base_pos = marker.global_position if marker else Vector3.ZERO
-	var spacing: float = 3.0
+	var spacing: float = formation_spacing
 	
 	match formation:
 		Troops.Formation.FRONT_ROW:
-			return base_pos + Vector3(index * spacing - (total - 1) * spacing / 2.0, 0, 0)
+			# Center formation with one in middle, others on sides
+			if total == 1:
+				return base_pos
+			
+			# Calculate positions: center at 0, then alternate left/right
+			var center_index = int(total / 2.0)
+			var offset = index - center_index
+			return base_pos + Vector3(offset * spacing, 0, 0)
+			
 		Troops.Formation.TRIANGLE:
 			var row = int(sqrt(index))
 			var col = index - row * row
@@ -288,6 +303,24 @@ func _ready():
 	ActionButtons.get_node("Run").disabled = not run_toggle
 
 func _input(event: InputEvent) -> void:
+	# Handle speed key
+	if speed_is_toggle:
+		# Toggle mode - press once to toggle on/off
+		if event.is_action_pressed(speed_key):
+			is_speed_active = !is_speed_active
+			speed_multiplier = speed_increase_amount if is_speed_active else 1.0
+			print("Battle speed ", "increased" if is_speed_active else "returned to normal", ": ", speed_multiplier, "x")
+	else:
+		# Hold mode - hold key to speed up
+		if event.is_action_pressed(speed_key):
+			is_speed_active = true
+			speed_multiplier = speed_increase_amount
+			print("Battle speed increased to: ", speed_multiplier, "x")
+		elif event.is_action_released(speed_key):
+			is_speed_active = false
+			speed_multiplier = 1.0
+			print("Battle speed returned to normal")
+	
 	# Cancel is currently bound to Escape key
 	if event.is_action_pressed("Cancel"):
 		print("Pressed cancel")
@@ -413,10 +446,12 @@ func start_next_turn():
 	
 	update_hud()
 
-func player_turn(character):
-	count_allies()
-	hud.set_activebattler(character)
-	hud.show_action_buttons(character)
+func update_hud():
+	hud.update_character_info()
+	if turn_order[current_turn] in players and not is_animating:
+		hud.show_action_buttons(turn_order[current_turn])
+	else:
+		hud.hide_action_buttons()
 
 var queued_action:String
 var queued_skill:Skill
@@ -673,6 +708,12 @@ func _use_action_on_target() -> void:
 	print("Current target: ", current_target.character_name if current_target else "NULL")
 	print("Queued action: ", queued_action)
 	print("Queued skill: ", queued_skill.skill_name if queued_skill else "NULL")
+	print("Queued item: ", queued_item.item_name if queued_item else "NULL")
+	
+	if !current_target:
+		print("ERROR: No target selected!")
+		_cancel_action_target_selection()
+		return
 	
 	in_target_selection = false
 	in_menu_selection = false
@@ -687,6 +728,7 @@ func _use_action_on_target() -> void:
 					if queued_skill.applies_state:
 						current_target.apply_state(queued_skill.applies_state)
 						print("Applied %s state to %s" % [queued_skill.applies_state.state_name, current_target.character_name])
+					queued_action = ""  # Clear early for buff skills
 				else:
 					# Normal skill handling with damage
 					battler_attacking = true
@@ -702,62 +744,57 @@ func _use_action_on_target() -> void:
 		"item":
 			print("Using item on target: ", current_target.character_name)
 			current_character.battle_item(queued_item, current_target)
+			queued_action = ""  # Clear early for items
 	
-	queued_action = ""
+	# Don't clear queued_action yet for damage skills - let _on_anim_damage use it
 	queued_skill = null
 	queued_item = null
 	SignalBus.allow_select_target.emit(false)
 	end_turn()
 
 func _on_anim_damage():
-	print("=== ANIMATION DAMAGE DEBUG ===")
-	print("Current character: ", current_character.character_name if current_character else "NULL")
-	print("Current target: ", current_target.character_name if current_target else "NULL")
-	print("MANAGER: Processing animation damage")
-	if current_character and current_target:
-		var damage = current_character.get_attack_damage(current_target) # Get damage for current target
-		print("Calculated damage: ", damage, " for target: ", current_target.character_name)
-		damage_calculation(current_character, current_target, damage)
-
-func process_exp_gain(user, target):
-	if not target:
-		return
-	var exp_gained = target.get_exp_stat().get_exp_on_kill()
-	user.get_exp_stat().add_exp(exp_gained)
-	user.gain_experience(exp_gained)
-
-# Updating this just to follow pattern being used in battler_enemy
-func perform_attack(attacker:Battler, target:Battler):
-	current_target = target
-	if attacker.default_attack:
-		attacker.use_skill(attacker.default_attack, target)
-	else:
-		attacker.attack_anim(target)
-
-func perform_defend(character):
-	character.defend()
-	print("%s is defending!" % character.character_name)
-
-# Don't forget that game's also allow skill's to heal players, So use a universal term and if statements.
-func perform_skill(user:Battler, target:Battler, skill:Skill) -> void:
-	if not skill.can_use(user):
-		print("Not enough SP/HP to use skill!")
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	if not battle_manager:
+		print("ERROR: Could not find BattleManager!")
 		return
 	
-	user.use_skill(skill, target)
-	update_hud()
+	# PREVENT DOUBLE PROCESSING - only process once per action
+	if damage_processed_this_turn:
+		print("Damage already processed this turn, skipping duplicate call")
+		return
+	
+	print("=== ANIMATION DAMAGE DEBUG ===")
+	print("Current character: ", battle_manager.current_character.character_name if battle_manager.current_character else "NULL")
+	print("Current target: ", battle_manager.current_target.character_name if battle_manager.current_target else "NULL")
+	print("Queued action: ", battle_manager.queued_action)
+	print("MANAGER: Processing animation damage")
+	
+	# ONLY process damage for attack and skill actions
+	if battle_manager.current_character and battle_manager.current_target and battle_manager.queued_action in ["attack", "skill"]:
+		var damage = battle_manager.current_character.get_attack_damage(battle_manager.current_target)
+		print("Calculated damage: ", damage, " for target: ", battle_manager.current_target.character_name)
+		battle_manager.damage_calculation(battle_manager.current_character, battle_manager.current_target, damage)
+		# Mark as processed to prevent duplicate calls
+		damage_processed_this_turn = true
+	else:
+		print("Skipping damage - queued_action is: ", battle_manager.queued_action)
 
-func perform_item(user):
-	var amount = user.skill_heal()
-	heal_calculation(user, user, amount)
-
-# Loving the additions of formula's!
 func damage_calculation(attacker, target, damage):
+	# Safety check - if damage is 0, don't process
+	if damage <= 0:
+		print("Damage is 0 or negative, skipping calculation")
+		return
+	
 	damage = Formulas.physical_damage(attacker, target, damage)
 	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
-	target.take_damage(damage)
-	hud.update_health_bars()
-	update_hud()
+	
+	# Only apply if damage is still positive after calculation
+	if damage > 0:
+		target.take_damage(damage, attacker)
+		hud.update_health_bars()
+		update_hud()
+	else:
+		print("Final damage after calculation is 0 or negative, not applying")
 
 func heal_calculation(user, target, amount):
 	var healing = target.take_healing(amount)
@@ -768,6 +805,10 @@ func heal_calculation(user, target, amount):
 func enemy_turn(character:Battler) -> void:
 	print("=== ENEMY TURN ===")
 	print("Enemy character: ", character.character_name)
+	
+	# SET THESE BEFORE AI CHOOSES ACTION
+	current_character = character
+	current_battler = character
 	
 	# Get all players (allies) as targets for enemies
 	var available_targets: Array = []
@@ -799,6 +840,8 @@ func end_turn():
 		skip_turn = false
 		current_turn = (current_turn + 1) % turn_order.size()
 		is_animating = false
+		queued_action = ""
+		damage_processed_this_turn = false  # RESET THIS
 		start_next_turn()
 	else:
 		if battler_attacking:
@@ -824,14 +867,18 @@ func end_turn():
 		
 		current_turn = (current_turn + 1) % turn_order.size()
 		is_animating = false
+		queued_action = ""
+		damage_processed_this_turn = false  # RESET THIS
+		
+		# Add small delay that respects speed multiplier
+		await get_tree().create_timer(0.2 / speed_multiplier).timeout
 		start_next_turn()
 
-func update_hud():
-	hud.update_character_info()
-	if turn_order[current_turn] in players and not is_animating:
-		hud.show_action_buttons(turn_order[current_turn])
-	else:
-		hud.hide_action_buttons()
+func player_turn(character):
+	count_allies()
+	hud.set_activebattler(character)
+	hud.show_action_buttons(character)  # Make sure HUD shows here
+	is_animating = false  # Allow player input
 
 func is_battle_over():
 	return all_defeated(players) or all_defeated(enemies)

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="State" format=3 uid="uid://weakness111"]
+
+[ext_resource type="Script" uid="uid://ck454uorrpoxa" path="res://database/states/states_template.gd" id="1_state"]
+
+[resource]
+script = ExtResource("1_state")
+state_name = "Weakness"
+state_description = "Takes 50% more damage from all sources"
+state_type = 3
+turns_active = 3
+damage_taken_multiplier = 1.5

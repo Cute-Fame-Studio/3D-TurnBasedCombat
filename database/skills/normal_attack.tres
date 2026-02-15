@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://w5n4kf04c1fp"]
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://w5n4kf04c1fp"]
 
 [ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_pveml"]
 
@@ -6,6 +6,4 @@
 script = ExtResource("1_pveml")
 skill_name = "Attack"
 description = "Basic Attack"
-base_power = 10
-critical_rate = 5
 animation_name = "attack"

@@ -55,6 +55,8 @@ var original_position: Vector3
 ## Example: Set custom_movement_speed = 1.0 for a slow character
 ## Example: Set custom_movement_animation = "my_movement_anim" for custom animation
 
+
+
 # Targeting controls
 @onready var material:Material = %Alpha_Surface.material_override
 @onready var select_outline:Shader = preload("res://assets/shaders/battler_select_shader.gdshader")
@@ -118,14 +120,16 @@ func _update_highlight() -> void:
 
 @export_group("Special Dependencies")
 @onready var basic_attack_animation = "attack"
-@onready var state_machine = $AnimationTree["parameters/playback"]
+@onready var animation_tree: AnimationTree = $AnimationTree
+@onready var anim_tree: AnimationTree = $AnimationTree
+var state_machine: AnimationNodeStateMachinePlayback
 @export var skill_node: SkillList
 @onready var skill_list: Array[Skill] = []
 @onready var exp_node: Experience = get_node("Experience")
 @export var damage_indicator_subviewport:SubViewport
-@onready var anim_tree: AnimationTree = $AnimationTree
 
-func _ready():	
+
+func _ready():
 	# Disconnect any existing connections first
 	if SignalBus.select_target.is_connected(check_select_target):
 		SignalBus.select_target.disconnect(check_select_target)
@@ -141,6 +145,13 @@ func _ready():
 	SignalBus.allow_select_target.connect(set_selectable)
 	SignalBus.hover_target.connect(check_hover_target)
 	SignalBus.clear_default_selection.connect(_clear_default_selection)
+	
+	state_machine = anim_tree.get("parameters/playback") as AnimationNodeStateMachinePlayback
+	
+	# Verify state_machine is valid
+	if not state_machine:
+		push_error("AnimationNodeStateMachinePlayback not found! Check AnimationTree setup.")
+		return
 	
 	if !default_attack:
 		default_attack = load("res://database/skills/normal_attack.tres")
@@ -332,8 +343,17 @@ func take_damage(amount: int, attacker: Battler = null) -> void:
 		damage_reduction *= 2
 		is_defending = false
 	
-	var damage_num: DamageNumber = floating_damage_num.instantiate()
 	var damage_taken = max(0, amount - damage_reduction)
+	
+	# Check for weakness state BEFORE applying damage
+	var weakness_multiplier = 1.0
+	if active_states.has("Weakness"):
+		weakness_multiplier = 1.5  # Takes 50% more damage
+		print("[WEAKNESS] %s is afflicted with weakness, damage increased by 50%%" % character_name)
+	
+	damage_taken = int(float(damage_taken) * weakness_multiplier)
+	
+	var damage_num: DamageNumber = floating_damage_num.instantiate()
 	damage_num.value = damage_taken
 	damage_indicator_subviewport.add_child(damage_num)
 	current_health -= damage_taken
@@ -343,18 +363,21 @@ func take_damage(amount: int, attacker: Battler = null) -> void:
 	
 	print("%s took %d damage. Health: %d/%d" % [character_name, damage_taken, current_health, max_health])
 	
+	# TRIGGER COUNTER IF ACTIVE
+	if attacker and active_states.has("Counter"):
+		var counter_state = active_states["Counter"] as CounterState
+		if counter_state:
+			counter_state.perform_counter(self, attacker)
+	
 	# Check if this battler is defeated and should be removed
 	if current_health <= 0 and team == TEAM.ENEMY:
 		var battle_manager = get_tree().get_first_node_in_group("battle_manager")
 		if battle_manager and battle_manager.remove_defeated_enemies:
 			print("Removing defeated enemy: ", character_name)
-			# Remove from turn order
 			if battle_manager.turn_order.has(self):
 				battle_manager.turn_order.erase(self)
-			# Remove from enemies array
 			if battle_manager.enemies.has(self):
 				battle_manager.enemies.erase(self)
-			# Remove from scene
 			call_deferred("queue_free")
 	
 	# Handle counter if we have the state
@@ -375,28 +398,9 @@ func take_healing(amount: int):
 func defend():
 	is_defending = true
 	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
-	var defend_anim = battle_manager.get_animation("defend") if battle_manager else "defend"
-	_try_animation(defend_anim)
+	# FORCE use idle1, not the dictionary
+	_try_animation("idle1")
 	print("%s is defending. Defense doubled for the next attack." % character_name)
-	
-
-func gain_experience(amount: int):
-	print("%s gained %d experience!" % [character_name, amount])
-	print("%s needs %d to level up!" % [character_name, get_exp_stat().get_exp_to_level()])
-
-func battle_run():
-	pass
-
-func battle_item(item:Item, target:Battler) -> void:
-	# TODO: Check if user can legally use this item/take this action
-	if inventory.remove_item_from_collection(item) == Inventory.Resolution.SUCCESS:
-		ItemHandler.use_item(item, target)
-	# Integrate a simple inventory system. Trying to do this alone may cause mistakes.
-
-func battle_idle():
-	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
-	var anim_name = battle_manager.get_animation("idle") if battle_manager else "idle1"
-	_try_animation(anim_name)
 
 func attack_anim(target) -> void:
 	print("PLAYER: Starting attack sequence for target: ", target.character_name)
@@ -406,8 +410,7 @@ func attack_anim(target) -> void:
 	
 	if await advance_to_target(target):
 		print("Advancing to target")
-		var forward_animation = get_tree().get_first_node_in_group("battle_manager").walking_forward_animation
-		_try_animation(forward_animation)
+		_try_animation("walk")
 		while is_advancing:
 			await get_tree().create_timer(0.016).timeout
 	
@@ -417,7 +420,6 @@ func attack_anim(target) -> void:
 	var attack_animation_name = battle_manager.get_animation("attack") if battle_manager else "attack"
 	_try_animation(attack_animation_name)
 
-
 func use_skill(skill:Skill, target) -> void:
 	if skill.can_use(self):
 		await turn_to_face_target(target)
@@ -425,7 +427,7 @@ func use_skill(skill:Skill, target) -> void:
 		if skill.effect_type == Skill.EFFECT_TYPE.DAMAGE and await advance_to_target(target):
 			await get_tree().create_timer(0.1).timeout
 			while is_advancing:
-				await get_tree().create_timer(0.1).timeout
+				await get_tree().create_timer(0.016).timeout
 		
 		var anim_name = skill.animation_name
 		if anim_name.is_empty():
@@ -439,6 +441,10 @@ func use_skill(skill:Skill, target) -> void:
 			Skill.EFFECT_TYPE.DAMAGE:
 				var damage = Formulas.calculate_damage(self, target, skill)
 				target.take_damage(damage, self)
+				# Apply state AFTER damage is dealt
+				if skill.applies_state and randf() * 100 <= skill.state_apply_chance:
+					print("Applying state from skill after damage: ", skill.applies_state.state_name)
+					target.apply_state(skill.applies_state)
 			Skill.EFFECT_TYPE.HEAL:
 				target.take_healing(skill.hp_delta)
 			_:
@@ -459,6 +465,11 @@ func wait_attack():
 	
 	battle_idle()
 
+func battle_idle():
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	var anim_name = battle_manager.get_animation("idle") if battle_manager else "idle1"
+	_try_animation(anim_name)
+
 # Turning animation system
 var is_turning: bool = false
 var turn_target_rotation: float
@@ -470,6 +481,9 @@ func turn_to_face_target(target: Battler) -> void:
 	if not target:
 		return
 	
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	var speed_mult = battle_manager.speed_multiplier if battle_manager else 1.0
+	
 	var direction = (target.global_position - global_position).normalized()
 	if face_away_from_target:
 		direction = -direction
@@ -480,7 +494,6 @@ func turn_to_face_target(target: Battler) -> void:
 	
 	# If angle difference is small enough, just rotate directly
 	if abs(angle_diff) < 0.1:
-		# Direct rotation
 		var new_basis = global_transform.basis
 		new_basis = new_basis.rotated(Vector3.UP, angle_diff)
 		global_transform.basis = new_basis
@@ -495,12 +508,11 @@ func turn_to_face_target(target: Battler) -> void:
 		anim_tree.set("parameters/conditions/is_turning_left", true)
 		anim_tree.set("parameters/conditions/is_turning_right", false)
 	
-	await get_tree().create_timer(0.3).timeout
+	await get_tree().create_timer(0.3 / speed_mult).timeout
 	
 	anim_tree.set("parameters/conditions/is_turning_right", false)
 	anim_tree.set("parameters/conditions/is_turning_left", false)
 	
-	# Final rotation to face target exactly
 	var new_basis = global_transform.basis
 	new_basis = new_basis.rotated(Vector3.UP, angle_diff)
 	global_transform.basis = new_basis
@@ -522,6 +534,9 @@ func advance_to_target(target: Battler) -> bool:
 	var movement_distance = custom_movement_distance if custom_movement_distance > 0 else battle_manager.movement_distance_threshold
 	var movement_speed = custom_movement_speed if custom_movement_speed > 0 else battle_manager.movement_speed
 	
+	# Apply speed multiplier from battle manager
+	movement_speed *= battle_manager.speed_multiplier
+	
 	var distance_to_target = global_position.distance_to(target.global_position)
 	if distance_to_target <= movement_distance:
 		return false
@@ -530,49 +545,17 @@ func advance_to_target(target: Battler) -> bool:
 	var direction = (target.global_position - global_position).normalized()
 	advance_target_position = target.global_position - direction * movement_distance
 	
-	# Check if moving in positive Z direction (toward enemy)
-	var moving_forward = advance_target_position.z > global_position.z
-	
 	set_advancing(true)
 	
-	# Handle backwards movement behavior
-	if not moving_forward:
-		match battle_manager.backwards_movement_behavior:
-			battle_manager.BACKWARDS_BEHAVIOR.PLAY_ANIMATION:
-				# Play animation while moving backwards
-				if battle_manager.play_animation_when_moving_backwards:
-					var forward_animation = battle_manager.walking_forward_animation
-					_try_animation(forward_animation)
-					$AnimationPlayer.speed_scale = 1.8
-					print("Started advancing backwards: from ", global_position, " to ", advance_target_position)
-			battle_manager.BACKWARDS_BEHAVIOR.INSTANT_RETURN:
-				# Instantly move without animation
-				print("Moving backwards instantly: from ", global_position, " to ", advance_target_position)
-			battle_manager.BACKWARDS_BEHAVIOR.DELAYED_RETURN:
-				# Move with a slight delay before returning
-				await get_tree().create_timer(battle_manager.backwards_return_delay).timeout
-				print("Delayed movement to: ", advance_target_position)
-	else:
-		# Forward movement - always play animation
-		var forward_animation = battle_manager.walking_forward_animation
-		_try_animation(forward_animation)
-		# Speed up animation to match movement speed
-		anim_tree.set("parameters/TimeSeek/seek_request", 0)
-		anim_tree.set("parameters/walk/blend_position", 1.0)
-		$AnimationPlayer.speed_scale = 1.8  # Speed up animation to match movement
-		print("Started advancing: from ", global_position, " to ", advance_target_position, " at speed ", movement_speed)
-		
-		# If moving forward and sync is enabled, force animation to match movement immediately
-		if sync_movement_animation_forward:
-			# Set animation playback to match movement progress
-			var movement_blend_position = 0.5  # Midway through animation
-			anim_tree.set("parameters/TimeSeek/seek_request", movement_blend_position)
-			print("Synced movement animation to forward movement")
+	# Forward movement - play walk animation
+	_try_animation("walk")
+	
+	print("Started advancing: from ", global_position, " to ", advance_target_position, " at speed ", movement_speed)
 	
 	var tween = create_tween()
+	tween.set_speed_scale(battle_manager.speed_multiplier)
 	tween.tween_property(self, "global_position", advance_target_position, 
 		global_position.distance_to(advance_target_position) / movement_speed)
-	tween.tween_callback(func(): print("Movement completed"))
 	tween.tween_callback(_on_advance_complete)
 	return true
 
@@ -581,16 +564,22 @@ func _try_animation(anim_name: String) -> bool:
 		print("Empty animation name provided")
 		return false
 	
+	if not state_machine:
+		print("ERROR: state_machine not initialized!")
+		return false
+	
 	print("Attempting to play animation: ", anim_name)
+	
+	# Just call travel directly - don't check return value
 	state_machine.travel(anim_name)
+	print("Sent travel command to state machine for: ", anim_name)
+	
+	# Always return true - trust that travel worked
 	return true
 
 func _on_advance_complete():
-	# Movement is complete, stop the advancing flag
-	# Animation tree will transition to idle via condition (is_walking == false)
 	set_advancing(false)
-	# Reset animation speed to normal
-	$AnimationPlayer.speed_scale = 1.0
+	_try_animation("idle1")
 	print("Movement completed, is_advancing set to false")
 
 func return_to_original_position():
@@ -602,11 +591,13 @@ func return_to_original_position():
 		return
 		
 	var movement_speed = custom_movement_speed if custom_movement_speed > 0 else battle_manager.movement_speed
+	movement_speed *= battle_manager.speed_multiplier
 	
 	set_advancing(true)
 	_try_animation("walk")
 	
 	var tween = create_tween()
+	tween.set_speed_scale(battle_manager.speed_multiplier)
 	tween.tween_property(self, "global_position", original_position, 
 		global_position.distance_to(original_position) / movement_speed)
 	tween.tween_callback(_on_return_complete)
@@ -614,16 +605,47 @@ func return_to_original_position():
 func _on_return_complete():
 	set_advancing(false)
 	_try_animation("idle1")
-
+	
 func get_exp_stat():
 	return exp_node
 
 # # #
-# Call methods
+# Animation Damage & Effects Application
 # # #
-func call_attack():
+## Called when animation reaches the hit point - applies damage and any attached states
+func apply_animation_effects():
 	print("PLAYER: Animation hit point reached")
 	anim_damage.emit()
+
+func call_attack():
+	# Deprecated - use apply_animation_effects() instead
+	apply_animation_effects()
+
+# In take_damage, add state application for counter:
+
+# Update the animation callback to use new name:
+func _on_anim_damage():
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	if not battle_manager:
+		print("ERROR: Could not find BattleManager!")
+		return
+	
+	print("=== ANIMATION DAMAGE DEBUG ===")
+	print("Current character: ", battle_manager.current_character.character_name if battle_manager.current_character else "NULL")
+	print("Current target: ", battle_manager.current_target.character_name if battle_manager.current_target else "NULL")
+	print("Queued action: ", battle_manager.queued_action)
+	print("MANAGER: Processing animation damage")
+	
+	# ONLY process damage for attack and skill actions
+	# AND only if we haven't already processed this action
+	if battle_manager.current_character and battle_manager.current_target and battle_manager.queued_action in ["attack", "skill"]:
+		var damage = battle_manager.current_character.get_attack_damage(battle_manager.current_target)
+		print("Calculated damage: ", damage, " for target: ", battle_manager.current_target.character_name)
+		battle_manager.damage_calculation(battle_manager.current_character, battle_manager.current_target, damage)
+		# IMMEDIATELY clear queued action to prevent double processing
+		battle_manager.queued_action = ""
+	else:
+		print("Skipping damage - action is: ", battle_manager.queued_action)
 
 # # #
 # Save System
@@ -731,10 +753,25 @@ func process_states() -> void:
 		if state.damage_per_turn != 0:
 			# Apply power multiplier and defense reduction: base_damage * power_mult * (1 - (defense / 100))
 			var defense_multiplier = max(0.1, 1.0 - (float(defense) / 100.0))
-			var actual_damage = int(state.damage_per_turn * state.power_multiplier * defense_multiplier * state.damage_reduction)
+			var actual_damage = int(state.damage_per_turn * state.power_multiplier * defense_multiplier)
 			actual_damage = max(1, actual_damage)  # Minimum 1 damage
-			take_damage(actual_damage)
-			print("[STATE] %s takes %d damage from %s (base: %d, power: %.2f, defense_mult: %.2f, reduction: %.2f)" % [character_name, actual_damage, state_name, state.damage_per_turn, state.power_multiplier, defense_multiplier, state.damage_reduction])
+			
+			# Only show damage popup for positive damage (DOT)
+			if actual_damage > 0:
+				var damage_num: DamageNumber = floating_damage_num.instantiate()
+				damage_num.value = actual_damage
+				damage_indicator_subviewport.add_child(damage_num)
+				current_health -= actual_damage
+				%BattlerHealthBar.value = current_health
+				if current_health < 0:
+					current_health = 0
+				print("[STATE] %s takes %d damage from %s (base: %d, power: %.2f, defense_mult: %.2f)" % [character_name, actual_damage, state_name, state.damage_per_turn, state.power_multiplier, defense_multiplier])
+			else:
+				# Healing state (negative damage)
+				var healing = abs(actual_damage)
+				current_health = min(current_health + healing, max_health)
+				%BattlerHealthBar.value = current_health
+				print("[STATE] %s recovers %d health from %s" % [character_name, healing, state_name])
 		
 		# Handle duration
 		if state.turns_active > 0:

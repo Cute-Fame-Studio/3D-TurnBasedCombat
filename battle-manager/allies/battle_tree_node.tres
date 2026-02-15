@@ -1,4 +1,4 @@
-[gd_resource type="AnimationNodeStateMachine" load_steps=32 format=3 uid="uid://c7waot7s0me6v"]
+[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://c7waot7s0me6v"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3rsfg"]
 animation = &"Locomotion-Library/attack1"
@@ -101,6 +101,7 @@ advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_q7yk4"]
 xfade_time = 0.2
+switch_mode = 2
 advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_kstkv"]
@@ -131,4 +132,4 @@ states/turn_right/position = Vector2(957, 100)
 states/walk/node = SubResource("AnimationNodeAnimation_4t2y6")
 states/walk/position = Vector2(85.636185, 172.91974)
 transitions = ["idle1", "run", SubResource("idle_to_walk"), "run", "turn_left", SubResource("walk_to_turn"), "run", "turn_right", SubResource("walk_to_turn"), "turn_left", "attack", SubResource("turn_to_attack"), "turn_right", "attack", SubResource("turn_to_attack"), "attack", "idle1", SubResource("AnimationNodeStateMachineTransition_bn3j8"), "idle1", "turn_right", SubResource("idle_to_turn_right"), "idle1", "turn_left", SubResource("idle_to_turn_left"), "turn_right", "idle1", SubResource("turn_to_idle"), "turn_left", "idle1", SubResource("turn_to_idle"), "idle1", "kick", SubResource("AnimationNodeStateMachineTransition_lm7ud"), "idle1", "jump", SubResource("AnimationNodeStateMachineTransition_00hc0"), "turn_left", "turn_right", SubResource("AnimationNodeStateMachineTransition_1rigw"), "turn_right", "turn_left", SubResource("AnimationNodeStateMachineTransition_xdrmx"), "turn_right", "run", SubResource("AnimationNodeStateMachineTransition_k0l0t"), "run", "idle1", SubResource("AnimationNodeStateMachineTransition_4t2y6"), "kick", "idle1", SubResource("AnimationNodeStateMachineTransition_0idrr"), "jump", "idle1", SubResource("AnimationNodeStateMachineTransition_uno5v"), "Start", "run", SubResource("AnimationNodeStateMachineTransition_e4e1w"), "idle1", "defend", SubResource("AnimationNodeStateMachineTransition_ys4go"), "defend", "idle1", SubResource("AnimationNodeStateMachineTransition_xi3w4"), "run", "walk", SubResource("AnimationNodeStateMachineTransition_1heaf"), "walk", "run", SubResource("AnimationNodeStateMachineTransition_q7yk4"), "walk", "idle1", SubResource("AnimationNodeStateMachineTransition_kstkv")]
-graph_offset = Vector2(-23.36382, -30.014421)
+graph_offset = Vector2(-334.36212, 119.6646)

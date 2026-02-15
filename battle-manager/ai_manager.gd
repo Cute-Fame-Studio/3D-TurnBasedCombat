@@ -8,31 +8,43 @@ extends Node
 
 
 # Pulled from Enemy (deprecated/removed class)
-func choose_action(this:Battler, opposing_team:Array, _ally_team:Array, battle_manager:BattleManager) -> void:
-	battle_manager.current_battler = this
-	match this.ai_type:
+func choose_action(character:Battler, available_targets: Array, all_enemies: Array, battle_manager:BattleManager):
+	print("=== AI TARGET SELECTION ===")
+	print("AI Character: ", character.character_name)
+	print("AI Intelligence: ", character.intelligence)
+	print("Available targets: ", available_targets.size())
+	for target in available_targets:
+		if target is Battler:
+			print("  - ", target.character_name, " (HP: ", target.current_health, "/", target.max_health, ")")
+	
+	# Choose action based on AI type
+	match character.ai_type:
 		Battler.AIType.AGGRESSIVE:
-			aggressive_action(this, opposing_team, battle_manager)
+			aggressive_action(character, available_targets, battle_manager)
 		Battler.AIType.DEFENSIVE:
-			defensive_action(this, opposing_team, battle_manager)
+			defensive_action(character, available_targets, battle_manager)
+		_:
+			aggressive_action(character, available_targets, battle_manager)
 
-func aggressive_action(this:Battler, players: Array, battle_manager:BattleManager):
-	var target = choose_target(this, players)
+func aggressive_action(character:Battler, players: Array, battle_manager:BattleManager):
+	var target = choose_target(character, players)
 	if target:
 		battle_manager.current_target = target
+		battle_manager.current_character = character
+		battle_manager.queued_action = "attack"  # SET THIS!
 		battle_manager.battler_attacking = true
-		this.attack_anim(target)
+		character.attack_anim(target)
 
-func defensive_action(this:Battler, players: Array, battle_manager:BattleManager):
-	if float(this.current_health) / this.max_health < 0.3:
-		this.defend()
+func defensive_action(character:Battler, players: Array, battle_manager:BattleManager):
+	if float(character.current_health) / character.max_health < 0.3:
+		character.defend()
 	else:
-		aggressive_action(this, players, battle_manager)
+		aggressive_action(character, players, battle_manager)
 
-func choose_target(this:Battler, targets: Array) -> Node:
+func choose_target(character:Battler, targets: Array) -> Node:
 	print("=== AI TARGET SELECTION ===")
-	print("AI Character: ", this.character_name)
-	print("AI Intelligence: ", this.intelligence)
+	print("AI Character: ", character.character_name)
+	print("AI Intelligence: ", character.intelligence)
 	print("Available targets: ", targets.size())
 	for target in targets:
 		if target is Battler:
@@ -41,7 +53,7 @@ func choose_target(this:Battler, targets: Array) -> Node:
 	# Filter out defeated targets
 	var valid_targets = []
 	for target:Battler in targets:
-		if target != this and !target.is_defeated():
+		if target != character and !target.is_defeated():
 			valid_targets.append(target)
 	
 	if valid_targets.is_empty():
@@ -49,7 +61,7 @@ func choose_target(this:Battler, targets: Array) -> Node:
 		return null
 	
 	# Use intelligence to determine targeting strategy
-	var intelligence = this.intelligence
+	var intelligence = character.intelligence
 	var rand_value = randi() % 100
 	
 	print("Random value: ", rand_value, " vs Intelligence: ", intelligence)

@@ -1,6 +1,6 @@
-[gd_scene load_steps=16 format=3 uid="uid://b56ncgnrwugct"]
+[gd_scene format=3 uid="uid://b56ncgnrwugct"]
 
-[ext_resource type="PackedScene" uid="uid://bcqxqucgohr4x" path="res://battle-manager/allies/y_bot-ally.tscn" id="1_2aqym"]
+[ext_resource type="PackedScene" uid="uid://b8ggpluijlogu" path="res://battle-manager/allies/y_bot-ally.scn" id="1_2aqym"]
 [ext_resource type="PackedScene" uid="uid://bvhah4cfn4txb" path="res://battle-manager/BattleManager.tscn" id="1_t14x8"]
 [ext_resource type="Resource" uid="uid://d0noky2jlhk4u" path="res://database/troops/test_troop.tres" id="3_yxp8s"]
 [ext_resource type="Resource" uid="uid://w5n4kf04c1fp" path="res://database/skills/normal_attack.tres" id="4_q6nlu"]
@@ -51,50 +51,53 @@ SubResource("Resource_fa7uu"): 3
 })
 metadata/_custom_type_script = "uid://c2j4t3rigq4gk"
 
-[node name="Battle-Manager" instance=ExtResource("1_t14x8")]
+[node name="Battle-Manager" unique_id=241725287 instance=ExtResource("1_t14x8")]
 default_attack = ExtResource("4_q6nlu")
 mouse_input_toggle = false
+speed_key = "Tab"
+speed_increase_amount = 2.0
+speed_is_toggle = true
 active_troop = ExtResource("3_yxp8s")
 
 [node name="Control" parent="BattleHUD" index="0"]
 mouse_filter = 1
 
-[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats2" index="2"]
+[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats2" index="2" unique_id=1891800953]
 layout_mode = 2
 
-[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats3" index="2"]
+[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats3" index="2" unique_id=790602087]
 layout_mode = 2
 
-[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats4" index="2"]
+[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats4" index="2" unique_id=1668325989]
 layout_mode = 2
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." index="1"]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." index="1" unique_id=1830630196]
 environment = SubResource("Environment_misr6")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" index="0"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" index="0" unique_id=1312529796]
 transform = Transform3D(1, 0, 0, 0, 0.0715845, 0.997435, 0, -0.997435, 0.0715845, 0, 17.7598, 0)
 light_energy = 1.646
 shadow_enabled = true
 
-[node name="Platform" type="CSGBox3D" parent="." index="2"]
+[node name="Platform" type="CSGBox3D" parent="." index="2" unique_id=716479702]
 use_collision = true
 size = Vector3(100, 0.5, 100)
 material = SubResource("StandardMaterial3D_3fc4g")
 
-[node name="Ally1" parent="." index="3" instance=ExtResource("1_2aqym")]
+[node name="Ally1" parent="." index="3" unique_id=306467406 instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.260986, -1.00599)
 stats = SubResource("Resource_yxp8s")
 inventory = SubResource("Resource_4yi8j")
 
-[node name="Ally2" parent="." index="4" instance=ExtResource("1_2aqym")]
+[node name="Ally2" parent="." index="4" unique_id=1684378736 instance=ExtResource("1_2aqym")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.260986, -1.00599)
 stats = SubResource("Resource_yxp8s")
 inventory = SubResource("Resource_4yi8j")
 
-[node name="Camera3D" type="Camera3D" parent="." index="5"]
+[node name="Camera3D" type="Camera3D" parent="." index="5" unique_id=1327336196]
 transform = Transform3D(-0.730587, -0.228461, 0.643466, -0.0331128, 0.953111, 0.300804, -0.682016, 0.198457, -0.703896, 2.48554, 3.00572, -3.08627)
 
-[node name="FRONTROW" type="Marker3D" parent="." index="6" groups=["FRONTROW"]]
+[node name="FRONTROW" type="Marker3D" parent="." index="6" unique_id=952362055 groups=["FRONTROW"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 3)
 
 [editable path="BattleHUD"]

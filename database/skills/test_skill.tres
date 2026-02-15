@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://dgjjcfpn4opfv"]
+
+[ext_resource type="Resource" path="res://database/states/weakness.tres" id="1_id45u"]
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_ssnf4"]
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_udlog"]
+
+[resource]
+script = ExtResource("1_ssnf4")
+skill_name = "Test"
+skill_color = "red"
+skill_tags = "magic,projectile"
+icon = SubResource("NoiseTexture3D_udlog")
+element = 5
+animation_name = "attack"
+applies_state = ExtResource("1_id45u")

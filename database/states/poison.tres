@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="State" format=3 uid="uid://poison123"]
+
+[ext_resource type="Script" uid="uid://ck454uorrpoxa" path="res://database/states/states_template.gd" id="1_state"]
+
+[resource]
+script = ExtResource("1_state")
+state_name = "Poison"
+state_description = "Deals 5-8 damage per turn"
+state_type = 0
+damage_per_turn = 6
+power_multiplier = 1.0
+turns_active = 5
+can_be_cured = true
+damage_reduction = 1.0

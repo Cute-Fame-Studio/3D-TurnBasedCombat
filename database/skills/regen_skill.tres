@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://regen_skill"]
+
+[ext_resource type="Script" uid="uid://skills" path="res://database/skills/skills_template.gd" id="1"]
+[ext_resource type="Resource" uid="uid://regen_state" path="res://database/states/regen.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+skill_name = "Regeneration"
+description = "Apply regeneration for 5 turns"
+base_power = 0
+sp_cost = 15
+hp_cost = 0
+element = 5
+target_type = 2
+effect_type = 2
+animation_name = ""
+applies_state = ExtResource("2")
+state_apply_chance = 100

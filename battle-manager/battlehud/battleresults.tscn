@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://cn21e4r3htvwd"]
+[gd_scene format=3 uid="uid://cn21e4r3htvwd"]
 
 [ext_resource type="Texture2D" uid="uid://i6v7uo8qdg1d" path="res://Placeholder.svg" id="1_23vvh"]
 [ext_resource type="Texture2D" uid="uid://desmmvfvehe3b" path="res://assets/images/icons/Asset 11.png" id="2_1ilkb"]
@@ -16,7 +16,7 @@ gradient = SubResource("Gradient_8qws1")
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 
-[node name="Control" type="Control"]
+[node name="Control" type="Control" unique_id=1064251967]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,7 +24,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=101809964]
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
@@ -32,7 +32,7 @@ offset_right = 441.0
 grow_vertical = 2
 color = Color(0.28485027, 0.2848503, 0.28485018, 0.4862745)
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="." unique_id=926764876]
 layout_mode = 1
 offset_left = 104.0
 offset_right = 326.0
@@ -42,7 +42,7 @@ text = "Battle Results"
 vertical_alignment = 3
 uppercase = true
 
-[node name="BoxContainer" type="BoxContainer" parent="."]
+[node name="BoxContainer" type="BoxContainer" parent="." unique_id=185949286]
 layout_mode = 0
 offset_top = 199.0
 offset_right = 441.0
@@ -50,22 +50,22 @@ offset_bottom = 604.0
 theme_override_constants/separation = 8
 vertical = true
 
-[node name="BoxContainer2" type="BoxContainer" parent="BoxContainer"]
+[node name="BoxContainer2" type="BoxContainer" parent="BoxContainer" unique_id=918854965]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="BoxContainer/BoxContainer2"]
+[node name="TextureRect" type="TextureRect" parent="BoxContainer/BoxContainer2" unique_id=1224725573]
 clip_contents = true
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 texture = ExtResource("1_23vvh")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="BoxContainer/BoxContainer2"]
+[node name="Label" type="Label" parent="BoxContainer/BoxContainer2" unique_id=1607595243]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Experince"
 
-[node name="Label2" type="Label" parent="BoxContainer/BoxContainer2"]
+[node name="Label2" type="Label" parent="BoxContainer/BoxContainer2" unique_id=1384968156]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 26
@@ -73,25 +73,25 @@ text = "100"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="HSeparator2" type="HSeparator" parent="BoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="BoxContainer" unique_id=1575929727]
 layout_mode = 2
 
-[node name="BoxContainer3" type="BoxContainer" parent="BoxContainer"]
+[node name="BoxContainer3" type="BoxContainer" parent="BoxContainer" unique_id=325549911]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="BoxContainer/BoxContainer3"]
+[node name="TextureRect" type="TextureRect" parent="BoxContainer/BoxContainer3" unique_id=787677525]
 clip_contents = true
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 texture = ExtResource("2_1ilkb")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="BoxContainer/BoxContainer3"]
+[node name="Label" type="Label" parent="BoxContainer/BoxContainer3" unique_id=1834932498]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Cash/Gold"
 
-[node name="Label2" type="Label" parent="BoxContainer/BoxContainer3"]
+[node name="Label2" type="Label" parent="BoxContainer/BoxContainer3" unique_id=763794316]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 26
@@ -99,191 +99,191 @@ text = "£10"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="BoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="BoxContainer" unique_id=862679731]
 layout_mode = 2
 
-[node name="BoxContainer" type="BoxContainer" parent="BoxContainer"]
+[node name="BoxContainer" type="BoxContainer" parent="BoxContainer" unique_id=1434684864]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="BoxContainer/BoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="BoxContainer/BoxContainer" unique_id=149611204]
 clip_contents = true
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 texture = SubResource("PlaceholderTexture2D_1ilkb")
 
-[node name="Label" type="Label" parent="BoxContainer/BoxContainer"]
+[node name="Label" type="Label" parent="BoxContainer/BoxContainer" unique_id=1059790508]
 layout_mode = 2
 text = "ITEMS"
 
-[node name="BoxContainer4" type="BoxContainer" parent="BoxContainer"]
+[node name="BoxContainer4" type="BoxContainer" parent="BoxContainer" unique_id=1313454935]
 layout_mode = 2
 size_flags_horizontal = 3
 theme = SubResource("Theme_1ilkb")
 alignment = 2
 vertical = true
 
-[node name="BoxContainer3" type="BoxContainer" parent="BoxContainer/BoxContainer4"]
+[node name="BoxContainer3" type="BoxContainer" parent="BoxContainer/BoxContainer4" unique_id=751518842]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer3"]
+[node name="Label" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer3" unique_id=304007906]
 layout_mode = 2
 text = "Trash"
 
-[node name="Label2" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer3"]
+[node name="Label2" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer3" unique_id=1766851469]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "X1"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="BoxContainer4" type="BoxContainer" parent="BoxContainer/BoxContainer4"]
+[node name="BoxContainer4" type="BoxContainer" parent="BoxContainer/BoxContainer4" unique_id=1250498359]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer4"]
+[node name="Label" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer4" unique_id=103611068]
 layout_mode = 2
 text = "Opened Soda"
 
-[node name="Label2" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer4"]
+[node name="Label2" type="Label" parent="BoxContainer/BoxContainer4/BoxContainer4" unique_id=2050860589]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "X1"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="HSeparator4" type="HSeparator" parent="BoxContainer"]
+[node name="HSeparator4" type="HSeparator" parent="BoxContainer" unique_id=1528624464]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="."]
+[node name="GridContainer" type="GridContainer" parent="." unique_id=2108246870]
 layout_mode = 0
 offset_left = 670.0
 offset_right = 1150.0
 offset_bottom = 126.0
 columns = 4
 
-[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer" unique_id=1153957665]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer" unique_id=2085554719]
 clip_contents = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 texture = SubResource("GradientTexture2D_xpspd")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="GridContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="GridContainer/VBoxContainer" unique_id=502651343]
 layout_mode = 2
 text = "Your Character"
 
-[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer"]
+[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer" unique_id=1645046258]
 layout_mode = 2
 value = 48.0
 rounded = true
 show_percentage = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer" unique_id=444341373]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="GridContainer/VBoxContainer/HBoxContainer"]
+[node name="Label2" type="Label" parent="GridContainer/VBoxContainer/HBoxContainer" unique_id=1770854223]
 layout_mode = 2
 text = "Lv. 20"
 
-[node name="Label3" type="Label" parent="GridContainer/VBoxContainer/HBoxContainer"]
+[node name="Label3" type="Label" parent="GridContainer/VBoxContainer/HBoxContainer" unique_id=1147163801]
 layout_mode = 2
 size_flags_horizontal = 10
 text = "X1.0"
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="GridContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="GridContainer" unique_id=853599003]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer2"]
+[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer2" unique_id=1793640389]
 clip_contents = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 texture = SubResource("GradientTexture2D_xpspd")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="GridContainer/VBoxContainer2"]
+[node name="Label" type="Label" parent="GridContainer/VBoxContainer2" unique_id=474607661]
 layout_mode = 2
 text = "Your Character"
 
-[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer2"]
+[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer2" unique_id=861753430]
 layout_mode = 2
 value = 48.0
 rounded = true
 show_percentage = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer2"]
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer2" unique_id=2001630530]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="GridContainer/VBoxContainer2/HBoxContainer"]
+[node name="Label2" type="Label" parent="GridContainer/VBoxContainer2/HBoxContainer" unique_id=1551513931]
 layout_mode = 2
 text = "Lv. 20"
 
-[node name="Label3" type="Label" parent="GridContainer/VBoxContainer2/HBoxContainer"]
+[node name="Label3" type="Label" parent="GridContainer/VBoxContainer2/HBoxContainer" unique_id=2048737323]
 layout_mode = 2
 size_flags_horizontal = 10
 text = "X1.0"
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="GridContainer"]
+[node name="VBoxContainer3" type="VBoxContainer" parent="GridContainer" unique_id=1617397137]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer3"]
+[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer3" unique_id=635631788]
 clip_contents = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 texture = SubResource("GradientTexture2D_xpspd")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="GridContainer/VBoxContainer3"]
+[node name="Label" type="Label" parent="GridContainer/VBoxContainer3" unique_id=1977768415]
 layout_mode = 2
 text = "Your Character"
 
-[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer3"]
+[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer3" unique_id=1016140212]
 layout_mode = 2
 value = 48.0
 rounded = true
 show_percentage = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer3"]
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer3" unique_id=731695622]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="GridContainer/VBoxContainer3/HBoxContainer"]
+[node name="Label2" type="Label" parent="GridContainer/VBoxContainer3/HBoxContainer" unique_id=873130716]
 layout_mode = 2
 text = "Lv. 20"
 
-[node name="Label3" type="Label" parent="GridContainer/VBoxContainer3/HBoxContainer"]
+[node name="Label3" type="Label" parent="GridContainer/VBoxContainer3/HBoxContainer" unique_id=1257713976]
 layout_mode = 2
 size_flags_horizontal = 10
 text = "X1.0"
 
-[node name="VBoxContainer4" type="VBoxContainer" parent="GridContainer"]
+[node name="VBoxContainer4" type="VBoxContainer" parent="GridContainer" unique_id=1301049859]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer4"]
+[node name="TextureRect" type="TextureRect" parent="GridContainer/VBoxContainer4" unique_id=1599541614]
 clip_contents = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 texture = SubResource("GradientTexture2D_xpspd")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="GridContainer/VBoxContainer4"]
+[node name="Label" type="Label" parent="GridContainer/VBoxContainer4" unique_id=1632438892]
 layout_mode = 2
 text = "Your Character"
 
-[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer4"]
+[node name="bar" type="ProgressBar" parent="GridContainer/VBoxContainer4" unique_id=1992681188]
 layout_mode = 2
 value = 48.0
 rounded = true
 show_percentage = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer4"]
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer4" unique_id=1865729849]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="GridContainer/VBoxContainer4/HBoxContainer"]
+[node name="Label2" type="Label" parent="GridContainer/VBoxContainer4/HBoxContainer" unique_id=1420041644]
 layout_mode = 2
 text = "Lv. 20"
 
-[node name="Label3" type="Label" parent="GridContainer/VBoxContainer4/HBoxContainer"]
+[node name="Label3" type="Label" parent="GridContainer/VBoxContainer4/HBoxContainer" unique_id=421377623]
 layout_mode = 2
 size_flags_horizontal = 10
 text = "X1.0"

@@ -29,6 +29,7 @@ var current_sp: int = 100  # Add SP variables
 var max_sp: int = 100      # Add max SP
 var is_defending: bool = false
 var current_target = null
+var is_counter_stunned: bool = false  # Stunned by being hit with a counter attack
 
 # Walking animation system
 var is_advancing: bool = false
@@ -47,6 +48,10 @@ var original_position: Vector3
 @export var requires_walking: bool = true
 ## Force movement animation to sync immediately when moving toward positive Z (toward enemy)
 @export var sync_movement_animation_forward: bool = true
+## Maximum time (seconds) this battler can be stuck in advancing state before auto-return
+@export var stuck_movement_timeout: float = 5.0
+## If true, fallback damage applies if animation callback doesn't fire
+@export var allow_animation_fallback: bool = true
 ## 
 ## CUSTOM MOVEMENT SETTINGS EXPLAINED:
 ## -1.0 values mean "use the global setting from BattleManager"
@@ -127,6 +132,10 @@ var state_machine: AnimationNodeStateMachinePlayback
 @onready var skill_list: Array[Skill] = []
 @onready var exp_node: Experience = get_node("Experience")
 @export var damage_indicator_subviewport:SubViewport
+
+@export_group("Counter Stun Settings", "stun")
+## Duration (seconds) before recovering from being hit by a counter attack
+@export var counter_stun_duration: float = 1.5
 
 
 func _ready():
@@ -363,11 +372,20 @@ func take_damage(amount: int, attacker: Battler = null) -> void:
 	
 	print("%s took %d damage. Health: %d/%d" % [character_name, damage_taken, current_health, max_health])
 	
-	# TRIGGER COUNTER IF ACTIVE
+	# Turn to face attacker after being hit (for visual feedback)
+	if attacker:
+		await turn_to_face_target(attacker)
+	
+	# WAKE UP FROM SLEEP WHEN ATTACKED
+	if active_states.has("Sleep"):
+		remove_state("Sleep")
+		print("%s woke up from sleep after being hit!" % character_name)
+	
+	# TRIGGER COUNTER IF ACTIVE - await so attacker stays in place during counter
 	if attacker and active_states.has("Counter"):
 		var counter_state = active_states["Counter"] as CounterState
 		if counter_state:
-			counter_state.perform_counter(self, attacker)
+			await counter_state.perform_counter(self, attacker)
 	
 	# Check if this battler is defeated and should be removed
 	if current_health <= 0 and team == TEAM.ENEMY:
@@ -379,13 +397,6 @@ func take_damage(amount: int, attacker: Battler = null) -> void:
 			if battle_manager.enemies.has(self):
 				battle_manager.enemies.erase(self)
 			call_deferred("queue_free")
-	
-	# Handle counter if we have the state
-	if attacker and !attacker.is_defeated():
-		for state in active_states.values():
-			if state is CounterState:
-				state.perform_counter(self, attacker)
-				break
 
 func take_healing(amount: int):
 	var healing = min(amount, max_health - current_health)
@@ -397,18 +408,23 @@ func take_healing(amount: int):
 
 func defend():
 	is_defending = true
-	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
 	# FORCE use idle1, not the dictionary
 	_try_animation("idle1")
 	print("%s is defending. Defense doubled for the next attack." % character_name)
 
 func attack_anim(target) -> void:
 	print("PLAYER: Starting attack sequence for target: ", target.character_name)
+	
+	# SAFETY: Prevent self-attacks
+	if target == self:
+		print("[Safety] Prevented self-attack on ", character_name)
+		return
+	
 	current_target = target
 	
 	await turn_to_face_target(target)
 	
-	if await advance_to_target(target):
+	if advance_to_target(target):
 		print("Advancing to target")
 		_try_animation("walk")
 		while is_advancing:
@@ -419,56 +435,127 @@ func attack_anim(target) -> void:
 	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
 	var attack_animation_name = battle_manager.get_animation("attack") if battle_manager else "attack"
 	_try_animation(attack_animation_name)
+	
+	# Wait for attack animation to finish
+	await $AnimationTree.animation_finished
+	
+	# CRITICAL: Wait for damage callback and counters to complete before returning
+	# Give time for the damage callback signal and counter execution to finish
+	await get_tree().process_frame
+	await get_tree().process_frame
+	await get_tree().create_timer(0.1).timeout
+	
+	# If stunned by counter, wait before returning to position
+	if is_counter_stunned:
+		await get_tree().create_timer(counter_stun_duration).timeout
+		is_counter_stunned = false
+	
+	# NOW return to original position after damage/counter completed
+	if original_position != Vector3.ZERO:
+		return_to_original_position()
+		# Wait for return movement to complete
+		while is_advancing:
+			await get_tree().create_timer(0.1).timeout
+	
+	# Return to idle state
+	battle_idle()
 
 func use_skill(skill:Skill, target) -> void:
 	if skill.can_use(self):
+		# SAFETY: Prevent self-targeting for damage skills
+		if target == self and skill.effect_type == Skill.EFFECT_TYPE.DAMAGE:
+			print("[Safety] Prevented self-damage skill on ", character_name)
+			return
+		
 		await turn_to_face_target(target)
 		
-		if skill.effect_type == Skill.EFFECT_TYPE.DAMAGE and await advance_to_target(target):
+		# Advance to target for DAMAGE skills and BUFF/DEBUFF skills targeting enemies
+		var should_advance = false
+		if skill.effect_type == Skill.EFFECT_TYPE.DAMAGE:
+			should_advance = true
+		elif skill.effect_type == Skill.EFFECT_TYPE.BUFF and target != self and target.team == TEAM.ENEMY:
+			# BUFF skills on enemies (debuffs) should advance, but not on allies
+			should_advance = true
+		
+		if should_advance and advance_to_target(target):
 			await get_tree().create_timer(0.1).timeout
 			while is_advancing:
 				await get_tree().create_timer(0.016).timeout
 		
 		var anim_name = skill.animation_name
+		# Skills use their own animations, not the global dictionary
 		if anim_name.is_empty():
-			var battle_manager = get_tree().get_first_node_in_group("battle_manager")
-			anim_name = battle_manager.get_animation("attack") if battle_manager else "attack"
+			anim_name = "attack"  # Default to attack for all skill types
 		
 		_try_animation(anim_name)
 		skill.apply_costs(self)
 		
 		match skill.effect_type:
 			Skill.EFFECT_TYPE.DAMAGE:
-				var damage = Formulas.calculate_damage(self, target, skill)
-				target.take_damage(damage, self)
-				# Apply state AFTER damage is dealt
-				if skill.applies_state and randf() * 100 <= skill.state_apply_chance:
-					print("Applying state from skill after damage: ", skill.applies_state.state_name)
-					target.apply_state(skill.applies_state)
+				# Damage is applied via animation callback (_on_anim_damage)
+				# Just wait for the animation to finish
+				await $AnimationTree.animation_finished
 			Skill.EFFECT_TYPE.HEAL:
 				target.take_healing(skill.hp_delta)
+				# Apply state if present (healing with state effect)
+				if skill.applies_state and randf() * 100 <= skill.state_apply_chance:
+					target.apply_state(skill.applies_state)
+				# Wait for animation
+				await $AnimationTree.animation_finished
+			Skill.EFFECT_TYPE.BUFF:
+				# State-only skill: just apply the state, no damage
+				if skill.applies_state:
+					print("Applying state: ", skill.applies_state.state_name, " to ", target.character_name)
+					if randf() * 100 <= skill.state_apply_chance:
+						target.apply_state(skill.applies_state)
+					else:
+						print("State application missed! (", skill.state_apply_chance, "% chance)")
+				else:
+					print("ERROR: BUFF skill has no applies_state set!")
+				# Wait for animation
+				await $AnimationTree.animation_finished
 			_:
 				pass
+		
+		# CRITICAL: Wait for damage callback and counters to complete before returning
+		# Give time for the damage callback signal and counter execution to finish
+		await get_tree().process_frame
+		await get_tree().process_frame
+		await get_tree().create_timer(0.1).timeout
+		
+		# NOW return to original position after damage/counter completed
+		if original_position != Vector3.ZERO:
+			return_to_original_position()
+			# Wait for return movement to complete
+			while is_advancing:
+				await get_tree().create_timer(0.1).timeout
+		
+		# Return to idle state
+		battle_idle()
 
 func wait_attack():
 	if self.is_defending:
 		return
 	await $AnimationTree.animation_finished
 	
-	# If we advanced to attack, wait for return movement to complete
-	if original_position != Vector3.ZERO and not is_advancing:
-		# Start return movement if not already started
+	# If we advanced to attack, return to original position
+	if original_position != Vector3.ZERO:
 		return_to_original_position()
 		# Wait for return movement to complete
 		while is_advancing:
 			await get_tree().create_timer(0.1).timeout
 	
+	# Always end in idle state
 	battle_idle()
 
 func battle_idle():
 	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
 	var anim_name = battle_manager.get_animation("idle") if battle_manager else "idle1"
 	_try_animation(anim_name)
+	# Clear any lingering animation conditions
+	anim_tree.set("parameters/conditions/is_walking", false)
+	anim_tree.set("parameters/conditions/is_turning", false)
+	anim_tree.set("parameters/conditions/is_attacking", false)
 
 # Turning animation system
 var is_turning: bool = false
@@ -513,9 +600,9 @@ func turn_to_face_target(target: Battler) -> void:
 	anim_tree.set("parameters/conditions/is_turning_right", false)
 	anim_tree.set("parameters/conditions/is_turning_left", false)
 	
-	var new_basis = global_transform.basis
-	new_basis = new_basis.rotated(Vector3.UP, angle_diff)
-	global_transform.basis = new_basis
+	var final_basis = global_transform.basis
+	final_basis = final_basis.rotated(Vector3.UP, angle_diff)
+	global_transform.basis = final_basis
 	
 	is_turning = false
 
@@ -529,6 +616,11 @@ func advance_to_target(target: Battler) -> bool:
 		return false
 		
 	if not battle_manager.enable_movement_to_target or not requires_walking:
+		return false
+	
+	# SAFETY: Prevent overlapping advances
+	if is_advancing:
+		print("[Safety] Movement already in progress on ", character_name)
 		return false
 		
 	var movement_distance = custom_movement_distance if custom_movement_distance > 0 else battle_manager.movement_distance_threshold
@@ -546,33 +638,26 @@ func advance_to_target(target: Battler) -> bool:
 	advance_target_position = target.global_position - direction * movement_distance
 	
 	set_advancing(true)
-	
-	# Forward movement - play walk animation
-	_try_animation("walk")
-	
-	print("Started advancing: from ", global_position, " to ", advance_target_position, " at speed ", movement_speed)
-	
 	var tween = create_tween()
 	tween.set_speed_scale(battle_manager.speed_multiplier)
 	tween.tween_property(self, "global_position", advance_target_position, 
 		global_position.distance_to(advance_target_position) / movement_speed)
 	tween.tween_callback(_on_advance_complete)
+	
+	# Start movement timeout timer
+	_start_movement_timeout()
+	
 	return true
 
 func _try_animation(anim_name: String) -> bool:
 	if not anim_name or anim_name.is_empty():
-		print("Empty animation name provided")
 		return false
 	
 	if not state_machine:
-		print("ERROR: state_machine not initialized!")
 		return false
-	
-	print("Attempting to play animation: ", anim_name)
 	
 	# Just call travel directly - don't check return value
 	state_machine.travel(anim_name)
-	print("Sent travel command to state machine for: ", anim_name)
 	
 	# Always return true - trust that travel worked
 	return true
@@ -581,6 +666,23 @@ func _on_advance_complete():
 	set_advancing(false)
 	_try_animation("idle1")
 	print("Movement completed, is_advancing set to false")
+
+## Start movement timeout to prevent stuck advancing state
+func _start_movement_timeout() -> void:
+	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+	if not battle_manager:
+		return
+	
+	var timeout = stuck_movement_timeout
+	print("[Movement Timeout] Started (%.1fs) on %s" % [timeout, character_name])
+	
+	await get_tree().create_timer(timeout / battle_manager.speed_multiplier).timeout
+	
+	# Check if still advancing (means it got stuck)
+	if is_advancing:
+		print("[Movement Timeout] WARNING: Movement stuck on %s! Force-returning." % character_name)
+		set_advancing(false)
+		return_to_original_position()
 
 func return_to_original_position():
 	if is_advancing or original_position == Vector3.ZERO:
@@ -627,25 +729,15 @@ func call_attack():
 func _on_anim_damage():
 	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
 	if not battle_manager:
-		print("ERROR: Could not find BattleManager!")
 		return
-	
-	print("=== ANIMATION DAMAGE DEBUG ===")
-	print("Current character: ", battle_manager.current_character.character_name if battle_manager.current_character else "NULL")
-	print("Current target: ", battle_manager.current_target.character_name if battle_manager.current_target else "NULL")
-	print("Queued action: ", battle_manager.queued_action)
-	print("MANAGER: Processing animation damage")
 	
 	# ONLY process damage for attack and skill actions
 	# AND only if we haven't already processed this action
 	if battle_manager.current_character and battle_manager.current_target and battle_manager.queued_action in ["attack", "skill"]:
 		var damage = battle_manager.current_character.get_attack_damage(battle_manager.current_target)
-		print("Calculated damage: ", damage, " for target: ", battle_manager.current_target.character_name)
 		battle_manager.damage_calculation(battle_manager.current_character, battle_manager.current_target, damage)
 		# IMMEDIATELY clear queued action to prevent double processing
 		battle_manager.queued_action = ""
-	else:
-		print("Skipping damage - action is: ", battle_manager.queued_action)
 
 # # #
 # Save System
@@ -735,8 +827,12 @@ var active_states: Dictionary = {}  # {state_name: State}
 func apply_state(state: State) -> void:
 	if state == null:
 		return
-	active_states[state.state_name] = state.duplicate()
-	print("[STATE] %s was afflicted with %s!" % [character_name, state.state_name])
+	var state_copy = state.duplicate()
+	# Force state_name to be set properly after duplication
+	state_copy.state_name = state.state_name
+	var key = state_copy.state_name
+	active_states[key] = state_copy
+	print("[STATE] %s was afflicted with %s!" % [character_name, key])
 
 func remove_state(state_name: String) -> void:
 	if active_states.has(state_name):

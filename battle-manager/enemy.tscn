@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bmu11p8vvo71p"]
 
 [ext_resource type="PackedScene" uid="uid://b8ggpluijlogu" path="res://battle-manager/allies/y_bot-ally.scn" id="1_yb6qq"]
-[ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://BattlerStats.gd" id="2_abxtc"]
+[ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://battle-manager/scripts/BattlerStats.gd" id="2_abxtc"]
 
 [sub_resource type="Resource" id="Resource_pggsg"]
 script = ExtResource("2_abxtc")

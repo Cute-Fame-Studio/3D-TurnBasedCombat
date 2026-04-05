@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://watermelon"]
+
+[ext_resource type="Script" uid="uid://m02b4cy78or" path="res://database/items/items_template.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+item_name = "Watermelon"
+description = "Refreshing summer watermelon. Restores 80 HP. Perfect for picnics!"
+item_tags = "fruit,healing,rare"
+base_power = 0
+critical_rate = 0
+effectiveness = 100
+element = 0
+target_type = 1
+skill_type = 0
+hp_delta = 80
+sp_delta = 0
+effect_type = "Heal"
+animation_name = ""

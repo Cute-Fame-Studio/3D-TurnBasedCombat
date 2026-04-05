@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://homing_missile"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+skill_name = "Homing Missile"
+description = "Launch a guided missile. Never misses!"
+skill_color = "red"
+skill_tags = "projectile,air,guided"
+base_power = 48
+critical_rate = 8
+hit_chance = 100
+sp_cost = 13
+element = 2
+target_type = 0
+effect_type = 0
+animation_name = "attack"

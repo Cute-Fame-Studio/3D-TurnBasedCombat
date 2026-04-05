@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://expired_milk"]
+
+[ext_resource type="Script" uid="uid://m02b4cy78or" path="res://database/items/items_template.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+item_name = "Expired Milk"
+description = "Chunky, green milk. DO NOT CONSUME. Deals 40 damage. Why would you throw this?"
+item_tags = "throwable,harmful,joke"
+base_power = 40
+critical_rate = 0
+effectiveness = 100
+element = 0
+target_type = 1
+skill_type = 1
+hp_delta = -40
+sp_delta = 0
+effect_type = "Damage"
+animation_name = ""
+is_battle_item = true

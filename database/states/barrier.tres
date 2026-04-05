@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="State" format=3 uid="uid://barrier"]
+
+[ext_resource type="Script" uid="uid://ck454uorrpoxa" path="res://database/states/states_template.gd" id="1_state"]
+
+[resource]
+script = ExtResource("1_state")
+state_name = "Barrier"
+state_description = "Protected by a mystical barrier! Takes 30% less damage for 7 turns."
+state_type = 2
+damage_per_turn = 0
+power_multiplier = 1.0
+turns_active = 7
+can_be_cured = true
+damage_taken_multiplier = 0.7

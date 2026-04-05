@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://holy_water"]
+
+[ext_resource type="Script" uid="uid://m02b4cy78or" path="res://database/items/items_template.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+item_name = "Holy Water"
+description = "Pure blessed water. Heals all allies for 40 HP. Splashes on impact!"
+item_tags = "potion,throwable,healing,magical"
+base_power = 0
+critical_rate = 0
+effectiveness = 100
+element = 5
+target_type = 0
+skill_type = 0
+hp_delta = 40
+sp_delta = 0
+effect_type = "Heal"
+animation_name = ""
+is_battle_item = true

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="State" format=3 uid="uid://blind"]
+
+[ext_resource type="Script" uid="uid://ck454uorrpoxa" path="res://database/states/states_template.gd" id="1_state"]
+
+[resource]
+script = ExtResource("1_state")
+state_name = "Blind"
+state_description = "Blinded! Cannot see targets clearly. Hit rate reduced for 4 turns."
+state_type = 3
+damage_per_turn = 0
+power_multiplier = 1.0
+hit_chance = 60.0
+turns_active = 4
+can_be_cured = true
+damage_taken_multiplier = 1.0

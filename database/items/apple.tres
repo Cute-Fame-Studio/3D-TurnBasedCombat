@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://pple"]
+
+[ext_resource type="Script" uid="uid://m02b4cy78or" path="res://database/items/items_template.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+item_name = "Apple"
+description = "A crispy red apple. Restores 30 HP."
+item_tags = "fruit,healing,common"
+hp_delta = 30
+effect_type = "Heal"

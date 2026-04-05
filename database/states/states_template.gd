@@ -13,6 +13,7 @@ enum StateType {
 @export var state_type: StateType
 @export_range(0, 100, 1) var damage_per_turn: int = 0  ## Base damage/healing per turn.
 @export_range(0.0, 2.0, 0.1) var power_multiplier: float = 1.0  ## Multiplier for state damage. Scales with attacker's attack stat.
+@export_range(0.0, 100.0, 1.0) var hit_chance: float = 100.0  ## Accuracy modifier (100 = normal, 60 = 60% hit chance). Used for Blind and accuracy debuffs.
 @export_range(-1, 99, 1) var turns_active: int = -1  ## Duration in turns. -1 means infinite until cured.
 @export var can_be_cured: bool = true  ## Whether this state can be removed by cure skills.
 @export_range(0.1, 2.0, 0.1) var damage_taken_multiplier: float = 1.0  ## Incoming damage multiplier. 1.0 = normal, 1.5 = 50% more damage, 0.5 = 50% less damage

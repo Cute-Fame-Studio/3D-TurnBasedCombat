@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://bi006s3ofd44q"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_skill"]
+[ext_resource type="Resource" uid="uid://slow" path="res://database/states/slow.tres" id="2_state"]
+
+[resource]
+script = ExtResource("1_skill")
+skill_name = "Test Slow"
+description = "TEST: Applies Slow state to test reduced attack speed"
+skill_color = "blue"
+skill_tags = "test,slow,debuff"
+sp_cost = 1
+effect_type = 2
+animation_name = "attack"
+applies_state = ExtResource("2_state")

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://test_haste"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_skill"]
+[ext_resource type="Resource" uid="uid://haste" path="res://database/states/haste.tres" id="2_state"]
+
+[resource]
+script = ExtResource("1_skill")
+skill_name = "Test Haste"
+description = "TEST: Applies Haste state to test increased attack power"
+skill_color = "gold"
+skill_tags = "test,haste,buff"
+base_power = 0
+critical_rate = 0
+hit_chance = 100
+sp_cost = 1
+element = 0
+target_type = 2
+skill_type = 0
+hp_delta = 0
+sp_delta = 0
+effect_type = 0
+animation_name = "attack"
+applies_state = ExtResource("2_state")
+state_apply_chance = 100

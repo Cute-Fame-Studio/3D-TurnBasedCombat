@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://water_blast"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+skill_name = "Water Blast"
+description = "Unleash a torrent of water at a single foe."
+skill_color = "blue"
+skill_tags = "water,magic,wave"
+base_power = 52
+critical_rate = 10
+hit_chance = 92
+sp_cost = 11
+element = 4
+target_type = 0
+effect_type = 0
+animation_name = "attack"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://berserk_rage"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+skill_name = "Berserk Rage"
+description = "Enter a berserker state. Damage increases but accuracy decreases for 4 turns!"
+skill_color = "red"
+skill_tags = "buff,self,powerful"
+base_power = 0
+critical_rate = 0
+hit_chance = 100
+sp_cost = 8
+element = 0
+target_type = 4
+skill_type = 0
+effect_type = 2
+animation_name = "attack"

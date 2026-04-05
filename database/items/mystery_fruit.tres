@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://mystery_fruit"]
+
+[ext_resource type="Script" uid="uid://m02b4cy78or" path="res://database/items/items_template.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+item_name = "Mystery Fruit"
+description = "An unidentifiable fruit. Could heal you... or hurt you. 50/50 odds!"
+item_tags = "fruit,throwable,random,joke"
+base_power = 50
+critical_rate = 50
+effectiveness = 100
+element = 6
+target_type = 1
+skill_type = 0
+hp_delta = 0
+sp_delta = 0
+effect_type = "Random"
+animation_name = ""
+is_battle_item = true

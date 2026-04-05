@@ -51,21 +51,28 @@ var current_battler
 @export var speed_is_toggle: bool = false  ## If true, press once to toggle fast forward. If false, hold to fast forward.
 var is_speed_active: bool = false
 
+# Turn Safety & Timeout
+@export_group("Turn Safety", "turn")
+@export var turn_timeout_seconds: float = 10.0  ## Max time a turn can take before force-advancing. Prevents soft locks.
+@export var movement_timeout_seconds: float = 5.0  ## Max time a battler can be stuck advancing before auto-return.
+var current_turn_timeout_timer: float = 0.0
+
 # Formation positioning with proper spacing
 @export_group("Formation Spacing", "formation")
 @export_range(1.0, 8.0, 0.5) var formation_spacing: float = 3.0  ## Space between enemies in formation
 
 var animation_dictionary: Dictionary = {
-	"run": "Locomotion-Library/walk",
-	"walk": "Locomotion-Library/walk",
-	"turn_left": "Locomotion-Library/turn left", 
-	"turn_right": "Locomotion-Library/turn right",
-	"attack": "Locomotion-Library/attack1",
-	"idle": "idle1",  # This is the STATE MACHINE node name, not the animation name
-	"defend": "armature_stand"
+	"run": "run",
+	"walk": "walk",
+	"turn_left": "turn_left", 
+	"turn_right": "turn_right",
+	"attack": "attack",
+	"idle": "idle1",
+	"defend": "defend"
 }
-## Dictionary of animation names. Keys are animation types, values are actual animation names.
-## This allows customization without assuming specific animation library names.
+## Dictionary of animation STATE NAMES (keys used by state_machine.travel())
+## Maps action types to their corresponding state machine states
+## NOTE: These are STATE NAMES, not animation names. The states themselves define which animation to play.
 
 # Rotation and Battle Settings
 @export_group("Battle Settings", "battle")
@@ -428,8 +435,19 @@ func start_next_turn():
 		end_battle()
 		return
 
+	# Reset turn-based flags
+	damage_processed_this_turn = false
+	current_turn_timeout_timer = 0.0
+
 	current_character = turn_order[current_turn]
 	current_battler = current_character
+	
+	# Reset counter usage for all battlers at turn start
+	for battler in turn_order:
+		if battler.active_states.has("Counter"):
+			var counter_state = battler.active_states["Counter"] as CounterState
+			if counter_state:
+				counter_state.reset_turn_usage()
 	
 	if current_character.is_defeated():
 		turn_order.erase(current_character)
@@ -456,6 +474,7 @@ func update_hud():
 var queued_action:String
 var queued_skill:Skill
 var queued_item:Item
+var current_skill_effect_type: int = 0  # Store skill type to check in damage callback
 func _on_action_selected(action: String, usable:Resource = current_character.default_attack):
 	print("=== ACTION SELECTED ===")
 	print("Action: ", action)
@@ -479,6 +498,7 @@ func _on_action_selected(action: String, usable:Resource = current_character.def
 			queued_skill = default_attack
 	if usable is Skill:
 		queued_skill = usable
+		current_skill_effect_type = queued_skill.effect_type  # Store effect type
 		print("Set queued_skill to: ", queued_skill.skill_name)
 	elif usable is Item:
 		queued_item = usable
@@ -723,24 +743,19 @@ func _use_action_on_target() -> void:
 	match queued_action:
 		"skill":
 			if queued_skill:
-				if queued_skill.effect_type == Skill.EFFECT_TYPE.BUFF:
-					# For buff skills, just apply the state without damage
-					if queued_skill.applies_state:
-						current_target.apply_state(queued_skill.applies_state)
-						print("Applied %s state to %s" % [queued_skill.applies_state.state_name, current_target.character_name])
-					queued_action = ""  # Clear early for buff skills
-				else:
-					# Normal skill handling with damage
-					battler_attacking = true
-					print("Using skill on target: ", current_target.character_name)
-					current_character.use_skill(queued_skill, current_target)
+				# Skills handle their own animation waiting via use_skill()
+				# Don't set battler_attacking since we're fully awaiting
+				print("Using skill on target: ", current_target.character_name)
+				await current_character.use_skill(queued_skill, current_target)
+				queued_action = ""  # Clear after skill completes
 		"attack":
-			battler_attacking = true
+			# Attacks also go through use_skill or attack_anim, both handle return movement
 			print("Performing attack on target: ", current_target.character_name)
 			if current_character.default_attack:
-				current_character.use_skill(current_character.default_attack, current_target)
+				await current_character.use_skill(current_character.default_attack, current_target)
 			else:
-				current_character.attack_anim(current_target)
+				await current_character.attack_anim(current_target)
+			queued_action = ""  # Clear after attack completes
 		"item":
 			print("Using item on target: ", current_target.character_name)
 			current_character.battle_item(queued_item, current_target)
@@ -767,30 +782,53 @@ func _on_anim_damage():
 	print("Current character: ", battle_manager.current_character.character_name if battle_manager.current_character else "NULL")
 	print("Current target: ", battle_manager.current_target.character_name if battle_manager.current_target else "NULL")
 	print("Queued action: ", battle_manager.queued_action)
+	print("Current skill effect type: ", battle_manager.current_skill_effect_type)
 	print("MANAGER: Processing animation damage")
 	
-	# ONLY process damage for attack and skill actions
-	if battle_manager.current_character and battle_manager.current_target and battle_manager.queued_action in ["attack", "skill"]:
+	# ONLY process damage for DAMAGE type skills, attacks, and counters
+	# Don't process for BUFF (2) or HEAL (1) skills
+	if battle_manager.current_character and battle_manager.current_target and battle_manager.queued_action in ["attack", "skill", "counter"]:
+		# Skip if this is a BUFF or HEAL skill (but not counter - counters always do damage)
+		if battle_manager.queued_action == "skill" and battle_manager.current_skill_effect_type != 0:  # 0 = DAMAGE
+			print("Skipping damage for non-damage skill (type: %d)" % battle_manager.current_skill_effect_type)
+			return
+		
 		var damage = battle_manager.current_character.get_attack_damage(battle_manager.current_target)
 		print("Calculated damage: ", damage, " for target: ", battle_manager.current_target.character_name)
-		battle_manager.damage_calculation(battle_manager.current_character, battle_manager.current_target, damage)
+		# AWAIT damage calculation so counters complete
+		await battle_manager.damage_calculation(battle_manager.current_character, battle_manager.current_target, damage)
 		# Mark as processed to prevent duplicate calls
 		damage_processed_this_turn = true
 	else:
 		print("Skipping damage - queued_action is: ", battle_manager.queued_action)
 
-func damage_calculation(attacker, target, damage):
+func damage_calculation(attacker, target, damage) -> void:
 	# Safety check - if damage is 0, don't process
 	if damage <= 0:
 		print("Damage is 0 or negative, skipping calculation")
 		return
 	
+	# CHECK HIT CHANCE from attacker's states (Blind reduces accuracy)
+	var hit_chance = 100.0
+	for state_name in attacker.active_states:
+		var state = attacker.active_states[state_name] as State
+		if state and state.hit_chance < 100.0:
+			hit_chance = state.hit_chance
+			break
+	
+	# Roll for hit
+	var roll = randf_range(0.0, 100.0)
+	if roll > hit_chance:
+		print("%s's attack misses! (rolled %.1f vs hit chance %.1f)" % [attacker.character_name, roll, hit_chance])
+		return  # Miss - no damage applied
+	
 	damage = Formulas.physical_damage(attacker, target, damage)
-	print("%s attacks %s for %d damage!" % [attacker.character_name, target.character_name, damage])
+	print("%s attacks %s for %d damage! (hit: %.1f/%.1f)" % [attacker.character_name, target.character_name, damage, hit_chance, 100.0])
 	
 	# Only apply if damage is still positive after calculation
 	if damage > 0:
-		target.take_damage(damage, attacker)
+		# AWAIT damage so counters complete before continuing
+		await target.take_damage(damage, attacker)
 		hud.update_health_bars()
 		update_hud()
 	else:
@@ -830,7 +868,8 @@ func enemy_turn(character:Battler) -> void:
 	
 	# Clear current_target before choosing new one
 	current_target = null
-	AIManager.choose_action(character, available_targets, all_enemies, self)
+	# AWAIT the AI action to complete before ending turn
+	await AIManager.choose_action(character, available_targets, all_enemies, self)
 	update_hud()
 	end_turn()
 
@@ -844,11 +883,8 @@ func end_turn():
 		damage_processed_this_turn = false  # RESET THIS
 		start_next_turn()
 	else:
-		if battler_attacking:
-			print("DEBUG: Waiting for attack animation to complete...")
-			await current_battler.wait_attack()
-			print("DEBUG: Attack animation completed")
-			battler_attacking = false
+		# All animations are now handled in _use_action_on_target with await,
+		# so we don't need to wait here
 		
 		# Process states before SP regen
 		if current_battler:
@@ -873,6 +909,25 @@ func end_turn():
 		# Add small delay that respects speed multiplier
 		await get_tree().create_timer(0.2 / speed_multiplier).timeout
 		start_next_turn()
+
+## Force turn to advance immediately (safety mechanism for stuck turns)
+func force_turn_advance() -> void:
+	print("[FORCE ADVANCE] Forcing turn to end due to timeout")
+	battler_attacking = false
+	queued_action = ""
+	end_turn()
+
+## Start the turn timeout timer to prevent soft locks
+func _start_turn_timeout() -> void:
+	current_turn_timeout_timer = turn_timeout_seconds
+	print("[Turn Timeout] Started timeout (%.1fs) for %s" % [turn_timeout_seconds, current_character.character_name if current_character else "NULL"])
+	
+	await get_tree().create_timer(turn_timeout_seconds / speed_multiplier).timeout
+	
+	# Check if we're still waiting for damage
+	if current_character and not damage_processed_this_turn:
+		print("[Turn Timeout] WARNING: Turn exceeded %.1fs without processing damage!" % turn_timeout_seconds)
+		force_turn_advance()
 
 func player_turn(character):
 	count_allies()

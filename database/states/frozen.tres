@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="State" format=3 uid="uid://fro0en"]
+
+[ext_resource type="Script" uid="uid://ck454uorrpoxa" path="res://database/states/states_template.gd" id="1_state"]
+
+[resource]
+script = ExtResource("1_state")
+state_name = "Frozen"
+state_description = "Frozen solid! Cannot act and takes ice damage for 4 turns."
+state_type = 0
+damage_per_turn = 8
+power_multiplier = 1.2
+turns_active = 4
+can_be_cured = true
+damage_taken_multiplier = 1.0

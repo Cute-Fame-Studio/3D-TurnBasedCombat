@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://plasma_burst"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+skill_name = "Plasma Burst"
+description = "Explode with burning plasma energy! Hits all enemies!"
+skill_color = "orange"
+skill_tags = "fire,magic,aoe,explosion"
+base_power = 50
+critical_rate = 10
+hit_chance = 88
+sp_cost = 20
+element = 3
+target_type = 1
+effect_type = 0
+animation_name = "attack"

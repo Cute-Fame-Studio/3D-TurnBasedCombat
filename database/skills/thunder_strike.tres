@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://thunder_strike"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+skill_name = "Thunder Strike"
+description = "Summon a lightning bolt to strike a foe."
+skill_color = "yellow"
+skill_tags = "air,magic,lightning"
+base_power = 55
+critical_rate = 12
+hit_chance = 90
+sp_cost = 12
+element = 2
+target_type = 0
+effect_type = 0
+animation_name = "attack"

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://earthquake"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+skill_name = "Earthquake"
+description = "Shake the earth and strike all enemies!"
+skill_color = "brown"
+skill_tags = "earth,magic,aoe"
+base_power = 45
+critical_rate = 5
+hit_chance = 85
+sp_cost = 18
+element = 1
+target_type = 1
+effect_type = 0
+animation_name = "attack"

@@ -8,7 +8,7 @@ extends Node
 
 
 # Pulled from Enemy (deprecated/removed class)
-func choose_action(character:Battler, available_targets: Array, all_enemies: Array, battle_manager:BattleManager):
+func choose_action(character:Battler, available_targets: Array, _all_enemies: Array, battle_manager:BattleManager) -> void:
 	print("=== AI TARGET SELECTION ===")
 	print("AI Character: ", character.character_name)
 	print("AI Intelligence: ", character.intelligence)
@@ -20,26 +20,26 @@ func choose_action(character:Battler, available_targets: Array, all_enemies: Arr
 	# Choose action based on AI type
 	match character.ai_type:
 		Battler.AIType.AGGRESSIVE:
-			aggressive_action(character, available_targets, battle_manager)
+			await aggressive_action(character, available_targets, battle_manager)
 		Battler.AIType.DEFENSIVE:
-			defensive_action(character, available_targets, battle_manager)
+			await defensive_action(character, available_targets, battle_manager)
 		_:
-			aggressive_action(character, available_targets, battle_manager)
+			await aggressive_action(character, available_targets, battle_manager)
 
-func aggressive_action(character:Battler, players: Array, battle_manager:BattleManager):
+func aggressive_action(character:Battler, players: Array, battle_manager:BattleManager) -> void:
 	var target = choose_target(character, players)
 	if target:
 		battle_manager.current_target = target
 		battle_manager.current_character = character
 		battle_manager.queued_action = "attack"  # SET THIS!
 		battle_manager.battler_attacking = true
-		character.attack_anim(target)
+		await character.attack_anim(target)
 
-func defensive_action(character:Battler, players: Array, battle_manager:BattleManager):
+func defensive_action(character:Battler, players: Array, battle_manager:BattleManager) -> void:
 	if float(character.current_health) / character.max_health < 0.3:
 		character.defend()
 	else:
-		aggressive_action(character, players, battle_manager)
+		await aggressive_action(character, players, battle_manager)
 
 func choose_target(character:Battler, targets: Array) -> Node:
 	print("=== AI TARGET SELECTION ===")

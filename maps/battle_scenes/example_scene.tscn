@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bvhah4cfn4txb" path="res://battle-manager/BattleManager.tscn" id="1_t14x8"]
 [ext_resource type="Resource" uid="uid://d0noky2jlhk4u" path="res://database/troops/test_troop.tres" id="3_yxp8s"]
 [ext_resource type="Resource" uid="uid://w5n4kf04c1fp" path="res://database/skills/normal_attack.tres" id="4_q6nlu"]
-[ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://BattlerStats.gd" id="4_xecl5"]
+[ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://battle-manager/scripts/BattlerStats.gd" id="4_xecl5"]
 [ext_resource type="Script" uid="uid://m02b4cy78or" path="res://database/items/items_template.gd" id="5_xecl5"]
 [ext_resource type="Script" uid="uid://c2j4t3rigq4gk" path="res://battle-manager/inventory/inventory.gd" id="6_yxp8s"]
 
@@ -59,7 +59,7 @@ speed_increase_amount = 2.0
 speed_is_toggle = true
 active_troop = ExtResource("3_yxp8s")
 
-[node name="Control" parent="BattleHUD" index="0"]
+[node name="Control" parent="BattleHUD" parent_id_path=PackedInt32Array(1325232602) index="0"]
 mouse_filter = 1
 
 [node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats2" index="2" unique_id=1891800953]

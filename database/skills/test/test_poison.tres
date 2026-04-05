@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://cxcpnwd8imtt1"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_skill"]
+[ext_resource type="Resource" uid="uid://poison123" path="res://database/states/poison.tres" id="2_state"]
+
+[resource]
+script = ExtResource("1_skill")
+skill_name = "Test Poison"
+description = "TEST: Applies Poison state to test damage over time"
+skill_color = "green"
+skill_tags = "test,poison,dot,debuff"
+base_power = 0
+critical_rate = 0
+hit_chance = 100
+sp_cost = 1
+hp_cost = 0
+element = 0
+target_type = 0
+skill_type = 0
+hp_delta = 0
+sp_delta = 0
+effect_type = 2
+animation_name = "attack"
+applies_state = ExtResource("2_state")
+state_apply_chance = 100

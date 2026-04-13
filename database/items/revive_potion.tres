@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://crevivepotion"]
+
+[ext_resource type="Script" uid="uid://m02b4cy78or" path="res://database/items/items_template.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+item_name = "Revival Potion"
+description = "Restores a defeated ally to life with 50% of their maximum HP."
+item_tags = "recovery,revival,potion"
+is_battle_item = true
+is_key_item = false
+is_stackable = true
+base_power = 50
+critical_rate = 0
+effectiveness = 100
+element = 5
+target_type = 1
+skill_type = 1
+hp_delta = 0
+sp_delta = 0
+effect_type = "Revive"
+animation_name = ""
+base_price = 200
+can_be_sold = true

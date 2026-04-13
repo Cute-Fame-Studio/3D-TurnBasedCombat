@@ -36,7 +36,23 @@ func aggressive_action(character:Battler, players: Array, battle_manager:BattleM
 		await character.attack_anim(target)
 
 func defensive_action(character:Battler, players: Array, battle_manager:BattleManager) -> void:
-	if float(character.current_health) / character.max_health < 0.3:
+	var health_percent = float(character.current_health) / character.max_health
+	
+	# Check if AI should use healing items (and has them)
+	if health_percent < 0.4 and character.inventory and !character.inventory.collection.is_empty():
+		var healing_item = find_best_healing_item(character.inventory)
+		if healing_item:
+			print("AI %s using healing item: %s" % [character.character_name, healing_item.item_name])
+			battle_manager.current_target = character
+			battle_manager.current_character = character
+			battle_manager.queued_action = "item"
+			battle_manager.queued_item = healing_item
+			battle_manager.battler_attacking = true
+			await character.battle_item(healing_item, character)
+			return
+	
+	# Default to defending or attacking
+	if health_percent < 0.3:
 		character.defend()
 	else:
 		await aggressive_action(character, players, battle_manager)
@@ -83,3 +99,19 @@ func get_weakest_target(targets: Array) -> Node:
 		if target != self and (weakest == null or target.current_health < weakest.current_health):
 			weakest = target
 	return weakest
+
+## Find the best healing item in inventory (prefers highest HP restore)
+func find_best_healing_item(inventory: Inventory) -> Item:
+	if not inventory or inventory.collection.is_empty():
+		return null
+	
+	var best_item: Item = null
+	var best_healing: int = 0
+	
+	for item in inventory.collection.keys():
+		if item and item.is_battle_item and item.effect_type == "Heal":
+			if item.hp_delta > best_healing:
+				best_healing = item.hp_delta
+				best_item = item
+	
+	return best_item

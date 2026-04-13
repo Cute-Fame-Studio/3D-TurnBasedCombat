@@ -1,7 +1,20 @@
 class_name BattleManager
 extends Node3D
 
-enum BattleEndCondition { WIN, DEFEAT, ESCAPE }
+## BATTLE CONFIGURATION USAGE:
+## Look for: assets/globals/battle-settings/battle_config.gd
+## 
+## How to use:
+## 1. Create a .tres file from BattleConfig resource
+## 2. Set properties in inspector (starting states, damage multipliers, difficulty, etc.)
+## 3. In your scene script BEFORE starting battle:
+##    GlobalBattleSettings.set_battle_config(your_config)
+## 4. Retrieve config after battle ends to apply effects:
+##    var config = GlobalBattleSettings.get_battle_config()
+##    # Use config.experience_multiplier, config.gold_multiplier, etc.
+## 5. Clean up: GlobalBattleSettings.clear_battle_config()
+
+enum BattleEndCondition { WIN, CUTSCENE, DEFEAT, ESCAPE }
 
 var skip_turn = false # Please please please, Change the functionality or entirely remove this down the line.
 var players: Array[Battler] = []
@@ -417,6 +430,10 @@ func target_selected(target: Battler) -> void:
 	print("Target that will be attacked: ", current_target.character_name)
 	_use_action_on_target()
 
+## The core turn loop. Called at the end of every turn and at battle start.
+## Checks win/loss conditions, skips defeated battlers, then delegates to
+## [method player_turn] or [method enemy_turn].
+## To run code every turn, add it here after the battle-over check.
 func start_next_turn():
 	# Check if battle is over before proceeding
 	if is_battle_over():
@@ -510,7 +527,10 @@ var current_default_selector: Battler = null  # Track who has the default select
 var last_selected_target: Battler = null  # Remember last target for next selection
 var keyboard_target_index: int = 0  # Track keyboard navigation position
 
-# Modify _do_target_selection to set target validity
+## Populates [member valid_targets] based on the queued skill's target type and highlights the default.
+## For multi-target skills (MULTIPLE_ENEMIES, MULTIPLE_ALLIES, ALL_TARGETS), skips manual selection
+## and calls [method _auto_select_multiple_targets] immediately.
+## Cancels back to the action menu if the skill can't be used or no valid targets exist.
 func _do_target_selection() -> void:
 	print("\n=== Starting Target Selection ===")
 	print("DEBUG: enemies array before target selection: ", enemies)
@@ -722,7 +742,9 @@ func _do_menu_selection() -> void:
 	in_menu_selection = true
 	hud.hide_action_buttons()
 
-# Modify _use_action_on_target to handle states properly
+## Executes the queued action on [member current_target] then calls [method end_turn].
+## Awaits animation completion for "attack" and "skill" so the next turn does not start
+## until the current action visually resolves. Items resolve immediately without awaiting.
 func _use_action_on_target() -> void:
 	print("=== USING ACTION ON TARGET ===")
 	print("Current target: ", current_target.character_name if current_target else "NULL")
@@ -820,6 +842,9 @@ func damage_calculation(attacker, target, damage) -> void:
 	var roll = randf_range(0.0, 100.0)
 	if roll > hit_chance:
 		print("%s's attack misses! (rolled %.1f vs hit chance %.1f)" % [attacker.character_name, roll, hit_chance])
+		# Display miss text
+		if hud and hud.battle_text_display and queued_skill:
+			hud.battle_text_display.show_miss(attacker, target, queued_skill)
 		return  # Miss - no damage applied
 	
 	damage = Formulas.physical_damage(attacker, target, damage)
@@ -831,14 +856,22 @@ func damage_calculation(attacker, target, damage) -> void:
 		await target.take_damage(damage, attacker)
 		hud.update_health_bars()
 		update_hud()
+		
+		# Display damage text with BattleAflictions
+		if hud and hud.battle_text_display and queued_skill:
+			hud.battle_text_display.show_damage(attacker, target, queued_skill, damage, false, false)
 	else:
 		print("Final damage after calculation is 0 or negative, not applying")
 
 func heal_calculation(user, target, amount):
 	var healing = target.take_healing(amount)
 	print("%s heals %s for %d health!" % [user.character_name, target.character_name, healing])
-	hud.update_health_bars()  # Add this line
+	hud.update_health_bars()
 	update_hud()
+	
+	# Display healing text with BattleAflictions
+	if hud and hud.battle_text_display and queued_skill:
+		hud.battle_text_display.show_healing(user, target, queued_skill, healing)
 
 func enemy_turn(character:Battler) -> void:
 	print("=== ENEMY TURN ===")
@@ -873,6 +906,11 @@ func enemy_turn(character:Battler) -> void:
 	update_hud()
 	end_turn()
 
+## Finalises the current turn: processes the active battler's states and SP regen,
+## cleans up defeated enemies, resets per-turn flags, advances [member current_turn],
+## then calls [method start_next_turn] after a short speed-scaled delay.
+## If [member skip_turn] is true (e.g. after a failed escape), state processing is skipped
+## and the turn advances immediately.
 var battler_attacking:bool = false
 func end_turn():
 	if skip_turn:
@@ -971,18 +1009,52 @@ func end_battle(state: BattleEndCondition = BattleEndCondition.WIN):
 	# ESCAPE always ends the battle abruptly. WIN, Will end the battle and return to normal, DEFEAT will end the battle with game over.
 	match state:
 		BattleEndCondition.ESCAPE:
-			print("cutscene will play.")
-			pass
-		BattleEndCondition.WIN:
-			hud.show_battle_result("Victory! All enemies have been defeated.")
+			print("Nobody Won - Battle Escaped.")
+			
+			# Show battle results for escape
+			show_battle_results()
+			
 			for player in players:
 				player.gain_experience(100)
+			
+			# Remove defeated enemies with tween (scale instead of modulate)
 			for enemy in enemies:
-				enemy.queue_free()
-				# Be sure to toggle Enemy's off on the scene you left.
-				get_tree().change_scene_to_file(game_map)
+				var tween = create_tween()
+				tween.set_parallel(true)
+				tween.tween_property(enemy, "position:y", enemy.position.y + 2.0, 1.0)  # Float up
+				tween.tween_property(enemy, "scale", Vector3.ZERO, 1.0)  # Shrink to nothing
+				tween.tween_callback(func(): enemy.queue_free())
+			
+			await get_tree().create_timer(1.5).timeout
+			get_tree().change_scene_to_file(game_map)
+			
+		BattleEndCondition.CUTSCENE:
+			print("cutscene will play.")
+			pass
+			
+		BattleEndCondition.WIN:
+			print("Victory! All enemies have been defeated.")
+			
+			# Show battle results screen
+			show_battle_results()
+			
+			# Award experience to players
+			for player in players:
+				player.gain_experience(100)
+			
+			# Remove defeated enemies with tween (scale instead of modulate)
+			for enemy in enemies:
+				var tween = create_tween()
+				tween.set_parallel(true)
+				tween.tween_property(enemy, "position:y", enemy.position.y + 2.0, 1.0)  # Float up
+				tween.tween_property(enemy, "scale", Vector3.ZERO, 1.0)  # Shrink to nothing
+				tween.tween_callback(func(): enemy.queue_free())
+			
+			await get_tree().create_timer(1.5).timeout
+			get_tree().change_scene_to_file(game_map)
+			
 		BattleEndCondition.DEFEAT:
-			hud.show_battle_result("Game Over. All players have been defeated.")
+			print("Game Over. All players have been defeated.")
 			hud.hide_action_buttons()
 
 func update_button_states():
@@ -1001,7 +1073,105 @@ func _apply_action_effects(target: Battler) -> void:
 				current_character.attack_anim(target)
 		"skill":
 			if queued_skill:
-				current_character.use_skill(queued_skill, target)
+				# Check if this is a revive skill
+				if queued_skill.effect_type == Skill.EFFECT_TYPE.HEAL and queued_skill.skill_name.to_lower().contains("revive"):
+					_apply_revive_action(current_character, target, queued_skill)
+				else:
+					current_character.use_skill(queued_skill, target)
 		"item":
 			if queued_item:
-				current_character.battle_item(queued_item, target)
+				# Check if this is a revive item
+				if queued_item.effect_type == "Revive":
+					_apply_revive_action(current_character, target, queued_item)
+				else:
+					current_character.battle_item(queued_item, target)
+
+## Helper function to apply revive action (skill or item)
+func _apply_revive_action(user: Battler, target: Battler, action: Resource) -> void:
+	# Check if target can be revived (is defeated)
+	if not Formulas.can_revive(target):
+		print("Target %s is not defeated, cannot revive" % target.character_name)
+		if hud and hud.battle_text_display:
+			hud.battle_text_display.text = "%s is not affected!" % target.character_name
+		return
+	
+	# Apply revive (restore to 50% health or item base_power %)
+	var hp_percent = 50
+	if action is Item:
+		hp_percent = action.base_power
+	
+	var _hp_restored = Formulas.apply_revive(target, hp_percent)
+	
+	# Update UI
+	hud.update_health_bars()
+	update_hud()
+	
+	# Update turn order if revived mid-battle
+	if not target.is_defeated() and target in turn_order:
+		print("Revived %s, turn order updated" % target.character_name)
+	
+	# Display revive text
+	if hud and hud.battle_text_display and action is Skill:
+		hud.battle_text_display.show_revive(user, target, action as Skill)
+	elif hud and hud.battle_text_display:
+		# For items, create a simple text display
+		var text = "%s revived %s!" % [user.character_name, target.character_name]
+		hud.battle_text_display.text = text
+
+## Display and populate battle results screen
+## Shows victory/defeat results and waits for player input to continue
+func show_battle_results() -> void:
+	if not hud:
+		return
+	
+	# Find the battle results scene (node is named "Results" in HUD)
+	var battle_results = hud.find_child("Results", true, false)
+	if battle_results:
+		# Populate battle results with player stats before showing
+		populate_battle_results(battle_results)
+		
+		# Make visible and fade in
+		battle_results.visible = true
+		if battle_results is CanvasItem:
+			battle_results.modulate.a = 0.0
+			
+			var tween = create_tween()
+			tween.tween_property(battle_results, "modulate:a", 1.0, 0.5)
+			await tween.finished
+		
+		# Wait for player input to continue
+		print("Battle Results shown - waiting for input...")
+		
+		# Safety check: ensure we're still in tree before awaiting
+		while is_node_alive() and not Input.is_action_just_pressed("ui_accept"):
+			await get_tree().process_frame
+		
+		if not is_node_alive():
+			print("BattleManager no longer in tree, exiting results...")
+			return
+		
+		print("Input received, continuing...")
+		
+		# Fade out when done
+		if battle_results is CanvasItem:
+			var fade_out = create_tween()
+			fade_out.tween_property(battle_results, "modulate:a", 0.0, 0.3)
+		battle_results.visible = false
+	else:
+		print("Results node not found in HUD")
+
+## Helper to check if node is still alive
+func is_node_alive() -> bool:
+	return is_instance_valid(self) and is_inside_tree()
+
+## Populate battle results with player stats and rewards
+func populate_battle_results(_results_node: Node) -> void:
+	# Update results node with battle information
+	print("Populating battle results...")
+	
+	# You can add more specific population logic here
+	# For example:
+	# - Show defeated enemies
+	# - Show experience gained per player
+	# - Show items obtained
+	# This depends on your BattleResults scene structure

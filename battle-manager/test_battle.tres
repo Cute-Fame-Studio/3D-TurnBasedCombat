@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BattleConfig" format=3 uid="uid://c3lnfadogm1ja"]
+
+[ext_resource type="Script" uid="uid://ck454uorrpoxa" path="res://database/states/states_template.gd" id="1_f5l4h"]
+[ext_resource type="Resource" uid="uid://bleed8aa" path="res://database/states/bleed.tres" id="2_8keub"]
+[ext_resource type="Script" uid="uid://bu8ww5qe5aani" path="res://assets/globals/battle-settings/battle_config.gd" id="2_qrth6"]
+
+[resource]
+script = ExtResource("2_qrth6")
+initial_ally_states = Array[ExtResource("1_f5l4h")]([ExtResource("2_8keub")])
+initial_enemy_states = Array[ExtResource("1_f5l4h")]([ExtResource("2_8keub")])
+metadata/_custom_type_script = "uid://bu8ww5qe5aani"

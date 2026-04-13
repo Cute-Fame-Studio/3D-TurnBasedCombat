@@ -77,3 +77,50 @@ static func calculate_damage(attacker:Battler, target:Battler, skill:Skill) -> i
 		_:
 			damage = max(1, int((atk-def) * (skill.base_power/50.0) * element_wheel(skill.element, target.stats.element)))
 	return damage
+
+## Check if a target can be revived
+## Returns true if target is defeated (current_health <= 0)
+static func can_revive(target: Battler) -> bool:
+	if not target:
+		return false
+	return target.is_defeated()
+
+## Revive a defeated battler with specified health percentage
+## Returns the amount of HP restored
+static func apply_revive(target: Battler, hp_percent: int = 50) -> int:
+	if not target:
+		return 0
+	
+	# Clamp percentage to 1-100
+	hp_percent = clampi(hp_percent, 1, 100)
+	
+	# Calculate HP to restore
+	var hp_restored = int(target.max_health * (hp_percent / 100.0))
+	hp_restored = maxi(hp_restored, 1)  # Minimum 1 HP
+	
+	# Apply healing
+	target.current_health = hp_restored
+	
+	print("[Revive] %s revived with %d/%d HP" % [target.character_name, target.current_health, target.max_health])
+	
+	return hp_restored
+
+## Calculate damage with difficulty scaling applied
+static func calculate_damage_with_difficulty(attacker:Battler, target:Battler, skill:Skill, is_enemy_attacker: bool = false) -> int:
+	var base_damage = calculate_damage(attacker, target, skill)
+	
+	# Apply difficulty multiplier based on whether it's player or enemy attacking
+	if is_enemy_attacker:
+		return DifficultyManager.apply_difficulty_to_damage(base_damage, "enemy_damage")
+	else:
+		return DifficultyManager.apply_difficulty_to_damage(base_damage, "player_damage")
+
+## Apply difficulty scaling to defense
+static func get_defense_with_difficulty(target: Battler, is_enemy_target: bool = false) -> float:
+	var base_defense = float(target.defense)
+	
+	if is_enemy_target:
+		var multiplier = DifficultyManager.get_difficulty_multiplier(DifficultyManager.get_active_difficulty(), "enemy_defense")
+		return base_defense * multiplier
+	
+	return base_defense

@@ -38,6 +38,9 @@ enum EFFECT_TYPE { # Rename this.
 @export var sp_delta : int = 0  # Positive for SP restore, negative for SP cost
 @export var effect_type : EFFECT_TYPE = EFFECT_TYPE.DAMAGE  # Damage, Heal, Buff, etc.
 
+## Progression
+@export var unlock_level: int = 1  ## Level at which this skill is learned
+
 ## Animation & Visuals
 @export var animation_name : String = ""
 

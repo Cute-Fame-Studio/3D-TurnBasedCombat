@@ -1,0 +1,87 @@
+[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://ctg1b4aj0r36n"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3rsfg"]
+animation = &"Locomotion-Library/attack1"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_q7yk4"]
+animation = &"armature_stand"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_f8jrq"]
+animation = &"Locomotion-Library/idle2"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gyp3t"]
+animation = &"Locomotion-Library/jump"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_qu72c"]
+animation = &"Locomotion-Library/kick1"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_shbi4"]
+animation = &"skill-animations/strong-attack"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_lxots"]
+animation = &"Locomotion-Library/walk"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="start_to_run"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="run_to_walk"]
+xfade_time = 0.2
+advance_condition = &"is_walking"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="walk_to_run"]
+xfade_time = 0.2
+advance_condition = &"stop_walking"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="run_to_attack"]
+xfade_time = 0.2
+advance_condition = &"is_attacking"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="attack_to_run"]
+xfade_time = 0.2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="run_to_skill"]
+xfade_time = 0.2
+advance_condition = &"is_attacking"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="skill_to_run"]
+xfade_time = 0.2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="run_to_defend"]
+advance_condition = &"defend"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="defend_to_run"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="run_to_kick"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="kick_to_run"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="run_to_jump"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="jump_to_run"]
+xfade_time = 0.2
+
+[resource]
+states/End/position = Vector2(1205, 100)
+states/Start/position = Vector2(50, 100)
+states/attack/node = SubResource("AnimationNodeAnimation_3rsfg")
+states/attack/position = Vector2(800, 50)
+states/defend/node = SubResource("AnimationNodeAnimation_q7yk4")
+states/defend/position = Vector2(300, 250)
+states/idle/node = SubResource("AnimationNodeAnimation_f8jrq")
+states/idle/position = Vector2(289, 100)
+states/jump/node = SubResource("AnimationNodeAnimation_gyp3t")
+states/jump/position = Vector2(550, 350)
+states/kick/node = SubResource("AnimationNodeAnimation_qu72c")
+states/kick/position = Vector2(550, 250)
+states/skill-strong-attack/node = SubResource("AnimationNodeAnimation_shbi4")
+states/skill-strong-attack/position = Vector2(800, 150)
+states/walk/node = SubResource("AnimationNodeAnimation_lxots")
+states/walk/position = Vector2(550, 100)
+transitions = ["Start", "idle", SubResource("start_to_run"), "idle", "walk", SubResource("run_to_walk"), "walk", "idle", SubResource("walk_to_run"), "idle", "attack", SubResource("run_to_attack"), "attack", "idle", SubResource("attack_to_run"), "idle", "skill-strong-attack", SubResource("run_to_skill"), "skill-strong-attack", "idle", SubResource("skill_to_run"), "idle", "defend", SubResource("run_to_defend"), "defend", "idle", SubResource("defend_to_run"), "idle", "kick", SubResource("run_to_kick"), "kick", "idle", SubResource("kick_to_run"), "idle", "jump", SubResource("run_to_jump"), "jump", "idle", SubResource("jump_to_run")]
+graph_offset = Vector2(-200, 1.1028968)

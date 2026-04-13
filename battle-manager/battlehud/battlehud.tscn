@@ -1,9 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://cyjcaceen0235"]
+[gd_scene format=3 uid="uid://cyjcaceen0235"]
 
 [ext_resource type="Script" uid="uid://835wmi7qej15" path="res://battle-manager/battlehud/battlehud.gd" id="1_0qukq"]
 [ext_resource type="Script" uid="uid://dbbsrqrispnmb" path="res://battle-manager/battlehud/battler_info.gd" id="2_64dmw"]
 [ext_resource type="Theme" uid="uid://crdk7x2bxdhob" path="res://replace/theme_test.tres" id="2_uiugx"]
+[ext_resource type="Script" uid="uid://gl487spddx3j" path="res://battle-manager/battlehud/battle_text_display.gd" id="3_btt"]
 [ext_resource type="PackedScene" uid="uid://xtvr2wp8ojvb" path="res://battle-manager/battlehud/skill-button-preset.tscn" id="4_t5sg5"]
+[ext_resource type="PackedScene" uid="uid://cn21e4r3htvwd" path="res://battle-manager/battlehud/battleresults.tscn" id="6_g4nh0"]
 
 [sub_resource type="GDScript" id="GDScript_mbt63"]
 resource_name = "EnemyStats"
@@ -50,10 +52,10 @@ func add_character(_character: Node):
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7jqjx"]
 
-[node name="BattleHUD" type="CanvasLayer" groups=["BattleHud"]]
+[node name="BattleHUD" type="CanvasLayer" unique_id=66736462 groups=["BattleHud"]]
 script = ExtResource("1_0qukq")
 
-[node name="Control" type="Control" parent="."]
+[node name="Control" type="Control" parent="." unique_id=905266182]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -62,7 +64,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_uiugx")
 
-[node name="ActionButtons" type="BoxContainer" parent="Control"]
+[node name="ActionButtons" type="BoxContainer" parent="Control" unique_id=1087849572]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -76,34 +78,34 @@ theme = ExtResource("2_uiugx")
 alignment = 2
 vertical = true
 
-[node name="Attack" type="Button" parent="Control/ActionButtons"]
+[node name="Attack" type="Button" parent="Control/ActionButtons" unique_id=253112515]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 text = "Attack
 "
 
-[node name="Skills" type="Button" parent="Control/ActionButtons"]
+[node name="Skills" type="Button" parent="Control/ActionButtons" unique_id=1944018683]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Skills"
 
-[node name="Items" type="Button" parent="Control/ActionButtons"]
+[node name="Items" type="Button" parent="Control/ActionButtons" unique_id=150334854]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Items"
 
-[node name="Defend" type="Button" parent="Control/ActionButtons"]
+[node name="Defend" type="Button" parent="Control/ActionButtons" unique_id=2109921689]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Defend"
 
-[node name="Run" type="Button" parent="Control/ActionButtons"]
+[node name="Run" type="Button" parent="Control/ActionButtons" unique_id=1887464156]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Run"
 
-[node name="Enemies" type="Control" parent="Control"]
+[node name="Enemies" type="Control" parent="Control" unique_id=163295688]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -112,7 +114,7 @@ offset_left = -212.0
 offset_bottom = 228.0
 grow_horizontal = 0
 
-[node name="AllEnemies" type="BoxContainer" parent="Control/Enemies"]
+[node name="AllEnemies" type="BoxContainer" parent="Control/Enemies" unique_id=1582774903]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -121,138 +123,148 @@ grow_horizontal = 2
 grow_vertical = 2
 vertical = true
 
-[node name="EnemyStats" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
+[node name="EnemyStats" type="VBoxContainer" parent="Control/Enemies/AllEnemies" unique_id=1936541486]
 layout_mode = 2
 script = SubResource("GDScript_mbt63")
 
-[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats"]
+[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats" unique_id=1226921246]
 layout_mode = 2
 text = "Test"
 
-[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats"]
+[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats" unique_id=1972268872]
 layout_mode = 2
 
-[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats"]
+[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats" unique_id=1443543778]
 layout_mode = 2
 
-[node name="EnemyStats2" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
+[node name="EnemyStats2" type="VBoxContainer" parent="Control/Enemies/AllEnemies" unique_id=834907052]
 visible = false
 layout_mode = 2
 script = SubResource("GDScript_djde1")
 
-[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats2"]
+[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats2" unique_id=1960495143]
 layout_mode = 2
 text = "Test"
 
-[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats2"]
+[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats2" unique_id=151162531]
 layout_mode = 2
 
-[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats2"]
+[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats2" unique_id=423628430]
 layout_mode = 2
 
-[node name="EnemyStats3" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
+[node name="EnemyStats3" type="VBoxContainer" parent="Control/Enemies/AllEnemies" unique_id=1413065645]
 visible = false
 layout_mode = 2
 script = SubResource("GDScript_mbt63")
 
-[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats3"]
+[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats3" unique_id=181842404]
 layout_mode = 2
 text = "Test"
 
-[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats3"]
+[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats3" unique_id=1906703926]
 layout_mode = 2
 
-[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats3"]
+[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats3" unique_id=549061840]
 layout_mode = 2
 
-[node name="EnemyStats4" type="VBoxContainer" parent="Control/Enemies/AllEnemies"]
+[node name="EnemyStats4" type="VBoxContainer" parent="Control/Enemies/AllEnemies" unique_id=38448121]
 visible = false
 layout_mode = 2
 script = SubResource("GDScript_djde1")
 
-[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats4"]
+[node name="EnemyNameLabel" type="Label" parent="Control/Enemies/AllEnemies/EnemyStats4" unique_id=321043939]
 layout_mode = 2
 text = "Test"
 
-[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats4"]
+[node name="EnemyHealthBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats4" unique_id=922601932]
 layout_mode = 2
 
-[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats4"]
+[node name="EnemySPBar" type="ProgressBar" parent="Control/Enemies/AllEnemies/EnemyStats4" unique_id=1016770029]
 layout_mode = 2
 
-[node name="Players" type="Control" parent="Control"]
+[node name="Players" type="Control" parent="Control" unique_id=1887976994]
 anchors_preset = 0
 offset_right = 183.0
 offset_bottom = 170.0
 
-[node name="AllAllies" type="BoxContainer" parent="Control/Players"]
+[node name="AllAllies" type="BoxContainer" parent="Control/Players" unique_id=1769589390]
 layout_mode = 0
 offset_right = 183.0
 offset_bottom = 228.0
 vertical = true
 
-[node name="AllyStats" type="VBoxContainer" parent="Control/Players/AllAllies"]
+[node name="AllyStats" type="VBoxContainer" parent="Control/Players/AllAllies" unique_id=1171218621]
 layout_mode = 2
 script = ExtResource("2_64dmw")
 
-[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats"]
+[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats" unique_id=1689654184]
 layout_mode = 2
 text = "Test"
 
-[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats"]
+[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats" unique_id=1624951378]
 layout_mode = 2
 
-[node name="PlayerSPBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats"]
+[node name="PlayerSPBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats" unique_id=1790835562]
 layout_mode = 2
 
-[node name="AllyStats2" type="VBoxContainer" parent="Control/Players/AllAllies"]
+[node name="AllyStats2" type="VBoxContainer" parent="Control/Players/AllAllies" unique_id=219571184]
 visible = false
 layout_mode = 2
 script = ExtResource("2_64dmw")
 
-[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats2"]
+[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats2" unique_id=1532537613]
 layout_mode = 2
 text = "Test"
 
-[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats2"]
+[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats2" unique_id=2052366553]
 layout_mode = 2
 
-[node name="AllyStats3" type="VBoxContainer" parent="Control/Players/AllAllies"]
+[node name="AllyStats3" type="VBoxContainer" parent="Control/Players/AllAllies" unique_id=1278126176]
 visible = false
 layout_mode = 2
 script = ExtResource("2_64dmw")
 
-[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats3"]
+[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats3" unique_id=667835542]
 layout_mode = 2
 text = "Test"
 
-[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats3"]
+[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats3" unique_id=1445137427]
 layout_mode = 2
 
-[node name="AllyStats4" type="VBoxContainer" parent="Control/Players/AllAllies"]
+[node name="AllyStats4" type="VBoxContainer" parent="Control/Players/AllAllies" unique_id=186362741]
 visible = false
 layout_mode = 2
 script = ExtResource("2_64dmw")
 
-[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats4"]
+[node name="PlayerNameLabel" type="Label" parent="Control/Players/AllAllies/AllyStats4" unique_id=463208403]
 layout_mode = 2
 text = "Test"
 
-[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats4"]
+[node name="PlayerHealthBar" type="ProgressBar" parent="Control/Players/AllAllies/AllyStats4" unique_id=1417407708]
 layout_mode = 2
 
-[node name="BattleResults" type="Control" parent="Control"]
+[node name="BattleTextDisplay" type="Control" parent="Control" unique_id=-389943844]
 anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchor_left = 0.5
+anchor_top = 0.3
+anchor_right = 0.5
+anchor_bottom = 0.3
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = 50.0
 
-[node name="BattleResultLabel" type="Label" parent="Control/BattleResults"]
-layout_mode = 0
-offset_top = 225.0
-offset_right = 1152.0
-offset_bottom = 365.0
+[node name="Text" type="RichTextLabel" parent="Control/BattleTextDisplay" unique_id=1590330011]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+script = ExtResource("3_btt")
 
-[node name="Skills" type="Control" parent="Control"]
+[node name="Skills" type="Control" parent="Control" unique_id=1762699737]
 visible = false
 layout_mode = 1
 anchors_preset = 7
@@ -266,7 +278,7 @@ offset_right = 201.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Control/Skills"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Control/Skills" unique_id=1865623431]
 clip_contents = false
 layout_mode = 1
 anchors_preset = 15
@@ -279,19 +291,19 @@ horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="BoxContainer" type="BoxContainer" parent="Control/Skills/ScrollContainer"]
+[node name="BoxContainer" type="BoxContainer" parent="Control/Skills/ScrollContainer" unique_id=1992857015]
 layout_mode = 2
 size_flags_horizontal = 3
 vertical = true
 
-[node name="SkillRow" parent="Control/Skills/ScrollContainer/BoxContainer" instance=ExtResource("4_t5sg5")]
+[node name="SkillRow" parent="Control/Skills/ScrollContainer/BoxContainer" unique_id=169852852 instance=ExtResource("4_t5sg5")]
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="SkillRow2" parent="Control/Skills/ScrollContainer/BoxContainer" instance=ExtResource("4_t5sg5")]
+[node name="SkillRow2" parent="Control/Skills/ScrollContainer/BoxContainer" unique_id=693951847 instance=ExtResource("4_t5sg5")]
 layout_mode = 2
 
-[node name="Items" type="Control" parent="Control"]
+[node name="Items" type="Control" parent="Control" unique_id=2067696712]
 visible = false
 layout_mode = 1
 anchors_preset = 7
@@ -305,7 +317,7 @@ offset_right = 201.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Control/Items"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Control/Items" unique_id=2074786861]
 clip_contents = false
 layout_mode = 1
 anchors_preset = 15
@@ -318,17 +330,21 @@ horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="BoxContainer" type="BoxContainer" parent="Control/Items/ScrollContainer"]
+[node name="BoxContainer" type="BoxContainer" parent="Control/Items/ScrollContainer" unique_id=1944414168]
 layout_mode = 2
 size_flags_horizontal = 3
 vertical = true
 
-[node name="SkillRow" parent="Control/Items/ScrollContainer/BoxContainer" instance=ExtResource("4_t5sg5")]
+[node name="SkillRow" parent="Control/Items/ScrollContainer/BoxContainer" unique_id=1032705261 instance=ExtResource("4_t5sg5")]
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="SkillRow2" parent="Control/Items/ScrollContainer/BoxContainer" instance=ExtResource("4_t5sg5")]
+[node name="SkillRow2" parent="Control/Items/ScrollContainer/BoxContainer" unique_id=599803946 instance=ExtResource("4_t5sg5")]
 layout_mode = 2
+
+[node name="Results" parent="Control" unique_id=1064251967 instance=ExtResource("6_g4nh0")]
+visible = false
+layout_mode = 1
 
 [connection signal="pressed" from="Control/ActionButtons/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="Control/ActionButtons/Skills" to="." method="_on_skills_pressed"]

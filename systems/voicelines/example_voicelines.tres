@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Voicelines" format=3 uid="uid://example_voicelines"]
+
+[ext_resource type="Script" path="res://systems/voicelines/voicelines.gd" id="1_voicelines"]
+
+[resource]
+script = ExtResource("1_voicelines")
+sound_on_battle_start = null
+sound_on_turn_start = null
+sound_on_attack = null
+sound_on_skill_use = null
+sound_on_take_damage = null
+sound_on_critical_hit = null
+sound_on_heal_received = null
+sound_on_revive = null
+sound_on_defeated = null
+sound_on_victory = null

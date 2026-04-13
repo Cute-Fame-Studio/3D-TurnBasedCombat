@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BattleConfig" format=3 uid="uid://example_battle_config"]
+
+[ext_resource type="Script" path="res://assets/globals/battle-settings/battle_config.gd" id="1_config"]
+
+[resource]
+script = ExtResource("1_config")
+battle_name = "Tutorial Battle"
+battle_description = "An easy introductory battle"
+override_difficulty = true
+difficulty = 0
+ally_damage_multiplier = 1.25
+enemy_damage_multiplier = 0.75
+ally_defense_multiplier = 1.0
+enemy_defense_multiplier = 0.85
+experience_multiplier = 1.0
+gold_multiplier = 1.0
+is_story_battle = true
+allow_escape = true

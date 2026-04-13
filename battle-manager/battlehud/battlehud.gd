@@ -13,8 +13,7 @@ signal menu_opened
 @onready var action_buttons: BoxContainer = $Control/ActionButtons
 @onready var ally_stats: BoxContainer = $Control/Players/AllAllies/AllyStats
 @onready var enemy_stats: BoxContainer = $Control/Enemies/AllEnemies/EnemyStats
-@onready var battle_result = $Control/BattleResults
-@onready var battle_result_label: Label = $Control/BattleResults/BattleResultLabel # I personally think this should be removed.
+@onready var battle_text_display: RichTextLabel = $Control/BattleTextDisplay/Text
 @onready var skill_select: Control = $Control/Skills
 @onready var item_select: Control = $Control/Items
 
@@ -35,7 +34,6 @@ func _ready():
 	print("Inside BattleHUD _ready()")
 	skill_select.visible = false
 	item_select.visible = false
-	battle_result_label.hide()
 	hide_action_buttons()
 
 	# Initialize health bars
@@ -85,10 +83,6 @@ func update_character_info():
 		ally_stats.update_player_stats(activeBattler)
 	if ally_stats.has_method("update_enemy_stats") and enemy:
 		enemy_stats.update_enemy_stats(enemy)
-
-func show_battle_result(result: String):
-	battle_result_label.text = result
-	battle_result_label.show()
 
 # Health bar update functions
 func update_player_health_bar():

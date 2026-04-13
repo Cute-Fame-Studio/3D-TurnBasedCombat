@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://creviveskill"]
+
+[ext_resource type="Script" uid="uid://c8svh8mpm0hp5" path="res://database/skills/skills_template.gd" id="1_udlog"]
+
+[resource]
+script = ExtResource("1_udlog")
+skill_name = "Revive"
+description = "Brings a defeated ally back to life with 50% of their maximum HP."
+skill_color = "magenta"
+skill_tags = "revival,magic,healing"
+base_power = 50
+critical_rate = 0
+hit_chance = 100
+sp_cost = 15
+hp_cost = 0
+element = 5
+target_type = 2
+skill_type = 1
+effect_type = 1
+animation_name = "attack"

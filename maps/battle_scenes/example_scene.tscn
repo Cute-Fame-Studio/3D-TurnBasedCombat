@@ -6,7 +6,7 @@
 [ext_resource type="Resource" uid="uid://w5n4kf04c1fp" path="res://database/skills/normal_attack.tres" id="4_q6nlu"]
 [ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://battle-manager/scripts/BattlerStats.gd" id="4_xecl5"]
 [ext_resource type="Script" uid="uid://m02b4cy78or" path="res://database/items/items_template.gd" id="5_xecl5"]
-[ext_resource type="Script" uid="uid://c2j4t3rigq4gk" path="res://battle-manager/inventory/inventory.gd" id="6_yxp8s"]
+[ext_resource type="Script" uid="uid://c2j4t3rigq4gk" path="res://inventory/inventory.gd" id="6_yxp8s"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2ddfu"]
 sky_top_color = Color(0.447336, 0.519571, 0.620102, 1)
@@ -59,16 +59,16 @@ speed_increase_amount = 2.0
 speed_is_toggle = true
 active_troop = ExtResource("3_yxp8s")
 
-[node name="Control" parent="BattleHUD" parent_id_path=PackedInt32Array(1325232602) index="0"]
+[node name="Control" parent="BattleHUD" parent_id_path=PackedInt32Array(1325232602) index="0" unique_id=905266182]
 mouse_filter = 1
 
-[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats2" index="2" unique_id=1891800953]
+[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats2" parent_id_path=PackedInt32Array(1325232602, 219571184) index="2" unique_id=1891800953]
 layout_mode = 2
 
-[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats3" index="2" unique_id=790602087]
+[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats3" parent_id_path=PackedInt32Array(1325232602, 1278126176) index="2" unique_id=790602087]
 layout_mode = 2
 
-[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats4" index="2" unique_id=1668325989]
+[node name="PlayerSPBar" type="ProgressBar" parent="BattleHUD/Control/Players/AllAllies/AllyStats4" parent_id_path=PackedInt32Array(1325232602, 186362741) index="2" unique_id=1668325989]
 layout_mode = 2
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." index="1" unique_id=1830630196]

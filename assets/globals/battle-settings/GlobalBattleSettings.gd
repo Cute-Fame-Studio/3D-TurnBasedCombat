@@ -66,6 +66,24 @@ enum Damage_Calc_Type {
 	PKMN = 0,
 	DRGNQST = 1
 }
+
+# Element colors for battle affliction text display (BBCode format)
+var element_colors = {
+	0: Color.GRAY,                    # Physical
+	1: Color.DARK_GOLDENROD,         # EARTH
+	2: Color.WHITE_SMOKE,            # AIR
+	3: Color.RED,                    # FIRE
+	4: Color.SKY_BLUE,               # WATER
+	5: Color.MAGENTA,                # MAGIC
+	6: Color.WHITE                   # NONE
+}
+
+# Battle Configuration - Set before starting a battle
+var current_battle_config: BattleConfig = null
+
+# Current difficulty for this session
+var Global_Difficulty: int = Difficulties.NORMAL
+
 # Start Functions down here.
 
 
@@ -73,3 +91,33 @@ enum Damage_Calc_Type {
 # Where they get hit first before battle.
 func set_active_battler(character):
 	activeBattler = character
+
+## Set the current battle configuration
+func set_battle_config(config: BattleConfig) -> void:
+	current_battle_config = config
+	if config:
+		print("Battle config set: ", config.battle_name)
+
+## Get the current battle configuration
+func get_battle_config() -> BattleConfig:
+	return current_battle_config
+
+## Clear battle configuration after battle ends
+func clear_battle_config() -> void:
+	if current_battle_config:
+		print("Clearing battle config: ", current_battle_config.battle_name)
+	current_battle_config = null
+
+## Explain the battle config system (for documentation)
+func explain_battle_config_usage() -> void:
+	print("\n=== BATTLE CONFIGURATION SYSTEM ===")
+	print("Script Location: Look for 'battle_config.gd' in assets/globals/battle-settings/")
+	print("Creation: Right-click in Godot file browser > New Resource > BattleConfig")
+	print("Usage:")
+	print("  1. Create a .tres file from BattleConfig resource")
+	print("  2. Configure battle properties (starting states, multipliers, difficulty, etc.)")
+	print("  3. In your scene script, call: GlobalBattleSettings.set_battle_config(your_config)")
+	print("  4. Start the battle normally")
+	print("  5. After battle, retrieve data: GlobalBattleSettings.get_battle_config()")
+	print("  6. Call clear_battle_config() when done")
+	print("==================================\n")

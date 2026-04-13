@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://dk4h2ybl5kvno"]
+
+[ext_resource type="Script" path="res://battle-manager/battlehud/battle_text_display.gd" id="1_5lk7m"]
+
+[node name="BattleTextDisplay" type="Label"]
+anchor_left = 0.5
+anchor_top = 0.3
+anchor_right = 0.5
+anchor_bottom = 0.3
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 20
+text = ""
+justify = 1
+script = ExtResource("1_5lk7m")
+show_damage_dealt = true
+show_skill_name = true
+show_weakness_indicator = true
+use_color_formatting = true
+display_duration = 2.0
+fade_duration = 0.5

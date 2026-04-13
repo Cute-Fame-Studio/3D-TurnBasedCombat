@@ -32,5 +32,9 @@ enum TARGETS_TYPES {
 @export var sp_delta : int = 0  # Positive for SP restore, negative for SP cost
 @export var effect_type : String = "Damage"  # Damage, Heal, Buff, etc.
 
+## Economy
+@export var base_price : int = 0  ## Shop/sell value
+@export var can_be_sold : bool = true  ## Whether this item can be sold
+
 ## Animation & Visuals
 @export var animation_name : String = ""

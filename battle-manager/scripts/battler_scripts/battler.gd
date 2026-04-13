@@ -177,17 +177,14 @@ func _ready():
 		character_name = stats.character_name
 		%BattlerNameLabel.text = character_name
 		
-		max_health = stats.max_health
-		current_health = max_health
+		# Apply level-focused progression (calculates stats based on level)
+		apply_level_progression()
+		
 		%BattlerHealthBar.max_value = max_health
 		%BattlerHealthBar.value = current_health
 		
-		attack = stats.attack
-		defense = stats.defense
-		agility = stats.agility
-		
 		# SP stats
-		max_sp = stats.max_sp
+		max_sp = max_sp  # Already set by apply_level_progression
 		current_sp = max_sp
 		
 		if skill_node:
@@ -637,6 +634,8 @@ func advance_to_target(target: Battler) -> bool:
 	var direction = (target.global_position - global_position).normalized()
 	advance_target_position = target.global_position - direction * movement_distance
 	
+	print("[WALK DEBUG] %s advancing toward %s - setting is_walking=true, direction=%v" % [character_name, target.character_name, direction])
+	
 	set_advancing(true)
 	var tween = create_tween()
 	tween.set_speed_scale(battle_manager.speed_multiplier)
@@ -664,7 +663,9 @@ func _try_animation(anim_name: String) -> bool:
 
 func _on_advance_complete():
 	set_advancing(false)
-	_try_animation("idle1")
+	# Force transition out of walk state - don't wait for condition
+	if state_machine:
+		state_machine.travel("idle1")
 	print("Movement completed, is_advancing set to false")
 
 ## Start movement timeout to prevent stuck advancing state
@@ -881,7 +882,66 @@ func process_states() -> void:
 
 func set_advancing(value: bool):
 	is_advancing = value
+	var tree_name = str(anim_tree.name) if anim_tree else "NO TREE"
+	print("[SET ADVANCING] %s: is_advancing=%s, setting is_walking=%s on anim_tree (%s)" % [character_name, value, value, tree_name])
 	anim_tree.set("parameters/conditions/is_walking", value)
+	if anim_tree and anim_tree.get("parameters/conditions/is_walking") != null:
+		print("[SET ADVANCING] Confirmed: is_walking is now %s" % anim_tree.get("parameters/conditions/is_walking"))
+	else:
+		print("[SET ADVANCING] WARNING: is_walking parameter does not exist on animation tree!")
 
 func set_defending(value: bool):
 	is_defending = value
+
+## LEVEL-FOCUSED PROGRESSION
+## Add experience and check for level up
+func gain_experience(amount: int) -> void:
+	if not exp_node:
+		push_error("Battler %s has no Experience node" % character_name)
+		return
+	
+	exp_node.add_exp(amount)
+	print("%s gained %d EXP" % [character_name, amount])
+	
+	# Check if level up occurred
+	while LevelProgression.check_level_up(self):
+		pass
+
+## Apply level-based stat scaling to this battler
+## Called on _ready() and after level up
+func apply_level_progression() -> void:
+	if not stats:
+		return
+	
+	# Calculate stats based on level and multipliers
+	var base_stats = {
+		"max_health": stats.max_health,
+		"max_sp": stats.max_sp,
+		"attack": stats.attack,
+		"defense": stats.defense,
+		"agility": stats.agility
+	}
+	
+	var stat_multipliers = {
+		"max_health": stats.health_multiplier,
+		"max_sp": stats.sp_multiplier,
+		"attack": stats.attack_multiplier,
+		"defense": stats.defense_multiplier,
+		"agility": stats.agility_multiplier
+	}
+	
+	# Get calculated stats at current level
+	var calculated = LevelProgression.get_stats_at_level(base_stats, stat_multipliers, stats.level)
+	
+	# Apply to battler
+	max_health = calculated["max_health"]
+	max_sp = calculated["max_sp"]
+	attack = calculated["attack"]
+	defense = calculated["defense"]
+	agility = calculated["agility"]
+	
+	# Set current health/sp to max if first time initialization
+	if current_health == 0:
+		current_health = max_health
+	if current_sp == 0:
+		current_sp = max_sp

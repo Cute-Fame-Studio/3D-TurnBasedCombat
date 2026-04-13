@@ -3,6 +3,12 @@ class_name BattlerStats
 extends Resource
 
 @export var character_name: String = "Player" ## Fill in this variable as soon as possible, This will be used when mentioning the character
+@export var thumbnail: Texture2D = preload("res://Placeholder.svg") ## Portrait shown in battle results UI.
+
+@export_group("Battle Rewards")
+@export var exp_reward: int = 100 ## EXP granted when this battler is defeated.
+@export var cash_reward: int = 10 ## Cash granted when this battler is defeated.
+@export var item_drops: Array[EnemyDrop] = [] ## Optional item drops with per-drop percentage chance (EnemyDrop resources).
 
 ## LEVEL-FOCUSED PROGRESSION SYSTEM
 ## Each battler has a level that determines their stats via multipliers

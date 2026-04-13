@@ -30,6 +30,7 @@ var max_sp: int = 100      # Add max SP
 var is_defending: bool = false
 var current_target = null
 var is_counter_stunned: bool = false  # Stunned by being hit with a counter attack
+var _is_despawning: bool = false
 
 # Walking animation system
 var is_advancing: bool = false
@@ -125,7 +126,6 @@ func _update_highlight() -> void:
 
 @export_group("Special Dependencies")
 @onready var basic_attack_animation = "attack"
-@onready var animation_tree: AnimationTree = $AnimationTree
 @onready var anim_tree: AnimationTree = $AnimationTree
 var state_machine: AnimationNodeStateMachinePlayback
 @export var skill_node: SkillList
@@ -136,6 +136,11 @@ var state_machine: AnimationNodeStateMachinePlayback
 @export_group("Counter Stun Settings", "stun")
 ## Duration (seconds) before recovering from being hit by a counter attack
 @export var counter_stun_duration: float = 1.5
+
+# Tracks the current attack animation duration so we can wait for it without
+# relying on AnimationPlayer.animation_finished (which AnimationTree blocks).
+# Set automatically inside _try_animation when an attack state is travelled to.
+var _current_attack_duration: float = 1.0
 
 
 func _ready():
@@ -216,11 +221,6 @@ func _input(event: InputEvent) -> void:
 		return
 		
 	if event.is_action_pressed("Select") and is_selectable and is_valid_target:
-		print("=== MOUSE INPUT DEBUG ===")
-		print("Battler: ", character_name)
-		print("Event: ", event)
-		print("Is selectable: ", is_selectable)
-		print("Is valid target: ", is_valid_target)
 		# Allow selection if valid target, regardless of hover state
 		select_target()
 	elif event is InputEventScreenTouch and event.pressed and is_valid_target:
@@ -237,9 +237,6 @@ func _mouse_enter() -> void:
 	if battle_manager and not battle_manager.mouse_input_toggle:
 		return
 		
-	print("=== MOUSE ENTER DEBUG ===")
-	print("Battler: ", character_name)
-	print("Is valid target: ", is_valid_target)
 	if is_valid_target:
 		has_hover(true)
 		
@@ -249,9 +246,8 @@ func _mouse_exit() -> void:
 	if battle_manager and not battle_manager.mouse_input_toggle:
 		return
 		
-	print("=== MOUSE EXIT DEBUG ===")
-	print("Battler: ", character_name)
 	has_hover(false)
+
 func has_hover(hover:bool = false) -> void:
 	# Only allow hover if this battler is a valid target
 	if hover and !is_valid_target:
@@ -284,12 +280,6 @@ func _clear_default_selection() -> void:
 		_update_highlight()
 
 func select_target() -> void:
-	print("=== TARGET SELECTION DEBUG ===")
-	print("Battler: ", character_name)
-	print("Is selectable: ", is_selectable)
-	print("Is valid target: ", is_valid_target)
-	print("Is targeted: ", is_targeted)
-	
 	# Will probably want to also add logic that prevents selecting invalid targets
 	# Clear all other selection states first
 	is_keyboard_selected = false
@@ -386,14 +376,21 @@ func take_damage(amount: int, attacker: Battler = null) -> void:
 	
 	# Check if this battler is defeated and should be removed
 	if current_health <= 0 and team == TEAM.ENEMY:
+		if _is_despawning:
+			return
+		_is_despawning = true
 		var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+		if battle_manager and battle_manager.has_method("register_enemy_defeat_reward"):
+			battle_manager.register_enemy_defeat_reward(self)
 		if battle_manager and battle_manager.remove_defeated_enemies:
 			print("Removing defeated enemy: ", character_name)
 			if battle_manager.turn_order.has(self):
 				battle_manager.turn_order.erase(self)
 			if battle_manager.enemies.has(self):
 				battle_manager.enemies.erase(self)
-			call_deferred("queue_free")
+			await _fade_and_remove()
+		else:
+			_is_despawning = false
 
 func take_healing(amount: int):
 	var healing = min(amount, max_health - current_health)
@@ -409,6 +406,8 @@ func defend():
 	_try_animation("idle1")
 	print("%s is defending. Defense doubled for the next attack." % character_name)
 
+## Switch to a different AnimationTree
+## Returns true if switch successful, false otherwise
 func attack_anim(target) -> void:
 	print("PLAYER: Starting attack sequence for target: ", target.character_name)
 	
@@ -422,7 +421,6 @@ func attack_anim(target) -> void:
 	await turn_to_face_target(target)
 	
 	if advance_to_target(target):
-		print("Advancing to target")
 		_try_animation("walk")
 		while is_advancing:
 			await get_tree().create_timer(0.016).timeout
@@ -431,10 +429,12 @@ func attack_anim(target) -> void:
 	
 	var battle_manager = get_tree().get_first_node_in_group("battle_manager")
 	var attack_animation_name = battle_manager.get_animation("attack") if battle_manager else "attack"
-	_try_animation(attack_animation_name)
+	if not _try_animation(attack_animation_name):
+		_try_animation("attack")
 	
-	# Wait for attack animation to finish
-	await $AnimationTree.animation_finished
+	# Wait for attack animation using duration read from AnimationPlayer at travel time.
+	# AnimationTree blocks AnimationPlayer.animation_finished so we use a timer instead.
+	await get_tree().create_timer(_current_attack_duration + 0.12).timeout
 	
 	# CRITICAL: Wait for damage callback and counters to complete before returning
 	# Give time for the damage callback signal and counter execution to finish
@@ -475,6 +475,7 @@ func use_skill(skill:Skill, target) -> void:
 			should_advance = true
 		
 		if should_advance and advance_to_target(target):
+			_try_animation("walk")
 			await get_tree().create_timer(0.1).timeout
 			while is_advancing:
 				await get_tree().create_timer(0.016).timeout
@@ -484,21 +485,24 @@ func use_skill(skill:Skill, target) -> void:
 		if anim_name.is_empty():
 			anim_name = "attack"  # Default to attack for all skill types
 		
-		_try_animation(anim_name)
+		if not _try_animation(anim_name):
+			# Hard fallback for damage actions: always ensure a real attack state plays.
+			if skill.effect_type == Skill.EFFECT_TYPE.DAMAGE:
+				_try_animation("attack")
 		skill.apply_costs(self)
 		
+		# Wait for animation using duration read from AnimationPlayer at travel time.
+		# AnimationTree blocks AnimationPlayer.animation_finished so we use a timer instead.
 		match skill.effect_type:
 			Skill.EFFECT_TYPE.DAMAGE:
 				# Damage is applied via animation callback (_on_anim_damage)
-				# Just wait for the animation to finish
-				await $AnimationTree.animation_finished
+				await get_tree().create_timer(_current_attack_duration + 0.12).timeout
 			Skill.EFFECT_TYPE.HEAL:
 				target.take_healing(skill.hp_delta)
 				# Apply state if present (healing with state effect)
 				if skill.applies_state and randf() * 100 <= skill.state_apply_chance:
 					target.apply_state(skill.applies_state)
-				# Wait for animation
-				await $AnimationTree.animation_finished
+				await get_tree().create_timer(_current_attack_duration).timeout
 			Skill.EFFECT_TYPE.BUFF:
 				# State-only skill: just apply the state, no damage
 				if skill.applies_state:
@@ -509,8 +513,7 @@ func use_skill(skill:Skill, target) -> void:
 						print("State application missed! (", skill.state_apply_chance, "% chance)")
 				else:
 					print("ERROR: BUFF skill has no applies_state set!")
-				# Wait for animation
-				await $AnimationTree.animation_finished
+				await get_tree().create_timer(_current_attack_duration).timeout
 			_:
 				pass
 		
@@ -533,7 +536,8 @@ func use_skill(skill:Skill, target) -> void:
 func wait_attack():
 	if self.is_defending:
 		return
-	await $AnimationTree.animation_finished
+	# Wait for attack animation using duration read from AnimationPlayer at travel time
+	await get_tree().create_timer(_current_attack_duration).timeout
 	
 	# If we advanced to attack, return to original position
 	if original_position != Vector3.ZERO:
@@ -648,24 +652,98 @@ func advance_to_target(target: Battler) -> bool:
 	
 	return true
 
+## Attempts to travel to an animation state by name.
+## For attack states inside the basic_attacks sub-machine, travels to the sub-machine
+## first then to the specific state. Also reads the animation duration from AnimationPlayer
+## and stores it in _current_attack_duration so callers can await the correct length.
 func _try_animation(anim_name: String) -> bool:
 	if not anim_name or anim_name.is_empty():
 		return false
-	
 	if not state_machine:
 		return false
-	
-	# Just call travel directly - don't check return value
-	state_machine.travel(anim_name)
-	
-	# Always return true - trust that travel worked
+
+	# Route attacks through the nested state machine using two-step travel.
+	# Parent playback cannot travel directly into child paths in Godot.
+	var attack_states = ["attack", "kick", "skill-strong-attack"]
+	var attack_leaf = anim_name
+	if anim_name in attack_states:
+		attack_leaf = anim_name
+	elif anim_name.begins_with("basic_attacks/"):
+		attack_leaf = anim_name.get_slice("/", 1)
+
+	if attack_leaf in attack_states:
+		state_machine.travel("basic_attacks")
+		var attacks_sm = anim_tree.get("parameters/basic_attacks/playback") as AnimationNodeStateMachinePlayback
+		if attacks_sm:
+			attacks_sm.travel(attack_leaf)
+		else:
+			push_warning("Missing nested playback for basic_attacks on %s" % character_name)
+			return false
+		# Read actual animation length from AnimationPlayer so waiters use the correct duration.
+		# AnimationTree blocks animation_finished from firing so we wait by timer instead.
+		_current_attack_duration = max(0.25, _get_animation_duration(attack_leaf))
+	else:
+		state_machine.travel(anim_name)
+
 	return true
+
+## Looks up the length of an animation from AnimationPlayer by state name.
+## Searches all animation libraries if a direct match is not found.
+## Returns 1.0 as a safe fallback if the animation cannot be found.
+func _get_animation_duration(anim_name: String) -> float:
+	var anim_player = get_node_or_null("AnimationPlayer")
+	if not anim_player:
+		return 1.0
+	
+	# Resolve state name -> actual animation clip name from AnimationTree state machine.
+	# Example: "attack" state may map to "Locomotion-Library/attack1".
+	var resolved_name = _resolve_state_animation_name(anim_name)
+	if not resolved_name.is_empty() and anim_player.has_animation(resolved_name):
+		return anim_player.get_animation(resolved_name).length
+	
+	# Try direct name match first
+	if anim_player.has_animation(anim_name):
+		return anim_player.get_animation(anim_name).length
+	# Search all libraries for an animation whose short name matches
+	for lib_name in anim_player.get_animation_library_list():
+		var lib = anim_player.get_animation_library(lib_name)
+		for anim in lib.get_animation_list():
+			if anim == anim_name:
+				var full_name = (lib_name + "/" + anim) if lib_name != "" else anim
+				return anim_player.get_animation(full_name).length
+	return 1.0  # Fallback if animation not found
+
+## Resolves a state machine state name to the animation clip assigned in that state.
+## Returns empty string if the state is not an AnimationNodeAnimation.
+func _resolve_state_animation_name(state_name: String) -> String:
+	if not anim_tree:
+		return ""
+	var root_sm = anim_tree.tree_root as AnimationNodeStateMachine
+	if not root_sm:
+		return ""
+	
+	# Attack states live inside the nested basic_attacks sub-machine.
+	var attack_states = ["attack", "kick", "skill-strong-attack"]
+	var leaf_state = state_name.get_slice("/", 1) if state_name.begins_with("basic_attacks/") else state_name
+	if leaf_state in attack_states:
+		if root_sm.has_node("basic_attacks"):
+			var attack_sm = root_sm.get_node("basic_attacks") as AnimationNodeStateMachine
+			if attack_sm and attack_sm.has_node(leaf_state):
+				var attack_node = attack_sm.get_node(leaf_state) as AnimationNodeAnimation
+				if attack_node and str(attack_node.animation) != "":
+					return str(attack_node.animation)
+	
+	# Top-level states
+	if root_sm.has_node(state_name):
+		var node = root_sm.get_node(state_name) as AnimationNodeAnimation
+		if node and str(node.animation) != "":
+			return str(node.animation)
+	
+	return ""
 
 func _on_advance_complete():
 	set_advancing(false)
-	# Force transition out of walk state - don't wait for condition
-	if state_machine:
-		state_machine.travel("idle1")
+	# NOTE: Do NOT travel to idle1 here - it fights whatever the caller triggers next
 	print("Movement completed, is_advancing set to false")
 
 ## Start movement timeout to prevent stuck advancing state
@@ -882,16 +960,30 @@ func process_states() -> void:
 
 func set_advancing(value: bool):
 	is_advancing = value
-	var tree_name = str(anim_tree.name) if anim_tree else "NO TREE"
-	print("[SET ADVANCING] %s: is_advancing=%s, setting is_walking=%s on anim_tree (%s)" % [character_name, value, value, tree_name])
 	anim_tree.set("parameters/conditions/is_walking", value)
-	if anim_tree and anim_tree.get("parameters/conditions/is_walking") != null:
-		print("[SET ADVANCING] Confirmed: is_walking is now %s" % anim_tree.get("parameters/conditions/is_walking"))
-	else:
-		print("[SET ADVANCING] WARNING: is_walking parameter does not exist on animation tree!")
 
 func set_defending(value: bool):
 	is_defending = value
+
+func _fade_and_remove() -> void:
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Optional: Try to fade if the specific Alpha_Surface exists
+	var surface = get_node_or_null("%Alpha_Surface")
+	if surface and surface is GeometryInstance3D:
+		var geo = surface as GeometryInstance3D
+		geo.transparency = 0.0
+		tween.tween_property(geo, "transparency", 1.0, 0.35)
+	
+	# Universal fallback: Scale the entire battler to 0
+	tween.tween_property(self, "scale", Vector3.ZERO, 0.35)
+	
+	await tween.finished
+	
+	# Safety check: ensure the node hasn't already been destroyed by a scene change
+	if is_instance_valid(self):
+		queue_free()
 
 ## LEVEL-FOCUSED PROGRESSION
 ## Add experience and check for level up

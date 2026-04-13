@@ -2,16 +2,41 @@
 
 [ext_resource type="PackedScene" uid="uid://b8ggpluijlogu" path="res://battle-manager/allies/y_bot-ally.scn" id="1_yb6qq"]
 [ext_resource type="Script" uid="uid://d2mintfjxyqei" path="res://battle-manager/scripts/BattlerStats.gd" id="2_abxtc"]
+[ext_resource type="Script" uid="uid://xut8pvgqpe8u" path="res://database/items/enemy_drop.gd" id="2_gsxiq"]
+[ext_resource type="Resource" uid="uid://orange" path="res://database/items/orange.tres" id="3_11jry"]
+[ext_resource type="Texture2D" uid="uid://i6v7uo8qdg1d" path="res://Placeholder.svg" id="3_pggsg"]
+[ext_resource type="Resource" uid="uid://pple" path="res://database/items/apple.tres" id="4_pdram"]
+[ext_resource type="Resource" path="res://database/items/mystery_fruit.tres" id="5_owwy5"]
+
+[sub_resource type="Resource" id="Resource_yokai"]
+script = ExtResource("2_gsxiq")
+item = ExtResource("3_11jry")
+drop_chance = 100.0
+metadata/_custom_type_script = "uid://xut8pvgqpe8u"
+
+[sub_resource type="Resource" id="Resource_yi2kr"]
+script = ExtResource("2_gsxiq")
+item = ExtResource("4_pdram")
+drop_chance = 100.0
+metadata/_custom_type_script = "uid://xut8pvgqpe8u"
+
+[sub_resource type="Resource" id="Resource_ceskq"]
+script = ExtResource("2_gsxiq")
+item = ExtResource("5_owwy5")
+drop_chance = 100.0
+metadata/_custom_type_script = "uid://xut8pvgqpe8u"
 
 [sub_resource type="Resource" id="Resource_pggsg"]
 script = ExtResource("2_abxtc")
 character_name = "Enemy"
+cash_reward = 41
+item_drops = Array[ExtResource("2_gsxiq")]([SubResource("Resource_yokai"), SubResource("Resource_yi2kr"), SubResource("Resource_ceskq")])
 metadata/_custom_type_script = "uid://d2mintfjxyqei"
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_abxtc"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_pggsg"]
 viewport_path = NodePath("DamageIndicator/DamageIndicator")
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_pggsg"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_gsxiq"]
 viewport_path = NodePath("HealthBar/SubViewport")
 
 [node name="Enemy" unique_id=1177617681 instance=ExtResource("1_yb6qq")]
@@ -19,57 +44,30 @@ stats = SubResource("Resource_pggsg")
 team = 1
 
 [node name="GeneralSkeleton" parent="Armature" index="0"]
-bones/0/position = Vector3(0.0062823724, 0.96057516, -0.06618631)
-bones/0/rotation = Quaternion(-2.9804365e-08, 4.423794e-09, 0.021021271, 0.9997791)
-bones/1/rotation = Quaternion(2.3081173e-05, 0.0010814781, -0.021279417, 0.999773)
-bones/2/rotation = Quaternion(3.333224e-07, -0.0010817286, -0.0003698637, 0.9999994)
-bones/3/rotation = Quaternion(-1.3318052e-07, 3.6833286e-11, -0.00031406715, 1)
-bones/4/rotation = Quaternion(1.7881578e-07, 2.18122e-11, 0.00094220304, 0.99999964)
-bones/5/rotation = Quaternion(0.058953356, -1.8094639e-24, -1.6650998e-17, 0.9982608)
-bones/8/rotation = Quaternion(0.24943657, 0.76762736, -0.5709389, -0.15019509)
-bones/9/rotation = Quaternion(0.09490117, -0.702823, 0.10694807, 0.696847)
-bones/10/rotation = Quaternion(-0.03929734, 0.48666498, 0.12205739, 0.86412674)
-bones/13/rotation = Quaternion(0.51138777, -0.24304067, 0.19258939, 0.8014507)
-bones/14/rotation = Quaternion(0.27501455, -0.020203842, -0.12780726, 0.95269316)
-bones/16/rotation = Quaternion(0.5617862, 0.0048624435, 0.0021467092, 0.82726544)
-bones/17/rotation = Quaternion(0.8793989, -0.033388607, -0.082343824, 0.46772048)
-bones/18/rotation = Quaternion(0.52242523, 0.0076181036, -0.09085564, 0.8477966)
-bones/20/rotation = Quaternion(0.5617862, 0.004862474, 0.0021463193, 0.82726544)
-bones/21/rotation = Quaternion(0.9000132, -0.014593809, -0.012297507, 0.43544462)
-bones/22/rotation = Quaternion(0.5562606, -0.0006816838, -0.033074137, 0.8303492)
-bones/24/rotation = Quaternion(0.5617862, 0.0048624435, 0.0021467092, 0.82726544)
-bones/25/rotation = Quaternion(0.9024556, 0.00989964, -0.0076476, 0.43060136)
-bones/26/rotation = Quaternion(0.56063646, -0.031900726, 0.008670848, 0.82740194)
-bones/28/rotation = Quaternion(0.5617862, 0.004862344, 0.0021466792, 0.82726544)
-bones/29/rotation = Quaternion(0.51353955, -0.04738505, 0.12648714, 0.8473682)
-bones/30/rotation = Quaternion(0.8665556, 0.0063375863, 0.15383516, 0.47473788)
-bones/32/rotation = Quaternion(0.031279318, 0.7864447, -0.6004815, 0.14123842)
-bones/33/rotation = Quaternion(0.15657605, 0.6920619, -0.17645119, 0.68220186)
-bones/34/rotation = Quaternion(-0.057520166, -0.6623391, 0.09124538, 0.74139905)
-bones/37/rotation = Quaternion(0.5160661, 0.15972522, -0.017672013, 0.84133905)
-bones/38/rotation = Quaternion(0.39375177, 0.028926583, 0.18298888, 0.9003543)
-bones/40/rotation = Quaternion(0.66970456, -0.019614454, -0.008654719, 0.74231815)
-bones/41/rotation = Quaternion(0.6242476, -0.015243089, 0.104992926, 0.7739891)
-bones/42/rotation = Quaternion(0.6380207, -0.0070820367, 0.108630955, 0.76228523)
-bones/44/rotation = Quaternion(0.66970456, -0.019614454, -0.008654339, 0.74231815)
-bones/45/rotation = Quaternion(0.66390085, 0.0076113893, 0.021439599, 0.7474745)
-bones/46/rotation = Quaternion(0.6768699, 0.0015438797, 0.039405897, 0.73504555)
-bones/48/rotation = Quaternion(0.66970456, -0.019614454, -0.008654719, 0.74231815)
-bones/49/rotation = Quaternion(0.6694725, -0.014794389, 0.0019101488, 0.7426871)
-bones/50/rotation = Quaternion(0.68213886, 0.037838798, -0.011042499, 0.73015946)
-bones/52/rotation = Quaternion(0.66970456, -0.019614454, -0.008654689, 0.74231815)
-bones/53/rotation = Quaternion(0.6193378, 0.05714709, -0.15254596, 0.76803946)
-bones/54/rotation = Quaternion(0.6128919, 0.087094, -0.163992, 0.76803964)
-bones/55/rotation = Quaternion(-0.015890473, 0.0845826, 0.9956557, 0.035538148)
-bones/56/rotation = Quaternion(0.0009228456, 0.8911388, -0.45355833, -0.012482181)
-bones/57/rotation = Quaternion(0.013339197, 0.80384123, -0.59380084, 0.03259021)
-bones/58/rotation = Quaternion(2.4033886e-07, 0.9703875, 0.24155393, -1.6518072e-07)
-bones/60/rotation = Quaternion(0.0065631107, 0.16117515, 0.98666966, 0.021506913)
-bones/61/rotation = Quaternion(-0.0005871323, 0.957427, -0.2885655, 0.007941665)
-bones/62/rotation = Quaternion(-0.0050269966, 0.6821425, -0.73113656, -0.009787492)
+bones/0/position = Vector3(-0.0022509845, 0.9513964, -0.091156244)
+bones/1/rotation = Quaternion(1.382178e-05, -0.0147168515, 0.0011406388, 0.9998911)
+bones/2/rotation = Quaternion(0.021121927, -0.0145247895, 0.00692619, 0.99964744)
+bones/3/rotation = Quaternion(-0.041706175, -0.015083812, -0.008417955, 0.9989807)
+bones/4/rotation = Quaternion(0.020206487, 0.044632953, 0.0015487185, 0.9987979)
+bones/5/rotation = Quaternion(0.010065907, -0.054391883, 0.0033252167, 0.9984634)
+bones/8/rotation = Quaternion(-0.054453537, 0.80445784, -0.5573074, -0.19821937)
+bones/9/rotation = Quaternion(0.3075209, -0.6362368, 0.34655747, 0.61687243)
+bones/10/rotation = Quaternion(-0.114280745, 0.5653121, 0.050565112, 0.81535596)
+bones/32/rotation = Quaternion(-0.054599613, 0.8041555, -0.56573206, 0.17406932)
+bones/33/rotation = Quaternion(0.2404013, 0.6666201, -0.2709175, 0.6514819)
+bones/34/rotation = Quaternion(-0.06317296, -0.5829913, -0.05266467, 0.8083048)
+bones/55/rotation = Quaternion(3.7595903e-05, 0.33041245, 0.942809, -0.044030692)
+bones/56/rotation = Quaternion(0.00047491473, 0.9723565, -0.2334127, -0.006423901)
+bones/57/rotation = Quaternion(-0.0277313, 0.70651704, -0.7067452, 0.023998702)
+bones/60/rotation = Quaternion(0.0009694488, 0.15935324, 0.9863918, 0.040459454)
+bones/61/rotation = Quaternion(-0.0004969576, 0.9696902, -0.2442449, 0.0067220014)
+bones/62/rotation = Quaternion(-0.13635653, 0.5459026, -0.77765673, -0.2804412)
+
+[node name="DamageIndicator" parent="DamageIndicator" parent_id_path=PackedInt32Array(137122840) index="0" unique_id=1865304107]
+size = Vector2i(128, 128)
 
 [node name="DamageIndicatorSprite" parent="DamageIndicator" parent_id_path=PackedInt32Array(137122840) index="1" unique_id=626474922]
-texture = SubResource("ViewportTexture_abxtc")
+texture = SubResource("ViewportTexture_pggsg")
 
 [node name="BattlerHealthBar" parent="HealthBar" parent_id_path=PackedInt32Array(193525210) index="0" unique_id=1904676435]
-texture = SubResource("ViewportTexture_pggsg")
+texture = SubResource("ViewportTexture_gsxiq")

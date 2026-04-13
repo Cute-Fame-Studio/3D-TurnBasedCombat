@@ -40,6 +40,7 @@ func _ready():
 	if player_health_bar and enemy_health_bar:
 		player_health_bar.value = 0
 		enemy_health_bar.value = 0
+		
 
 func on_start_combat(enemy_node: Node):
 	enemy = enemy_node
@@ -70,10 +71,20 @@ func set_activebattler(character: Node):
 
 func show_action_buttons(_character: Node):
 	action_buttons.show()
+	_focus_attack_button()
 	# You can customize this part to show different actions based on the character
 
 func hide_action_buttons():
 	action_buttons.hide()
+
+func _focus_attack_button() -> void:
+	var attack_button = action_buttons.get_node_or_null("Attack") as Button
+	if not attack_button:
+		return
+	if attack_button.disabled or not attack_button.visible:
+		return
+	# Defer focus until after visibility/layout updates are applied.
+	attack_button.call_deferred("grab_focus")
 
 func update_character_info():
 	if enemy and enemy_stats:

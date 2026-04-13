@@ -9,4 +9,5 @@ corner_radius_bottom_left = 5
 
 [resource]
 Base/base_type = &"Button"
+Button/font_sizes/font_size = 23
 Button/styles/normal = SubResource("StyleBoxFlat_h0lgr")
